@@ -5,13 +5,7 @@ export default function BankTransfer() {
     <section id="info" className="page-section bank-section">
       <SectionTitle
         eyebrow="BANK TRANSFER"
-        title={
-          <>
-            모자라면 알뜰살뜰
-            <br />
-            남는다면 흥청망청
-          </>
-        }
+        title="알뜰살뜰 아껴쓰자"
       />
 
       <div className="bank-layout">
