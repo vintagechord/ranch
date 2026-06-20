@@ -91,7 +91,18 @@ export default function Hero() {
 
       <div className="hero-content">
         <div className="hero-poster" aria-hidden="true">
-          <img src="/ranch-seal.svg" alt="" />
+          <div className="hero-poster-seal">
+            <img src="/ranch-seal.svg" alt="" />
+            <video
+              className="hero-poster-video"
+              src="https://i.namu.wiki/i/SQ37DTzVcrHHon2WShuYbkWV-Lxw8Zlw3BwX5pqa_nJO-gdPYqG-FsSBtMLpc40iCZU4alwMkPv1oBFGCyKtRNwYvVzyTshJ3xAXnlgRmaA.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+          </div>
           <span>NO. 0001</span>
         </div>
 
