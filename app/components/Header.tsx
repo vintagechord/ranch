@@ -10,8 +10,9 @@ const homeNavItems = [
   { label: "INFO", hash: "#venue" }
 ];
 
-const MAX_HEADER_COWS = 6;
+const MAX_HEADER_COWS = 5;
 const HEADER_HERD_HALF_CYCLE_MS = 7500;
+type HeaderHerdMode = "filling" | "emptying";
 
 function scrollToHash(event: MouseEvent<HTMLAnchorElement>, href: string) {
   const url = new URL(href, window.location.href);
@@ -59,7 +60,10 @@ function HeaderCow({ index }: { index: number }) {
 export default function Header({ showApplyCta = true }: HeaderProps) {
   const pathname = usePathname();
   const [hideMobileCta, setHideMobileCta] = useState(false);
-  const [cowCount, setCowCount] = useState(0);
+  const [herdState, setHerdState] = useState<{ cowCount: number; mode: HeaderHerdMode }>({
+    cowCount: 0,
+    mode: "filling"
+  });
   const [isHerdJumping, setIsHerdJumping] = useState(false);
   const [herdJumpVariant, setHerdJumpVariant] = useState<"a" | "b">("a");
 
@@ -95,7 +99,23 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
     }
 
     const interval = window.setInterval(() => {
-      setCowCount((count) => (count >= MAX_HEADER_COWS ? count : count + 1));
+      setHerdState(({ cowCount, mode }) => {
+        if (mode === "filling") {
+          const nextCowCount = Math.min(cowCount + 1, MAX_HEADER_COWS);
+
+          return {
+            cowCount: nextCowCount,
+            mode: nextCowCount === MAX_HEADER_COWS ? "emptying" : "filling"
+          };
+        }
+
+        const nextCowCount = Math.max(cowCount - 1, 0);
+
+        return {
+          cowCount: nextCowCount,
+          mode: nextCowCount === 0 ? "filling" : "emptying"
+        };
+      });
     }, HEADER_HERD_HALF_CYCLE_MS);
 
     return () => window.clearInterval(interval);
@@ -174,7 +194,7 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
                 <circle className="header-dog-eye" cx="10.6" cy="15" r="1.25" />
                 <ellipse className="header-dog-nose" cx="3.9" cy="20.5" rx="1.8" ry="1.3" />
               </svg>
-              {Array.from({ length: cowCount }, (_, index) => (
+              {Array.from({ length: herdState.cowCount }, (_, index) => (
                 <HeaderCow index={index} key={index} />
               ))}
             </button>
