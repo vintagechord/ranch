@@ -70,7 +70,6 @@ export default function Hero() {
             scale: compactMotion ? 1.24 : 1.58,
             y: compactMotion ? -74 : -174,
             x: compactMotion ? -10 : -42,
-            autoAlpha: 0.94,
             textShadow: compactMotion
               ? "4px 4px 0 rgba(136, 189, 242, 0.55)"
               : "10px 10px 0 rgba(136, 189, 242, 0.52)",
