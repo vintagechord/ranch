@@ -1242,7 +1242,7 @@ img {
   border: 1px solid var(--ink);
   border-radius: 8px;
   background: #111820;
-  color: var(--cream);
+  color: #fdfefe;
   box-shadow: 8px 8px 0 var(--orange);
   transform: rotate(2deg);
 }
@@ -1261,8 +1261,9 @@ img {
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(10, 14, 18, 0.72), rgba(10, 14, 18, 0.28) 46%, rgba(10, 14, 18, 0.76)),
-    linear-gradient(90deg, rgba(10, 14, 18, 0.68), rgba(10, 14, 18, 0.1));
+    radial-gradient(circle at 28% 52%, rgba(0, 0, 0, 0.84), rgba(0, 0, 0, 0.42) 34%, rgba(0, 0, 0, 0.18) 58%),
+    linear-gradient(180deg, rgba(10, 14, 18, 0.82), rgba(10, 14, 18, 0.42) 46%, rgba(10, 14, 18, 0.82)),
+    linear-gradient(90deg, rgba(10, 14, 18, 0.78), rgba(10, 14, 18, 0.18));
   content: "";
 }
 
@@ -1286,15 +1287,19 @@ img {
 }
 
 .sf-hero-panel strong {
+  color: #fdfefe;
   font-size: clamp(5rem, 10vw, 8rem);
   font-weight: 950;
   line-height: 0.82;
+  text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.72);
 }
 
 .sf-hero-panel p {
   margin: 0;
+  color: #fdfefe;
   font-size: 1.16rem;
   font-weight: 900;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.72);
 }
 
 .sf-hero-panel small {
