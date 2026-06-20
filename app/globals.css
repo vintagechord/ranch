@@ -2509,8 +2509,9 @@ img {
 }
 
 .site-footer div {
-  display: grid;
+  display: inline-grid;
   gap: 6px;
+  width: fit-content;
 }
 
 .site-footer strong {
@@ -2537,6 +2538,11 @@ img {
 .site-footer p {
   margin: 0;
   font-weight: 850;
+}
+
+.site-footer span {
+  justify-self: end;
+  text-align: right;
 }
 
 .admin-shell {
