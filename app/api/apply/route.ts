@@ -10,7 +10,6 @@ type ApplyPayload = {
   attendees?: unknown;
   message?: unknown;
   auction_item?: unknown;
-  advance_team?: unknown;
   creative_project?: unknown;
   food_note?: unknown;
   memo?: unknown;
@@ -44,10 +43,6 @@ function nullablePositiveInteger(value: unknown) {
   return numberValue;
 }
 
-function booleanValue(value: unknown) {
-  return value === true || value === "true" || value === "on";
-}
-
 function buildApplicationMessage(body: ApplyPayload) {
   const lines: string[] = [];
   const message = nullableString(body.message);
@@ -62,10 +57,6 @@ function buildApplicationMessage(body: ApplyPayload) {
 
   if (auctionItem) {
     lines.push(`경매 물품: ${auctionItem}`);
-  }
-
-  if (body.advance_team !== undefined) {
-    lines.push(`선발대: ${booleanValue(body.advance_team) ? "네" : "아니오"}`);
   }
 
   if (creativeProject) {

@@ -38,7 +38,6 @@ export default function ApplyForm() {
         name: textValue(formData, "name"),
         phone: textValue(formData, "phone"),
         auction_item: textValue(formData, "auction_item"),
-        advance_team: formData.get("advance_team") === "on",
         creative_project: textValue(formData, "creative_project"),
         food_note: textValue(formData, "food_note"),
         memo: textValue(formData, "memo"),
@@ -106,7 +105,7 @@ export default function ApplyForm() {
             </label>
           </div>
 
-          <fieldset className="choice-field">
+          <fieldset className="choice-field choice-field-inline">
             <legend>경매 물품 가져올 예정인가요? *</legend>
             <div className="choice-options">
               <label className="choice-option">
@@ -124,32 +123,26 @@ export default function ApplyForm() {
             </div>
           </fieldset>
 
-          <label className="advance-check">
-            <input name="advance_team" type="checkbox" />
-            <span>
-              <strong>선발대로 오실래요?</strong>
-              <small>선발대는 12시까지 김포 작업실로 와서 같이 이동합니다.</small>
-            </span>
-          </label>
+          <div className="form-note-grid">
+            <label>
+              <span>창작 캠프에서 소개할 프로젝트</span>
+              <textarea
+                name="creative_project"
+                rows={2}
+                placeholder="같이 만들 사람을 찾고 싶은 아이디어나 프로젝트"
+              />
+            </label>
 
-          <label>
-            <span>창작 캠프에서 소개할 프로젝트</span>
-            <textarea
-              name="creative_project"
-              rows={3}
-              placeholder="같이 만들 사람을 찾고 싶은 아이디어나 프로젝트"
-            />
-          </label>
+            <label>
+              <span>알레르기 / 못 먹는 음식</span>
+              <textarea className="compact-textarea" name="food_note" rows={2} />
+            </label>
 
-          <label>
-            <span>알레르기 / 못 먹는 음식</span>
-            <textarea name="food_note" rows={3} />
-          </label>
-
-          <label>
-            <span>기타 메모 / 프로그램 제안하기</span>
-            <textarea name="memo" rows={3} placeholder="하고 싶은 말이나 프로그램 제안" />
-          </label>
+            <label>
+              <span>기타 메모 / 프로그램 제안하기</span>
+              <textarea name="memo" rows={2} placeholder="하고 싶은 말이나 프로그램 제안" />
+            </label>
+          </div>
 
           <label className="privacy-check">
             <input name="privacy_agreed" type="checkbox" required />
