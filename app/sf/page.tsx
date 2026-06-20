@@ -131,7 +131,6 @@ export default function StrangeFactoryPage() {
             <span>CATALOG</span>
             <strong>{releases.length}</strong>
             <p>released tracks</p>
-            <small>Melon / Spotify / Apple Music / YouTube</small>
           </div>
         </section>
 
