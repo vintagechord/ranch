@@ -623,11 +623,12 @@ img {
   right: 0;
   z-index: 60;
   width: min(280px, calc(100vw - 32px));
-  border: 1px solid var(--ink);
+  border: 1px solid rgba(253, 254, 254, 0.22);
   border-radius: 8px;
-  background: var(--ivory);
+  background: #000;
   padding: 14px;
   box-shadow: 5px 5px 0 rgba(28, 105, 212, 0.82);
+  color: #fdfefe;
 }
 
 .piggy-bank-popover dl {
@@ -642,7 +643,7 @@ img {
 }
 
 .piggy-bank-popover dt {
-  color: var(--red);
+  color: #ffd95a;
   font-size: 0.72rem;
   font-weight: 950;
   letter-spacing: 0.1em;
@@ -650,7 +651,7 @@ img {
 
 .piggy-bank-popover dd {
   margin: 0;
-  color: var(--green);
+  color: #fdfefe;
   font-size: 1.2rem;
   font-weight: 950;
   line-height: 1.1;

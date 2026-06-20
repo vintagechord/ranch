@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type PiggyBankData = {
   balanceAmount: number;
   updatedAt: string | null;
 };
+
+const PIGGY_BANK_CACHE_MS = 60_000;
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("ko-KR", {
@@ -31,18 +33,14 @@ export default function PiggyBankButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [piggyBank, setPiggyBank] = useState<PiggyBankData | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const lastLoadedAtRef = useRef(0);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const abortController = new AbortController();
+  const loadPiggyBank = useCallback((signal: AbortSignal) => {
     setIsLoading(true);
 
     fetch("/api/piggy-bank", {
       cache: "no-store",
-      signal: abortController.signal
+      signal
     })
       .then((response) => {
         if (!response.ok) {
@@ -56,20 +54,43 @@ export default function PiggyBankButton() {
           balanceAmount: Number(data.balanceAmount ?? 0),
           updatedAt: typeof data.updatedAt === "string" ? data.updatedAt : null
         });
+        lastLoadedAtRef.current = Date.now();
       })
       .catch(() => {
-        if (!abortController.signal.aborted) {
+        if (!signal.aborted) {
           setPiggyBank(null);
         }
       })
       .finally(() => {
-        if (!abortController.signal.aborted) {
+        if (!signal.aborted) {
           setIsLoading(false);
         }
       });
+  }, []);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    loadPiggyBank(abortController.signal);
 
     return () => abortController.abort();
-  }, [isOpen]);
+  }, [loadPiggyBank]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const hasFreshData = piggyBank && Date.now() - lastLoadedAtRef.current < PIGGY_BANK_CACHE_MS;
+
+    if (hasFreshData) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    loadPiggyBank(abortController.signal);
+
+    return () => abortController.abort();
+  }, [isOpen, loadPiggyBank, piggyBank]);
 
   useEffect(() => {
     if (!isOpen) {
