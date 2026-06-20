@@ -623,11 +623,13 @@ img {
   right: 0;
   z-index: 60;
   width: min(280px, calc(100vw - 32px));
-  border: 1px solid rgba(253, 254, 254, 0.22);
+  border: 1px solid rgba(253, 254, 254, 0.14);
   border-radius: 8px;
-  background: #000;
+  background: #000000;
   padding: 14px;
-  box-shadow: 5px 5px 0 rgba(28, 105, 212, 0.82);
+  box-shadow:
+    0 22px 54px rgba(0, 0, 0, 0.96),
+    inset 0 0 0 1px rgba(253, 254, 254, 0.05);
   color: #fdfefe;
 }
 
