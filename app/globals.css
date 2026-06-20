@@ -522,11 +522,11 @@ img {
   justify-content: center;
   width: 42px;
   height: 42px;
-  border: 1px solid var(--ink);
+  border: 1px solid #15191d;
   border-radius: 6px;
-  background: var(--ivory);
-  color: var(--green);
-  box-shadow: 3px 3px 0 var(--orange);
+  background: #ff9a3d;
+  color: #15191d;
+  box-shadow: 4px 4px 0 #e22718;
   transition:
     background 160ms ease,
     box-shadow 160ms ease,
@@ -536,28 +536,28 @@ img {
 .sf-factory-link:hover,
 .sf-factory-link:focus-visible,
 .sf-factory-link.is-active {
-  background: var(--green-soft);
+  background: #ffbf68;
   outline: none;
   transform: translate(1px, 1px);
-  box-shadow: 2px 2px 0 var(--ink);
+  box-shadow: 3px 3px 0 #15191d;
 }
 
 .sf-factory-link svg {
   width: 30px;
   height: 30px;
   fill: none;
-  stroke: var(--ink);
+  stroke: #15191d;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.55;
 }
 
 .sf-factory-body {
-  fill: #e85d2a;
+  fill: #fff1cf;
 }
 
 .sf-factory-stack {
-  fill: #ff9a3d;
+  fill: #b32818;
 }
 
 .sf-factory-smoke,
@@ -567,11 +567,11 @@ img {
 }
 
 .sf-factory-sun {
-  fill: #ffd05a;
+  fill: #ffd95a;
 }
 
 .sf-factory-text {
-  fill: var(--ink);
+  fill: #15191d;
   stroke: none;
   font-size: 7.4px;
   font-weight: 950;
