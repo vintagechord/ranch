@@ -2390,7 +2390,7 @@ img {
   position: absolute;
   top: calc(100% + 9px);
   right: 0;
-  width: min(310px, calc(100vw - 48px));
+  width: min(360px, calc(100vw - 48px));
   padding: 13px 14px;
   border: 1px solid #15191d;
   border-radius: 6px;
@@ -2432,6 +2432,11 @@ img {
 
 .bank-fee-tooltip p {
   margin: 0 0 8px;
+}
+
+.bank-fee-tooltip p:last-child {
+  margin-top: 10px;
+  margin-bottom: 0;
 }
 
 .bank-fee-tooltip ul {
