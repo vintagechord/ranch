@@ -1866,6 +1866,7 @@ img {
   line-height: 1.35;
   opacity: 0;
   pointer-events: none;
+  white-space: pre-line;
   transform: translateY(-4px);
   transition:
     opacity 160ms ease,
