@@ -480,13 +480,36 @@ img {
 }
 
 .piggy-bank-button svg {
-  width: 25px;
-  height: 25px;
-  fill: currentColor;
+  width: 29px;
+  height: 29px;
+  fill: none;
   stroke: var(--ink);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6;
+}
+
+.piggy-body {
+  fill: #f4b8ca;
+}
+
+.piggy-ear,
+.piggy-snout,
+.piggy-leg {
+  fill: #ffd0dc;
+}
+
+.piggy-eye,
+.piggy-nostril {
+  fill: var(--ink);
+}
+
+.piggy-slot {
+  stroke-width: 2;
+}
+
+.piggy-coin {
+  fill: #ffd95a;
 }
 
 .piggy-bank-popover {
