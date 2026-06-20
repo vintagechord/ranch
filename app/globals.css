@@ -2289,15 +2289,15 @@ img {
   gap: 18px;
   min-height: 160px;
   padding: 18px;
-  border: 1px solid var(--ink);
+  border: 1px solid #15191d;
   border-radius: 8px;
-  background: var(--surface-card);
-  color: var(--ink);
-  box-shadow: 5px 5px 0 var(--orange);
+  background: #fdfefe;
+  color: #15191d;
+  box-shadow: 5px 5px 0 #88bdf2;
 }
 
 .bank-ticket span {
-  color: var(--red);
+  color: #e22718;
   font-size: 0.82rem;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -2305,6 +2305,7 @@ img {
 
 .bank-ticket strong {
   align-self: end;
+  color: #15191d;
   font-size: clamp(1.4rem, 3vw, 2.45rem);
   line-height: 1.05;
   overflow-wrap: anywhere;
@@ -2324,13 +2325,13 @@ img {
 }
 
 .bank-ticket.is-fee {
-  background: var(--surface-elevated);
-  color: var(--ink);
-  box-shadow: 5px 5px 0 var(--orange);
+  background: #ffd95a;
+  color: #15191d;
+  box-shadow: 5px 5px 0 #e22718;
 }
 
 .bank-ticket.is-fee span {
-  color: var(--red);
+  color: #e22718;
 }
 
 .bank-fee-info {
@@ -2344,20 +2345,20 @@ img {
   width: 24px;
   height: 24px;
   place-items: center;
-  border: 1px solid var(--ink);
+  border: 1px solid #15191d;
   border-radius: 999px;
-  background: var(--ivory);
-  color: var(--green);
+  background: #fdfefe;
+  color: #15191d;
   font-size: 0.74rem;
   font-weight: 950;
   line-height: 1;
-  box-shadow: 2px 2px 0 var(--orange);
+  box-shadow: 2px 2px 0 #88bdf2;
 }
 
 .bank-fee-info-button:hover,
 .bank-fee-info-button:focus-visible {
-  background: var(--orange);
-  color: var(--ink);
+  background: #15191d;
+  color: #fdfefe;
   outline: none;
 }
 
@@ -2367,11 +2368,11 @@ img {
   right: 0;
   width: min(310px, calc(100vw - 48px));
   padding: 13px 14px;
-  border: 1px solid var(--ink);
+  border: 1px solid #15191d;
   border-radius: 6px;
-  background: var(--ivory);
-  color: var(--ink);
-  box-shadow: 4px 4px 0 rgba(21, 25, 29, 0.88);
+  background: #fdfefe;
+  color: #15191d;
+  box-shadow: 4px 4px 0 #88bdf2;
   font-size: 0.84rem;
   font-weight: 760;
   line-height: 1.42;
@@ -2390,9 +2391,9 @@ img {
   right: 8px;
   width: 10px;
   height: 10px;
-  border-top: 1px solid var(--ink);
-  border-left: 1px solid var(--ink);
-  background: var(--ivory);
+  border-top: 1px solid #15191d;
+  border-left: 1px solid #15191d;
+  background: #fdfefe;
   content: "";
   transform: rotate(45deg);
 }
@@ -2400,7 +2401,7 @@ img {
 .bank-fee-tooltip b {
   display: block;
   margin-bottom: 6px;
-  color: var(--green);
+  color: #e22718;
   font-size: 0.9rem;
   font-weight: 950;
 }
