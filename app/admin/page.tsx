@@ -27,18 +27,11 @@ type PartyApplication = {
   id: string;
   created_at: string;
   name: string;
-  phone: string;
-  people_count: number;
-  depositor_name: string;
-  companions: string | null;
-  auction_item: string | null;
-  advance_team: boolean | null;
-  creative_project: string | null;
-  food_note: string | null;
-  memo: string | null;
-  privacy_agreed: boolean;
-  payment_status: string;
-  application_status: string;
+  phone: string | null;
+  email: string | null;
+  instagram: string | null;
+  attendees: number | null;
+  message: string | null;
 };
 
 function formatDate(value: string) {
@@ -141,10 +134,8 @@ function parsePositiveAmount(value: FormDataEntryValue | null) {
 async function getApplications() {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from("party_applications")
-    .select(
-      "id, created_at, name, phone, people_count, depositor_name, companions, auction_item, advance_team, creative_project, food_note, memo, privacy_agreed, payment_status, application_status"
-    )
+    .from("ranch_applications")
+    .select("id, created_at, name, phone, email, instagram, attendees, message")
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -253,10 +244,6 @@ function AdminLogin({ error }: { error?: string }) {
   );
 }
 
-function StatusBadge({ children }: { children: string }) {
-  return <span className="admin-status-badge">{children}</span>;
-}
-
 export default async function AdminPage({
   searchParams
 }: {
@@ -309,8 +296,11 @@ export default async function AdminPage({
         : "오픈채팅방 링크를 불러오지 못했습니다.";
   }
 
-  const pendingCount = applications.filter((item) => item.application_status === "대기").length;
-  const unpaidCount = applications.filter((item) => item.payment_status === "미확인").length;
+  const totalAttendees = applications.reduce(
+    (sum, item) => sum + Math.max(Number(item.attendees ?? 0), 0),
+    0
+  );
+  const emailCount = applications.filter((item) => item.email?.trim()).length;
   const latestCreatedAt = applications[0]?.created_at;
   const piggyMessage = getPiggyMessage(piggy);
   const openChatMessage = getOpenChatMessage(chat);
@@ -336,12 +326,12 @@ export default async function AdminPage({
           <strong>{applications.length}</strong>
         </article>
         <article>
-          <span>대기</span>
-          <strong>{pendingCount}</strong>
+          <span>참석 인원</span>
+          <strong>{totalAttendees || "-"}</strong>
         </article>
         <article>
-          <span>입금 미확인</span>
-          <strong>{unpaidCount}</strong>
+          <span>이메일 등록</span>
+          <strong>{emailCount}</strong>
         </article>
         <article>
           <span>최근 신청</span>
@@ -446,13 +436,10 @@ export default async function AdminPage({
                   <th>접수</th>
                   <th>이름</th>
                   <th>연락처</th>
-                  <th>선발대</th>
-                  <th>경매</th>
-                  <th>창작 캠프</th>
-                  <th>음식 메모</th>
-                  <th>기타 / 제안</th>
-                  <th>입금</th>
-                  <th>상태</th>
+                  <th>이메일</th>
+                  <th>인스타그램</th>
+                  <th>인원</th>
+                  <th>메시지</th>
                 </tr>
               </thead>
               <tbody>
@@ -462,18 +449,11 @@ export default async function AdminPage({
                     <td>
                       <strong>{item.name}</strong>
                     </td>
-                    <td>{item.phone}</td>
-                    <td>{item.advance_team ? "예" : "-"}</td>
-                    <td>{formatNullable(item.auction_item)}</td>
-                    <td>{formatNullable(item.creative_project)}</td>
-                    <td>{formatNullable(item.food_note)}</td>
-                    <td>{formatNullable(item.memo)}</td>
-                    <td>
-                      <StatusBadge>{item.payment_status}</StatusBadge>
-                    </td>
-                    <td>
-                      <StatusBadge>{item.application_status}</StatusBadge>
-                    </td>
+                    <td>{formatNullable(item.phone)}</td>
+                    <td>{formatNullable(item.email)}</td>
+                    <td>{formatNullable(item.instagram)}</td>
+                    <td>{item.attendees ?? "-"}</td>
+                    <td>{formatNullable(item.message)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -27,7 +27,7 @@ ADMIN_PASSWORD=
 ```
 
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase Project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon public key, 현재 클라이언트 직접 호출은 없지만 배포 환경에 같이 보관
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 신청 API에서 `ranch_applications` insert에 사용하는 Supabase anon public key
 - `SUPABASE_SERVICE_ROLE_KEY`: 서버 Route Handler 전용 키
 - `DATABASE_URL`: 직접 DB 연결 또는 마이그레이션용, 현재 런타임 필수는 아님
 - `ADMIN_PASSWORD`: `/admin` 관리자 페이지 로그인 비밀번호
@@ -52,11 +52,12 @@ supabase db push
 
 현재 스키마는 아래 테이블을 만듭니다.
 
-- `party_applications`: 참가 신청 폼 저장
+- `ranch_applications`: 참가 신청 폼 저장
+- `party_applications`: 기존 관리자 신청 데이터 호환용
 - `piggy_bank`: 관리자 저금통 잔액 저장
 - `open_chat_settings`: 신청 완료 후 보여줄 오픈채팅방 링크 저장
 
-RLS는 켜져 있고 public insert policy는 만들지 않습니다. 신청 저장과 저금통 수정은 service role key를 사용하는 서버 코드에서만 처리합니다.
+RLS는 켜져 있고 `ranch_applications`에는 이름과 연락처가 있는 anon insert만 허용합니다. 관리자 조회, 저금통 수정, 오픈채팅방 링크 관리는 service role key를 사용하는 서버 코드에서 처리합니다.
 
 ## Vercel 배포
 
@@ -72,6 +73,7 @@ Vercel에 최소로 필요한 값:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_PASSWORD=
 ```
@@ -79,7 +81,6 @@ ADMIN_PASSWORD=
 보관 권장 값:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
 DATABASE_URL=
 ```
 
@@ -107,12 +108,10 @@ curl -X POST http://localhost:3000/api/apply \
   -d '{
     "name": "테스트",
     "phone": "010-0000-0000",
-    "auction_item": "모르겠음",
-    "advance_team": false,
-    "creative_project": "",
-    "food_note": "",
-    "memo": "",
-    "privacy_agreed": true
+    "email": "test@example.com",
+    "instagram": "@test",
+    "attendees": 1,
+    "message": "테스트 신청입니다."
   }'
 ```
 
