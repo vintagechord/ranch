@@ -3220,35 +3220,30 @@ img {
   }
 
   .pinned-copy-section {
-    min-height: auto;
+    min-height: 100svh;
   }
 
   .pinned-stage {
-    min-height: auto;
-    padding: 68px 16px 64px;
-    place-items: start;
+    min-height: 100svh;
+    padding: 96px 16px 76px;
+    place-items: center start;
   }
 
   .pin-words {
-    display: grid;
-    gap: 8px;
     width: min(100%, 420px);
-    min-height: auto;
+    min-height: clamp(180px, 54vw, 260px);
   }
 
   .pin-word {
-    position: static;
-    display: block;
-    color: var(--ink);
-    font-size: clamp(3.2rem, 17vw, 5.2rem);
-    line-height: 0.9;
-    opacity: 1;
+    box-sizing: border-box;
+    font-size: clamp(4.2rem, 21vw, 6.6rem);
+    place-items: center start;
     text-align: left;
-    visibility: visible;
+    white-space: nowrap;
   }
 
   .pin-word:nth-child(even) {
-    padding-left: clamp(24px, 12vw, 48px);
+    padding-left: clamp(22px, 10vw, 44px);
   }
 
   .program-grid,

@@ -20,29 +20,31 @@ export default function PinnedCopy() {
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const compactLayout = window.matchMedia("(max-width: 720px)").matches;
-
-    if (reduceMotion || compactLayout) {
+    if (reduceMotion) {
       return;
     }
+
+    const mobileLayout = window.matchMedia("(max-width: 720px)").matches;
 
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
       const words = gsap.utils.toArray<HTMLElement>(".pin-word");
       const step = 0.74;
+      const scrollLength = mobileLayout ? words.length * 360 : 1900;
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=1900",
+          end: `+=${scrollLength}`,
           scrub: 0.45,
           pin: stage,
-          anticipatePin: 1
+          anticipatePin: 1,
+          invalidateOnRefresh: true
         }
       });
 
-      gsap.set(words, { autoAlpha: 0, y: 96, scale: 0.82 });
+      gsap.set(words, { autoAlpha: 0, y: mobileLayout ? 72 : 96, scale: 0.82 });
       gsap.set(words[0], { autoAlpha: 1, y: 0, scale: 1 });
 
       words.forEach((word, index) => {
