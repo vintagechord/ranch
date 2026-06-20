@@ -88,7 +88,7 @@ export default function ApplyForm() {
       <SectionTitle
         eyebrow="APPLY"
         title="참가 신청"
-        note="신청서 접수하면 채팅방 링크가 보여집니다."
+        note="신청서 접수하면 채팅방 링크가 오픈됩니다."
       />
 
       <div className="apply-layout">
