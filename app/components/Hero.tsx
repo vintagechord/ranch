@@ -96,7 +96,7 @@ export default function Hero() {
         </div>
 
         <h1 ref={titleRef} id="hero-title" className="hero-title">
-          목장의 을왕리
+          무적의 을왕리
         </h1>
 
         <div ref={subRef} className="hero-copy">
