@@ -2352,9 +2352,23 @@ img {
 }
 
 .site-footer strong {
-  color: var(--green);
+  position: relative;
+  width: fit-content;
+  color: var(--ink);
   font-size: clamp(1.7rem, 3vw, 2.7rem);
   font-weight: 950;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.site-footer strong::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 0.12em;
+  margin-top: 0.14em;
+  border-radius: 999px;
+  background: currentColor;
 }
 
 .site-footer span,
