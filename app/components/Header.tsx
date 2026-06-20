@@ -57,6 +57,31 @@ function HeaderCow({ index }: { index: number }) {
   );
 }
 
+function SfFactoryLink({ isActive }: { isActive: boolean }) {
+  return (
+    <a
+      className={`sf-factory-link${isActive ? " is-active" : ""}`}
+      href="/sf"
+      aria-label="S/F 음원 아카이브로 이동"
+    >
+      <svg viewBox="0 0 36 36" focusable="false" aria-hidden="true">
+        <path className="sf-factory-smoke" d="M24.2 5.8c2.7-1.8 5.4-.5 4.6 1.9-.6 1.8-3.6 1.8-5.5.8" />
+        <path className="sf-factory-stack" d="M23.2 9.1h5.4v8.1h-5.4Z" />
+        <path
+          className="sf-factory-body"
+          d="M6.1 27.5V17.1l7.3 3.8v-4.2l7.2 4v-4h7.6v10.8H6.1Z"
+        />
+        <path className="sf-factory-roof" d="M6.1 17.1 13.4 20.9V16.7L20.6 20.7" />
+        <path className="sf-factory-slot" d="M10.2 24.6h4.4M17.1 24.6h4.4" />
+        <path className="sf-factory-sun" d="M9.4 10.2a2.2 2.2 0 1 0 4.4 0 2.2 2.2 0 0 0-4.4 0Z" />
+        <text x="17.3" y="15.7" textAnchor="middle" className="sf-factory-text">
+          SF
+        </text>
+      </svg>
+    </a>
+  );
+}
+
 export default function Header({ showApplyCta = true }: HeaderProps) {
   const pathname = usePathname();
   const [hideMobileCta, setHideMobileCta] = useState(false);
@@ -121,13 +146,10 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
     return () => window.clearInterval(interval);
   }, []);
 
-  const navItems = [
-    ...homeNavItems.map((item) => ({
-      label: item.label,
-      href: pathname === "/" ? item.hash : `/${item.hash}`
-    })),
-    { label: "SF", href: "/sf" }
-  ];
+  const navItems = homeNavItems.map((item) => ({
+    label: item.label,
+    href: pathname === "/" ? item.hash : `/${item.hash}`
+  }));
 
   const topHref = pathname === "/" ? "#top" : "/";
   const mobileApplyHref = pathname === "/" ? "#apply" : "/#apply";
@@ -165,7 +187,10 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
           ))}
         </nav>
 
-        <PiggyBankButton />
+        <div className="header-tools">
+          <SfFactoryLink isActive={pathname === "/sf"} />
+          <PiggyBankButton />
+        </div>
 
         <div className="header-dog-runner">
           <div className="header-herd">
