@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export type RanchApplicationRow = {
   id: string;
@@ -39,13 +39,19 @@ export type Database = {
   };
 };
 
-export function getSupabaseClient() {
+export function getSupabaseClient(): SupabaseClient<Database> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const missingEnvironmentVariables = [
+    !supabaseUrl ? "NEXT_PUBLIC_SUPABASE_URL" : null,
+    !supabaseAnonKey ? "NEXT_PUBLIC_SUPABASE_ANON_KEY" : null
+  ].filter((name): name is string => Boolean(name));
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Supabase 공개 환경변수가 설정되지 않았습니다.");
+  if (missingEnvironmentVariables.length > 0) {
+    throw new Error(
+      `Missing Supabase environment variables: ${missingEnvironmentVariables.join(", ")}`
+    );
   }
 
-  return createClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createClient<Database>(supabaseUrl!, supabaseAnonKey!);
 }

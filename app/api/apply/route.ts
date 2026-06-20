@@ -83,6 +83,17 @@ function buildApplicationMessage(body: ApplyPayload) {
   return lines.length > 0 ? lines.join("\n") : null;
 }
 
+function getApplicationPayloadState(application: RanchApplicationInsert) {
+  return {
+    hasName: application.name.trim().length > 0,
+    hasPhone: Boolean(application.phone?.trim()),
+    hasEmail: Boolean(application.email?.trim()),
+    hasInstagram: Boolean(application.instagram?.trim()),
+    hasAttendees: application.attendees !== null && application.attendees !== undefined,
+    hasMessage: Boolean(application.message?.trim())
+  };
+}
+
 export async function POST(request: Request) {
   let body: ApplyPayload;
 
@@ -117,6 +128,7 @@ export async function POST(request: Request) {
     attendees: nullablePositiveInteger(body.attendees),
     message: buildApplicationMessage(body)
   };
+  const payloadState = getApplicationPayloadState(application);
 
   let insertError: {
     message: string;
@@ -129,7 +141,10 @@ export async function POST(request: Request) {
     const { error } = await supabase.from("ranch_applications").insert(application);
     insertError = error;
   } catch (error) {
-    console.error("Supabase insert request threw:", error);
+    console.error("Supabase insert request threw:", {
+      error,
+      payloadState
+    });
     return jsonError("신청 중 오류가 발생했습니다.", 500);
   }
 
@@ -138,7 +153,8 @@ export async function POST(request: Request) {
       message: insertError.message,
       code: insertError.code,
       details: insertError.details,
-      hint: insertError.hint
+      hint: insertError.hint,
+      payloadState
     });
     return jsonError("신청 중 오류가 발생했습니다.", 500);
   }
