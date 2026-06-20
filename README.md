@@ -43,7 +43,12 @@ Supabase 프로젝트 생성 후 아래 값을 확인합니다.
 - Service role key
 - Database password
 
-Supabase Dashboard > SQL Editor에서 [supabase/schema.sql](./supabase/schema.sql)을 실행합니다.
+Supabase Dashboard > SQL Editor에서 [supabase/schema.sql](./supabase/schema.sql)을 실행하거나, Supabase CLI로 프로젝트를 연결한 뒤 migration을 push합니다.
+
+```bash
+supabase link --project-ref 프로젝트_REFERENCE_ID
+supabase db push
+```
 
 현재 스키마는 아래 테이블을 만듭니다.
 
