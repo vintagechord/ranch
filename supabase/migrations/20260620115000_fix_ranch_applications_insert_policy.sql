@@ -1,14 +1,3 @@
-create table if not exists ranch_applications (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  phone text,
-  email text,
-  instagram text,
-  attendees integer,
-  message text,
-  created_at timestamptz default now()
-);
-
 alter table public.ranch_applications enable row level security;
 
 grant usage on schema public to anon;

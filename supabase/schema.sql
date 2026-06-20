@@ -11,12 +11,15 @@ create table if not exists ranch_applications (
   created_at timestamptz default now()
 );
 
-alter table ranch_applications enable row level security;
+alter table public.ranch_applications enable row level security;
 
-drop policy if exists "Allow public ranch application inserts" on ranch_applications;
+grant usage on schema public to anon;
+grant insert on table public.ranch_applications to anon;
+
+drop policy if exists "Allow public ranch application inserts" on public.ranch_applications;
 
 create policy "Allow public ranch application inserts"
-  on ranch_applications
+  on public.ranch_applications
   for insert
   to anon
   with check (
@@ -24,8 +27,6 @@ create policy "Allow public ranch application inserts"
     and phone is not null
     and length(btrim(phone)) > 0
   );
-
-grant insert on table ranch_applications to anon;
 
 create table if not exists party_applications (
   id uuid primary key default gen_random_uuid(),
