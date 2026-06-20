@@ -11,7 +11,6 @@ type Release = {
   tag: string;
   videoId: string;
   videoType: string;
-  note: string;
   platformLinks?: Partial<Record<ServiceKind, string>>;
 };
 
@@ -26,7 +25,6 @@ const releases: Release[] = [
     tag: "R&B / Indie",
     videoId: "8I2AxVIPTwY",
     videoType: "Official MV",
-    note: "같은 멜로디를 다른 목소리로 꺼내는 13LAYER의 첫 번째 버전.",
     platformLinks: {
       melon: "https://www.melon.com/album/detail.htm?albumId=11890166",
       apple: "https://music.apple.com/kr/album/melody-single/1825617674"
@@ -40,7 +38,6 @@ const releases: Release[] = [
     tag: "R&B / Indie",
     videoId: "WNTG5tZ19so",
     videoType: "YouTube Video",
-    note: "Iroso 보컬로 다시 놓인 너와 나의 멜로디.",
     platformLinks: {
       melon: "https://www.melon.com/album/detail.htm?albumId=11890166",
       apple: "https://music.apple.com/kr/album/melody-single/1825617674"
@@ -53,8 +50,7 @@ const releases: Release[] = [
     releaseDate: "2025.06.24",
     tag: "Winter Spring Summer Autumn",
     videoId: "3bv4NQn1ENk",
-    videoType: "Official MV",
-    note: "더즌 크레이프의 계절감 안에서 사랑의 속도를 느리게 펼친 트랙."
+    videoType: "Official MV"
   },
   {
     artist: "Dozen Crepe",
@@ -63,8 +59,7 @@ const releases: Release[] = [
     releaseDate: "2025.06.24",
     tag: "Winter Spring Summer Autumn",
     videoId: "JNhjS5pxwfE",
-    videoType: "YouTube Topic",
-    note: "서로의 계절을 빌려 입는 듯한 더즌 크레이프의 아카이브 컷."
+    videoType: "YouTube Topic"
   },
   {
     artist: "Odd Factory",
@@ -73,8 +68,7 @@ const releases: Release[] = [
     releaseDate: "2024.12.06",
     tag: "Odd Pop",
     videoId: "imtW6Jo6LE0",
-    videoType: "Official MV",
-    note: "작은 별이 되고 싶은 마음을 이상한 공장식 팝으로 정리한 곡."
+    videoType: "Official MV"
   },
   {
     artist: "grooming shagatto",
@@ -83,8 +77,7 @@ const releases: Release[] = [
     releaseDate: "2025.09.26",
     tag: "Adventure Pop",
     videoId: "YlgCi9Fnikc",
-    videoType: "Official MV",
-    note: "발끝에서 시작되는 첫 모험을 가볍고 선명하게 기록한 싱글."
+    videoType: "Official MV"
   }
 ];
 
@@ -175,7 +168,6 @@ export default function StrangeFactoryPage() {
                     <p className="sf-artist">{release.artist}</p>
                     <h2>{release.displayTitle}</h2>
                     <p className="sf-full-title">{release.title}</p>
-                    <p className="sf-release-note">{release.note}</p>
 
                     <dl className="sf-release-details">
                       <div>

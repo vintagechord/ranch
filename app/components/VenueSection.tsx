@@ -53,7 +53,6 @@ export default function VenueSection() {
 
       <div className="venue-card" data-reveal-card>
         <div className="venue-main">
-          <p>B동</p>
           <div className="venue-title-row">
             <button
               ref={openButtonRef}

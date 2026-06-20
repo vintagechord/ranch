@@ -762,23 +762,10 @@ img {
 
 .venue-main {
   display: grid;
-  align-content: space-between;
+  align-content: center;
   min-height: 210px;
   border-right: 1px dashed var(--ink);
   padding-right: clamp(18px, 4vw, 34px);
-}
-
-.venue-main p {
-  width: fit-content;
-  margin: 0;
-  padding: 8px 12px;
-  border: 1px solid var(--green);
-  border-radius: 6px;
-  background: var(--green);
-  color: var(--ivory);
-  font-size: 1rem;
-  font-weight: 950;
-  box-shadow: 3px 3px 0 var(--orange);
 }
 
 .venue-title-row {
@@ -1061,7 +1048,8 @@ img {
 }
 
 .sf-title-factory {
-  color: var(--green);
+  color: #ffd95a;
+  text-shadow: 4px 4px 0 rgba(21, 25, 29, 0.2);
 }
 
 .sf-title-archive {
@@ -1242,8 +1230,7 @@ img {
   overflow-wrap: anywhere;
 }
 
-.sf-full-title,
-.sf-release-note {
+.sf-full-title {
   margin: 0;
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -1254,13 +1241,6 @@ img {
   font-size: clamp(0.98rem, 1.45vw, 1.18rem);
   font-weight: 850;
   line-height: 1.45;
-}
-
-.sf-release-note {
-  color: rgba(56, 73, 89, 0.86);
-  font-size: 1rem;
-  font-weight: 720;
-  line-height: 1.58;
 }
 
 .sf-release-details {
