@@ -1200,6 +1200,8 @@ img {
   font-weight: 950;
   letter-spacing: 0;
   line-height: 0.9;
+  transform-origin: 8% 50%;
+  will-change: transform;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
@@ -1207,6 +1209,7 @@ img {
 .sf-title-factory,
 .sf-title-archive {
   display: block;
+  will-change: opacity, transform, text-shadow;
 }
 
 .sf-title-factory {
@@ -1245,6 +1248,7 @@ img {
   color: #fdfefe;
   box-shadow: 8px 8px 0 var(--orange);
   transform: rotate(2deg);
+  will-change: opacity, transform;
 }
 
 .sf-hero-panel::before {

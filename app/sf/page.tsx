@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
+import SfHero from "@/app/components/SfHero";
 
 type Release = {
   artist: string;
@@ -119,20 +120,7 @@ export default function StrangeFactoryPage() {
     <>
       <Header showApplyCta={false} />
       <main id="top" className="sf-page">
-        <section className="sf-hero" aria-labelledby="sf-title">
-          <div className="sf-hero-copy">
-            <h1 id="sf-title">
-              <span className="sf-title-factory">STRANGE FACTORY</span>
-              <span className="sf-title-archive">ARCHIVE</span>
-            </h1>
-          </div>
-
-          <div className="sf-hero-panel" aria-label="아카이브 요약">
-            <span>CATALOG</span>
-            <strong>{releases.length}</strong>
-            <p>released tracks</p>
-          </div>
-        </section>
+        <SfHero releaseCount={releases.length} />
 
         <section id="sf-releases" className="sf-release-section" aria-label="스트레인지 팩토리 발매 목록">
           <div className="sf-section-bar">
