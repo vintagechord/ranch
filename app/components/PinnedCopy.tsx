@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
 
-const phrases = ["을왕리로", "모이고", "해지면", "영화보고", "마시고", "아침까지", "못감"];
+const phrases = ["을왕리로", "모여서", "놀다가", "해지면", "영화보고", "아침까지", "못감"];
 
 export default function PinnedCopy() {
   const sectionRef = useRef<HTMLElement>(null);
