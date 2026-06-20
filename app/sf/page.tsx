@@ -187,11 +187,17 @@ export default function StrangeFactoryPage() {
                           target="_blank"
                           rel="noreferrer"
                           key={service.kind}
+                          data-service={service.kind}
                         >
                           {service.label}
                         </a>
                       ))}
-                      <a href={youtubeUrl(release.videoId)} target="_blank" rel="noreferrer">
+                      <a
+                        href={youtubeUrl(release.videoId)}
+                        target="_blank"
+                        rel="noreferrer"
+                        data-service="youtube"
+                      >
                         YouTube
                       </a>
                     </div>
