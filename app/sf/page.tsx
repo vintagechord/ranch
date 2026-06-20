@@ -51,7 +51,12 @@ const releases: Release[] = [
     releaseDate: "2025.06.24",
     tag: "Winter Spring Summer Autumn",
     videoId: "3bv4NQn1ENk",
-    videoType: "Official MV"
+    videoType: "Official MV",
+    platformLinks: {
+      melon: "https://www.melon.com/song/detail.htm?songId=39181951",
+      spotify: "https://open.spotify.com/search/%EB%8D%94%EC%A6%8C%20%ED%81%AC%EB%A0%88%EC%9D%B4%ED%94%84%20%EA%BD%83%EC%9E%A0%20Love%20Drive",
+      apple: "https://music.apple.com/kr/album/winter-spring-summer-autumn-single/1821416886?i=1821416901"
+    }
   },
   {
     artist: "Dozen Crepe",
@@ -60,7 +65,12 @@ const releases: Release[] = [
     releaseDate: "2025.06.24",
     tag: "Winter Spring Summer Autumn",
     videoId: "JNhjS5pxwfE",
-    videoType: "YouTube Topic"
+    videoType: "YouTube Topic",
+    platformLinks: {
+      melon: "https://www.melon.com/song/detail.htm?songId=39181950",
+      spotify: "https://open.spotify.com/search/%EB%8D%94%EC%A6%8C%20%ED%81%AC%EB%A0%88%EC%9D%B4%ED%94%84%20%EC%84%9C%EB%A1%9C%EC%9D%98%20%EA%B3%84%EC%A0%88",
+      apple: "https://music.apple.com/kr/album/winter-spring-summer-autumn-single/1821416886?i=1821416894"
+    }
   },
   {
     artist: "Odd Factory",
