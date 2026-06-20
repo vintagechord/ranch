@@ -127,11 +127,17 @@ img {
   position: relative;
   z-index: 2;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 0;
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: rgba(13, 13, 13, 0.78);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+  overflow: hidden;
 }
 
-.site-nav a,
 .header-cta,
 .primary-button,
 .secondary-button,
@@ -146,20 +152,46 @@ img {
   font-weight: 900;
 }
 
+.site-nav::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #0066b1 0 33.33%, #1c69d4 33.33% 66.66%, #e22718 66.66% 100%);
+  content: "";
+  opacity: 0.92;
+}
+
 .site-nav a {
-  padding: 0 14px;
-  background: var(--ivory);
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 17px;
+  border-radius: 4px;
+  color: var(--body-strong);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 
 .site-nav a:hover,
 .site-nav a:focus-visible {
-  background: var(--green-soft);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink);
+  outline: none;
 }
 
 .site-nav a.is-active {
-  background: var(--green);
-  color: var(--ivory);
-  box-shadow: 3px 3px 0 var(--orange);
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--ink);
 }
 
 .header-tools {
@@ -3010,7 +3042,7 @@ img {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
-    gap: 6px;
+    gap: 0;
   }
 
   .site-nav a {
