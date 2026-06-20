@@ -829,6 +829,15 @@ img {
   line-height: 1.38;
 }
 
+.hero-copy-highlight {
+  color: #ffd95a;
+  font-weight: 950;
+  text-decoration: underline;
+  text-decoration-color: #e22718;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.14em;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
