@@ -509,11 +509,11 @@ img {
   justify-content: center;
   width: 42px;
   height: 42px;
-  border: 1px solid var(--ink);
+  border: 1px solid #15191d;
   border-radius: 6px;
-  background: #e5f2ff;
-  color: var(--green);
-  box-shadow: 3px 3px 0 var(--orange);
+  background: #fdfefe;
+  color: #15191d;
+  box-shadow: 4px 4px 0 #88bdf2;
 }
 
 .sf-factory-link {
@@ -584,14 +584,14 @@ img {
   background: #bdddfc;
   outline: none;
   transform: translate(1px, 1px);
-  box-shadow: 2px 2px 0 var(--ink);
+  box-shadow: 3px 3px 0 #15191d;
 }
 
 .piggy-bank-button svg {
   width: 29px;
   height: 29px;
   fill: none;
-  stroke: var(--ink);
+  stroke: #15191d;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6;
@@ -609,7 +609,7 @@ img {
 
 .piggy-eye,
 .piggy-nostril {
-  fill: var(--ink);
+  fill: #15191d;
 }
 
 .piggy-slot {
