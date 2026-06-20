@@ -9,6 +9,12 @@ type ApplyPayload = {
   instagram?: unknown;
   attendees?: unknown;
   message?: unknown;
+  auction_item?: unknown;
+  advance_team?: unknown;
+  creative_project?: unknown;
+  food_note?: unknown;
+  memo?: unknown;
+  privacy_agreed?: unknown;
 };
 
 function jsonError(message: string, status: number) {
@@ -36,6 +42,45 @@ function nullablePositiveInteger(value: unknown) {
   }
 
   return numberValue;
+}
+
+function booleanValue(value: unknown) {
+  return value === true || value === "true" || value === "on";
+}
+
+function buildApplicationMessage(body: ApplyPayload) {
+  const lines: string[] = [];
+  const message = nullableString(body.message);
+  const auctionItem = nullableString(body.auction_item);
+  const creativeProject = nullableString(body.creative_project);
+  const foodNote = nullableString(body.food_note);
+  const memo = nullableString(body.memo);
+
+  if (message) {
+    lines.push(message);
+  }
+
+  if (auctionItem) {
+    lines.push(`경매 물품: ${auctionItem}`);
+  }
+
+  if (body.advance_team !== undefined) {
+    lines.push(`선발대: ${booleanValue(body.advance_team) ? "네" : "아니오"}`);
+  }
+
+  if (creativeProject) {
+    lines.push(`창작 캠프: ${creativeProject}`);
+  }
+
+  if (foodNote) {
+    lines.push(`음식 메모: ${foodNote}`);
+  }
+
+  if (memo) {
+    lines.push(`기타 메모: ${memo}`);
+  }
+
+  return lines.length > 0 ? lines.join("\n") : null;
 }
 
 export async function POST(request: Request) {
@@ -72,13 +117,18 @@ export async function POST(request: Request) {
     email: nullableString(body.email),
     instagram: nullableString(body.instagram),
     attendees: nullablePositiveInteger(body.attendees),
-    message: nullableString(body.message)
+    message: buildApplicationMessage(body)
   };
 
   const { error } = await supabase.from("ranch_applications").insert(application);
 
   if (error) {
-    console.error("Supabase insert failed:", error.message);
+    console.error("Supabase insert failed:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
     return jsonError("신청 중 오류가 발생했습니다.", 500);
   }
 
