@@ -2560,6 +2560,7 @@ img {
   font-size: 1rem;
   font-weight: 680;
   line-height: 1.65;
+  white-space: pre-line;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
