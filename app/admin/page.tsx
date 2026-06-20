@@ -3,6 +3,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated, isAdminConfigured } from "@/lib/adminAuth";
 import {
+  getOpenChatSettings,
+  normalizeOpenChatUrl,
+  setOpenChatUrl,
+  type OpenChatSettings
+} from "@/lib/openChat";
+import {
   addPiggyBankAmount,
   getPiggyBankBalance,
   type PiggyBankBalance
@@ -14,6 +20,7 @@ export const dynamic = "force-dynamic";
 type AdminSearchParams = Promise<{
   error?: string;
   piggy?: string;
+  chat?: string;
 }>;
 
 type PartyApplication = {
@@ -97,6 +104,26 @@ function getPiggyMessage(status?: string) {
   return "";
 }
 
+function getOpenChatMessage(status?: string) {
+  if (status === "saved") {
+    return "오픈채팅방 링크를 저장했습니다.";
+  }
+
+  if (status === "invalid") {
+    return "올바른 오픈채팅방 링크를 입력해 주세요.";
+  }
+
+  if (status === "auth") {
+    return "관리자 확인이 필요합니다. 다시 로그인해 주세요.";
+  }
+
+  if (status === "error") {
+    return "오픈채팅방 링크를 저장하지 못했습니다.";
+  }
+
+  return "";
+}
+
 function parsePositiveAmount(value: FormDataEntryValue | null) {
   if (typeof value !== "string") {
     return 0;
@@ -157,6 +184,38 @@ async function savePiggyBankAmount(formData: FormData) {
   redirect("/admin?piggy=saved");
 }
 
+async function saveOpenChatUrl(formData: FormData) {
+  "use server";
+
+  const authenticated = await isAdminAuthenticated();
+
+  if (!authenticated) {
+    redirect("/admin?chat=auth");
+  }
+
+  const chatUrlValue = formData.get("chatUrl");
+  const chatUrl = typeof chatUrlValue === "string" ? chatUrlValue : "";
+
+  try {
+    normalizeOpenChatUrl(chatUrl);
+  } catch {
+    redirect("/admin?chat=invalid");
+  }
+
+  try {
+    await setOpenChatUrl(chatUrl);
+  } catch (error) {
+    console.error(
+      "Open chat link update failed:",
+      error instanceof Error ? error.message : error
+    );
+    redirect("/admin?chat=error");
+  }
+
+  revalidatePath("/admin");
+  redirect("/admin?chat=saved");
+}
+
 function AdminLogin({ error }: { error?: string }) {
   const message = getErrorMessage(error);
 
@@ -203,7 +262,7 @@ export default async function AdminPage({
 }: {
   searchParams: AdminSearchParams;
 }) {
-  const { error, piggy } = await searchParams;
+  const { error, piggy, chat } = await searchParams;
   const authenticated = await isAdminAuthenticated();
 
   if (!authenticated) {
@@ -215,8 +274,13 @@ export default async function AdminPage({
     balanceAmount: 0,
     updatedAt: null
   };
+  let openChat: OpenChatSettings = {
+    chatUrl: null,
+    updatedAt: null
+  };
   let loadError = "";
   let piggyLoadError = "";
+  let openChatLoadError = "";
 
   try {
     applications = await getApplications();
@@ -236,10 +300,20 @@ export default async function AdminPage({
         : "저금통 정보를 불러오지 못했습니다.";
   }
 
+  try {
+    openChat = await getOpenChatSettings();
+  } catch (adminError) {
+    openChatLoadError =
+      adminError instanceof Error
+        ? adminError.message
+        : "오픈채팅방 링크를 불러오지 못했습니다.";
+  }
+
   const pendingCount = applications.filter((item) => item.application_status === "대기").length;
   const unpaidCount = applications.filter((item) => item.payment_status === "미확인").length;
   const latestCreatedAt = applications[0]?.created_at;
   const piggyMessage = getPiggyMessage(piggy);
+  const openChatMessage = getOpenChatMessage(chat);
 
   return (
     <main className="admin-shell">
@@ -312,6 +386,49 @@ export default async function AdminPage({
 
       {piggyMessage ? <div className="admin-alert">{piggyMessage}</div> : null}
       {piggyLoadError ? <div className="admin-alert">{piggyLoadError}</div> : null}
+
+      <section className="admin-piggy-section admin-open-chat-section" aria-label="오픈채팅방 링크 관리">
+        <div className="admin-piggy-info">
+          <p className="admin-eyebrow">OPEN CHAT</p>
+          <h2>채팅방 링크</h2>
+          <dl>
+            <div>
+              <dt>현재 링크</dt>
+              <dd className="admin-link-value">
+                {openChat.chatUrl ? (
+                  <a href={openChat.chatUrl} target="_blank" rel="noreferrer">
+                    {openChat.chatUrl}
+                  </a>
+                ) : (
+                  "-"
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>업데이트 날짜</dt>
+              <dd>{formatDateOnly(openChat.updatedAt)}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <form className="admin-piggy-form" action={saveOpenChatUrl}>
+          <label>
+            <span>오픈채팅방 링크</span>
+            <input
+              name="chatUrl"
+              type="url"
+              inputMode="url"
+              placeholder="https://open.kakao.com/o/..."
+              defaultValue={openChat.chatUrl ?? ""}
+              required
+            />
+          </label>
+          <button type="submit">링크 저장</button>
+        </form>
+      </section>
+
+      {openChatMessage ? <div className="admin-alert">{openChatMessage}</div> : null}
+      {openChatLoadError ? <div className="admin-alert">{openChatLoadError}</div> : null}
 
       <section className="admin-table-section" aria-label="신청 목록">
         <div className="admin-table-heading">

@@ -6,6 +6,7 @@ import SectionTitle from "@/app/components/SectionTitle";
 type SubmitState = {
   status: "idle" | "submitting" | "success" | "error";
   message: string;
+  chatUrl: string | null;
 };
 
 function textValue(formData: FormData, key: string) {
@@ -16,7 +17,8 @@ function textValue(formData: FormData, key: string) {
 export default function ApplyForm() {
   const [submitState, setSubmitState] = useState<SubmitState>({
     status: "idle",
-    message: ""
+    message: "",
+    chatUrl: null
   });
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -29,7 +31,7 @@ export default function ApplyForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    setSubmitState({ status: "submitting", message: "" });
+    setSubmitState({ status: "submitting", message: "", chatUrl: null });
 
     try {
       const payload = {
@@ -52,7 +54,7 @@ export default function ApplyForm() {
       });
 
       const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; message?: string }
+        | { ok?: boolean; message?: string; chatUrl?: string | null }
         | null;
 
       if (!response.ok || !result?.ok) {
@@ -60,15 +62,22 @@ export default function ApplyForm() {
       }
 
       form.reset();
+      const chatUrl = typeof result.chatUrl === "string" && result.chatUrl.trim()
+        ? result.chatUrl.trim()
+        : null;
+
       setSubmitState({
         status: "success",
-        message:
-          "신청이 접수되었습니다. 아래 계좌로 참가비를 입금해 주세요. 신청서 접수 후 채팅방으로 초대합니다."
+        message: chatUrl
+          ? "신청이 접수되었습니다. 아래 채팅방 링크로 들어와 주세요."
+          : "신청이 접수되었습니다. 채팅방 링크가 준비되는 대로 안내하겠습니다.",
+        chatUrl
       });
     } catch (error) {
       setSubmitState({
         status: "error",
-        message: error instanceof Error ? error.message : "신청 저장 중 오류가 발생했습니다."
+        message: error instanceof Error ? error.message : "신청 저장 중 오류가 발생했습니다.",
+        chatUrl: null
       });
     }
   }
@@ -84,7 +93,7 @@ export default function ApplyForm() {
 
       <div className="apply-layout">
         <div className="apply-instructions">
-          <p>신청서 접수 후 채팅방으로 초대합니다.</p>
+          <p>신청서 접수하면 채팅방 링크가 보여집니다.</p>
         </div>
 
         <form className="apply-form" onSubmit={handleSubmit}>
@@ -160,7 +169,12 @@ export default function ApplyForm() {
           </div>
 
           <div className={`form-message ${submitState.status}`} aria-live="polite">
-            {submitState.message}
+            <span>{submitState.message}</span>
+            {submitState.status === "success" && submitState.chatUrl ? (
+              <a href={submitState.chatUrl} target="_blank" rel="noreferrer">
+                오픈채팅방 들어가기
+              </a>
+            ) : null}
           </div>
         </form>
       </div>

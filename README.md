@@ -54,6 +54,7 @@ supabase db push
 
 - `party_applications`: 참가 신청 폼 저장
 - `piggy_bank`: 관리자 저금통 잔액 저장
+- `open_chat_settings`: 신청 완료 후 보여줄 오픈채팅방 링크 저장
 
 RLS는 켜져 있고 public insert policy는 만들지 않습니다. 신청 저장과 저금통 수정은 service role key를 사용하는 서버 코드에서만 처리합니다.
 

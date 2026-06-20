@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getOpenChatSettings } from "@/lib/openChat";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 type ApplyPayload = {
@@ -88,10 +89,23 @@ export async function POST(request: Request) {
     return jsonError("신청 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.", 500);
   }
 
+  let chatUrl: string | null = null;
+
+  try {
+    const openChat = await getOpenChatSettings();
+    chatUrl = openChat.chatUrl;
+  } catch (openChatError) {
+    console.error(
+      "Open chat settings load failed:",
+      openChatError instanceof Error ? openChatError.message : openChatError
+    );
+  }
+
   return NextResponse.json(
     {
       ok: true,
-      message: "신청이 접수되었습니다."
+      message: "신청이 접수되었습니다.",
+      chatUrl
     },
     { status: 201 }
   );

@@ -55,7 +55,7 @@ export default function BankTransfer() {
         </div>
       </div>
 
-      <p className="bank-note">입금 확인까지 시간이 걸릴 수 있습니다. 신청서 접수 후 채팅방으로 초대합니다.</p>
+      <p className="bank-note">입금 확인까지 시간이 걸릴 수 있습니다. 신청서 접수하면 채팅방 링크가 보여집니다.</p>
 
     </section>
   );
