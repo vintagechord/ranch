@@ -1781,7 +1781,7 @@ img {
 
 .apply-layout {
   display: grid;
-  grid-template-columns: 0.82fr 1.18fr;
+  grid-template-columns: 1fr;
   gap: clamp(22px, 5vw, 54px);
   align-items: start;
 }

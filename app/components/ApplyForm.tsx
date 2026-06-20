@@ -89,13 +89,10 @@ export default function ApplyForm() {
       <SectionTitle
         eyebrow="APPLY"
         title="참가 신청"
+        note="신청서 접수하면 채팅방 링크가 보여집니다."
       />
 
       <div className="apply-layout">
-        <div className="apply-instructions">
-          <p>신청서 접수하면 채팅방 링크가 보여집니다.</p>
-        </div>
-
         <form className="apply-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <label>
