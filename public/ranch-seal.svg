@@ -15,11 +15,11 @@
     </clipPath>
   </defs>
 
-  <circle cx="160" cy="160" r="84" fill="#FFF8D8" stroke="#384959" stroke-width="10"/>
+  <circle cx="160" cy="160" r="84" fill="#FFF8D8" stroke="#1C69D4" stroke-width="10"/>
   <g clip-path="url(#eulwangni-beach-window)">
     <rect x="82" y="82" width="156" height="156" fill="#FFF8D8"/>
     <path d="M82 175C113 160 139 160 169 174C194 186 216 187 238 176V238H82V175Z" fill="#88BDF2"/>
-    <path d="M82 202C116 188 143 190 174 204C200 216 219 215 238 204V238H82V202Z" fill="#384959"/>
+    <path d="M82 202C116 188 143 190 174 204C200 216 219 215 238 204V238H82V202Z" fill="#0066B1"/>
     <path d="M82 218C112 204 140 204 170 218C196 230 218 230 238 219V238H82V218Z" fill="#FFF8D8"/>
     <path d="M99 180C126 166 148 167 174 180C196 191 215 191 234 181" stroke="#FFF8D8" stroke-width="5" stroke-linecap="round"/>
     <path d="M99 207C126 195 149 196 175 208C198 218 215 218 234 209" stroke="#FFD95A" stroke-width="5" stroke-linecap="round"/>
@@ -30,5 +30,5 @@
     <path d="M112 159C122 141 131 137 142 143" stroke="#FFD95A" stroke-width="5" stroke-linecap="round"/>
     <path d="M101 228C118 220 134 220 151 228" stroke="#15191D" stroke-width="4" stroke-linecap="round"/>
   </g>
-  <circle cx="160" cy="160" r="66" stroke="#384959" stroke-width="3" stroke-opacity="0.22"/>
+  <circle cx="160" cy="160" r="66" stroke="#1C69D4" stroke-width="3" stroke-opacity="0.24"/>
 </svg>

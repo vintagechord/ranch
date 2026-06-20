@@ -19,5 +19,5 @@
   <path d="M40.5 47.5C38.8 50.2 34.6 50.8 31.8 49.1" stroke="#15191D" stroke-width="2" stroke-linecap="round"/>
   <path d="M23.5 24.5C27.4 20 33.6 18.1 39.7 20" stroke="#FDFEFE" stroke-width="2.6" stroke-linecap="round" opacity="0.7"/>
 
-  <text x="76" y="45" fill="#384959" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="950" letter-spacing="-1.1">목장의 아침</text>
+  <text x="76" y="45" fill="#15191D" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="950" letter-spacing="-1.1">목장의 아침</text>
 </svg>
