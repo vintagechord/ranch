@@ -112,9 +112,7 @@ export default function Hero() {
         <div ref={subRef} className="hero-copy">
           <p className="hero-kicker">EULWANGNI EDITION</p>
           <p className="hero-date">7월 17일 - 7월 18일</p>
-          <p>
-            을왕리에서 열리는 <span className="hero-copy-highlight">목장 친구들</span>의 강력한 수퍼 페스티벌
-          </p>
+          <p>을왕리에서 열리는 목장 친구들의 강력한 수퍼 페스티벌</p>
         </div>
 
         <div ref={noteRef} className="hero-actions">
