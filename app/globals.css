@@ -2945,26 +2945,34 @@ img {
   }
 
   .hero-content {
+    grid-template-columns: 82px minmax(0, 1fr);
+    column-gap: 14px;
     min-height: auto;
     align-content: start;
+    align-items: center;
   }
 
   .hero-title {
-    font-size: clamp(2.65rem, 12.2vw, 4.2rem);
+    grid-column: 2;
+    grid-row: 1;
+    font-size: clamp(2rem, 8.4vw, 3rem);
     line-height: 0.9;
     max-width: 100%;
   }
 
   .hero-poster {
+    grid-column: 1;
+    grid-row: 1;
     position: relative;
     top: auto;
     right: auto;
     width: 82px;
-    margin: 4px 0 14px;
+    margin: 4px 0 16px;
   }
 
   .hero-copy,
   .hero-actions {
+    grid-column: 1 / -1;
     margin-left: 0;
   }
 
