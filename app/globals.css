@@ -1152,6 +1152,7 @@ img {
 
 .sf-page {
   min-height: 100vh;
+  background: var(--cream);
   padding-top: 112px;
 }
 
