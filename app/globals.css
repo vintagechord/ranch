@@ -1884,7 +1884,7 @@ img {
 
 .schedule-tooltip {
   position: absolute;
-  top: calc(100% + 8px);
+  bottom: calc(100% + 10px);
   right: 0;
   width: max-content;
   max-width: min(240px, calc(100vw - 48px));
@@ -1900,7 +1900,7 @@ img {
   opacity: 0;
   pointer-events: none;
   white-space: pre-line;
-  transform: translateY(-4px);
+  transform: translateY(4px);
   transition:
     opacity 160ms ease,
     transform 160ms ease;
@@ -1908,12 +1908,12 @@ img {
 
 .schedule-tooltip::before {
   position: absolute;
-  top: -6px;
   right: 9px;
+  bottom: -6px;
   width: 10px;
   height: 10px;
-  border-top: 1px solid var(--ink);
-  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
   background: var(--ivory);
   content: "";
   transform: rotate(45deg);
