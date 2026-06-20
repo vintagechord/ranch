@@ -1,0 +1,34 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">목장의 아침 을왕리 바닷가 씰</title>
+  <desc id="desc">파도, 해, 파라솔로 구성된 을왕리 에디션 초대장 스타일 씰 그래픽</desc>
+  <rect width="320" height="320" rx="10" fill="#FFD95A"/>
+  <rect x="12" y="12" width="296" height="296" rx="7" stroke="#15191D" stroke-width="2" stroke-opacity="0.18"/>
+
+  <path d="M42 75H278" stroke="#15191D" stroke-width="4" stroke-linecap="round" stroke-opacity="0.84"/>
+  <path d="M42 246H278" stroke="#15191D" stroke-width="4" stroke-linecap="round" stroke-opacity="0.84"/>
+  <text x="160" y="54" text-anchor="middle" fill="#15191D" font-family="Arial, sans-serif" font-size="21" font-weight="900" letter-spacing="4">EULWANGNI</text>
+  <text x="160" y="281" text-anchor="middle" fill="#15191D" font-family="Arial, sans-serif" font-size="18" font-weight="900" letter-spacing="3">FRIENDS ONLY</text>
+
+  <defs>
+    <clipPath id="eulwangni-beach-window">
+      <circle cx="160" cy="160" r="78"/>
+    </clipPath>
+  </defs>
+
+  <circle cx="160" cy="160" r="84" fill="#FFF8D8" stroke="#384959" stroke-width="10"/>
+  <g clip-path="url(#eulwangni-beach-window)">
+    <rect x="82" y="82" width="156" height="156" fill="#FFF8D8"/>
+    <path d="M82 175C113 160 139 160 169 174C194 186 216 187 238 176V238H82V175Z" fill="#88BDF2"/>
+    <path d="M82 202C116 188 143 190 174 204C200 216 219 215 238 204V238H82V202Z" fill="#384959"/>
+    <path d="M82 218C112 204 140 204 170 218C196 230 218 230 238 219V238H82V218Z" fill="#FFF8D8"/>
+    <path d="M99 180C126 166 148 167 174 180C196 191 215 191 234 181" stroke="#FFF8D8" stroke-width="5" stroke-linecap="round"/>
+    <path d="M99 207C126 195 149 196 175 208C198 218 215 218 234 209" stroke="#FFD95A" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="205" cy="117" r="16" fill="#FFD95A" stroke="#15191D" stroke-width="4"/>
+    <path d="M112 159C122 127 148 112 182 118C167 122 153 129 142 143C131 137 122 141 112 159Z" fill="#FFF8D8" stroke="#15191D" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M142 143L159 222" stroke="#15191D" stroke-width="5" stroke-linecap="round"/>
+    <path d="M142 143C153 129 167 122 182 118" stroke="#15191D" stroke-width="4" stroke-linecap="round"/>
+    <path d="M112 159C122 141 131 137 142 143" stroke="#FFD95A" stroke-width="5" stroke-linecap="round"/>
+    <path d="M101 228C118 220 134 220 151 228" stroke="#15191D" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <circle cx="160" cy="160" r="66" stroke="#384959" stroke-width="3" stroke-opacity="0.22"/>
+</svg>

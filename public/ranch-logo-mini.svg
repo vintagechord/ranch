@@ -1,0 +1,20 @@
+<svg width="214" height="60" viewBox="0 0 214 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">목장의 아침 미니 로고</title>
+  <desc id="desc">작은 화면용 목장의 아침 페스티벌 배지 로고</desc>
+  <rect x="1.5" y="1.5" width="211" height="57" rx="8.5" fill="#FDFEFE" stroke="#15191D" stroke-width="3"/>
+
+  <rect x="7" y="7" width="46" height="46" rx="7" fill="#15191D"/>
+  <circle cx="30" cy="30" r="19" fill="#FDFEFE"/>
+  <path d="M22.7 22.1L15.2 12.5C22.1 12.8 26.7 17.1 27.5 24.8L22.7 22.1Z" fill="#15191D" stroke="#15191D" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M35.8 23.8L46.5 14.1C44.4 22.2 40 26.7 33.6 27.4L35.8 23.8Z" fill="#15191D" stroke="#15191D" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M18.3 31.5C17.4 23.8 22.1 17.8 29.7 17.3C38 16.7 43.8 22.3 43.1 30.9C42.2 41.1 35.4 46.2 27.1 44C21.6 42.6 18.9 37.3 18.3 31.5Z" fill="#15191D" stroke="#15191D" stroke-width="2"/>
+  <path d="M29.1 17.8C31.1 21.9 31.7 26.5 30.6 31.2C29.9 34.3 26.8 36.3 25.7 39.8C27.8 43.5 33.2 44.1 37 40.2C35.9 37.3 34.4 34.9 36 32C37.7 29.1 38 23.9 36.3 19.9C34.3 18.1 31.9 17.4 29.1 17.8Z" fill="#FDFEFE"/>
+  <ellipse cx="25.5" cy="30.9" rx="1.8" ry="2.2" fill="#FDFEFE" stroke="#15191D" stroke-width="0.6"/>
+  <ellipse cx="36.5" cy="31.9" rx="1.7" ry="2" fill="#FDFEFE" stroke="#15191D" stroke-width="0.6"/>
+  <ellipse cx="25.7" cy="31.1" rx="0.55" ry="0.75" fill="#15191D"/>
+  <ellipse cx="36.7" cy="32.1" rx="0.5" ry="0.7" fill="#15191D"/>
+  <ellipse cx="34.3" cy="37.1" rx="2.9" ry="2.2" fill="#15191D"/>
+  <path d="M33.3 39C31.8 41 28.8 41.4 26.8 40.1" stroke="#15191D" stroke-width="1.7" stroke-linecap="round"/>
+
+  <text x="63" y="38" fill="#384959" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="27" font-weight="950" letter-spacing="-1">목장의 아침</text>
+</svg>

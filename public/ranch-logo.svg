@@ -1,0 +1,23 @@
+<svg width="244" height="72" viewBox="0 0 244 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">목장의 아침 로고</title>
+  <desc id="desc">왼쪽 보더콜리 아이콘과 목장의 아침 텍스트로 구성된 페스티벌 배지 로고</desc>
+  <rect x="1.5" y="1.5" width="241" height="69" rx="9.5" fill="#FDFEFE" stroke="#15191D" stroke-width="3"/>
+
+  <rect x="7" y="7" width="58" height="58" rx="8" fill="#15191D"/>
+  <circle cx="36" cy="36" r="24" fill="#FDFEFE"/>
+  <path d="M26.5 25.4L17 12.8C25.7 13.3 31.6 18.8 32.6 28.6L26.5 25.4Z" fill="#15191D" stroke="#15191D" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M43.2 27.6L57.5 15.2C54.8 25.5 49.4 31.4 40.9 32.3L43.2 27.6Z" fill="#15191D" stroke="#15191D" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M20.2 37.9C18.9 27.9 25.1 20.2 35 19.5C45.7 18.7 53.3 26 52.3 37.2C51.2 50.4 42.3 57 31.6 54.2C24.4 52.3 21.1 45.4 20.2 37.9Z" fill="#15191D" stroke="#15191D" stroke-width="2.4"/>
+  <path d="M34 20.1C36.9 25.5 37.6 31.5 36.2 37.5C35.2 41.6 31.2 44 29.8 48.5C32.4 53.4 39.4 54.2 44.5 49.1C43 45.5 41 42.3 43.1 38.5C45.2 34.8 45.7 28 43.5 22.8C40.8 20.6 37.7 19.6 34 20.1Z" fill="#FDFEFE"/>
+  <path d="M25.7 34.4C27.8 32.2 31.2 32.1 33.3 34.1" stroke="#FDFEFE" stroke-width="2" stroke-linecap="round"/>
+  <path d="M42 35.7C44 33.8 47 34.3 48.3 36.2" stroke="#FDFEFE" stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="30.2" cy="37.2" rx="2.3" ry="2.8" fill="#FDFEFE" stroke="#15191D" stroke-width="0.7"/>
+  <ellipse cx="44.2" cy="38.4" rx="2.1" ry="2.6" fill="#FDFEFE" stroke="#15191D" stroke-width="0.7"/>
+  <ellipse cx="30.5" cy="37.5" rx="0.75" ry="1.05" fill="#15191D"/>
+  <ellipse cx="44.4" cy="38.7" rx="0.7" ry="0.95" fill="#15191D"/>
+  <ellipse cx="41.5" cy="45.1" rx="3.6" ry="2.8" fill="#15191D"/>
+  <path d="M40.5 47.5C38.8 50.2 34.6 50.8 31.8 49.1" stroke="#15191D" stroke-width="2" stroke-linecap="round"/>
+  <path d="M23.5 24.5C27.4 20 33.6 18.1 39.7 20" stroke="#FDFEFE" stroke-width="2.6" stroke-linecap="round" opacity="0.7"/>
+
+  <text x="76" y="45" fill="#384959" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="950" letter-spacing="-1.1">목장의 아침</text>
+</svg>

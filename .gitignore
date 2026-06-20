@@ -1,0 +1,14 @@
+node_modules
+.env
+.env.local
+.env.production
+.env*.local
+.vercel
+dist
+build
+.next
+out
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+border-collie-8895010_1280.webp
