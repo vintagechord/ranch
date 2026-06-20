@@ -479,7 +479,7 @@ img {
   height: 42px;
   border: 1px solid var(--ink);
   border-radius: 6px;
-  background: var(--ivory);
+  background: #e5f2ff;
   color: var(--green);
   box-shadow: 3px 3px 0 var(--orange);
 }
@@ -549,7 +549,7 @@ img {
 .piggy-bank-button:hover,
 .piggy-bank-button:focus-visible,
 .piggy-bank-button[aria-expanded="true"] {
-  background: var(--green-soft);
+  background: #bdddfc;
   outline: none;
   transform: translate(1px, 1px);
   box-shadow: 2px 2px 0 var(--ink);
