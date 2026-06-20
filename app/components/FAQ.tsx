@@ -26,7 +26,7 @@ const faqs = [
 export default function FAQ() {
   return (
     <section id="faq" className="page-section faq-section">
-      <SectionTitle eyebrow="FAQ" title="물어볼 법한 것들" />
+      <SectionTitle eyebrow="FAQ" title="미리 물어보자" />
 
       <div className="faq-list">
         {faqs.map((faq, index) => (
