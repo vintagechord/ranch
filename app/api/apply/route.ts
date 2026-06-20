@@ -88,7 +88,8 @@ export async function POST(request: Request) {
 
   try {
     body = (await request.json()) as ApplyPayload;
-  } catch {
+  } catch (error) {
+    console.error("Apply request JSON parse failed:", error);
     return jsonError("신청 중 오류가 발생했습니다.", 400);
   }
 
@@ -104,10 +105,7 @@ export async function POST(request: Request) {
   try {
     supabase = getSupabaseClient();
   } catch (error) {
-    console.error(
-      "Supabase client configuration failed:",
-      error instanceof Error ? error.message : error
-    );
+    console.error("Supabase client configuration failed:", error);
     return jsonError("신청 중 오류가 발생했습니다.", 500);
   }
 
@@ -120,14 +118,27 @@ export async function POST(request: Request) {
     message: buildApplicationMessage(body)
   };
 
-  const { error } = await supabase.from("ranch_applications").insert(application);
+  let insertError: {
+    message: string;
+    code?: string;
+    details?: string;
+    hint?: string;
+  } | null = null;
 
-  if (error) {
+  try {
+    const { error } = await supabase.from("ranch_applications").insert(application);
+    insertError = error;
+  } catch (error) {
+    console.error("Supabase insert request threw:", error);
+    return jsonError("신청 중 오류가 발생했습니다.", 500);
+  }
+
+  if (insertError) {
     console.error("Supabase insert failed:", {
-      message: error.message,
-      code: error.code,
-      details: error.details,
-      hint: error.hint
+      message: insertError.message,
+      code: insertError.code,
+      details: insertError.details,
+      hint: insertError.hint
     });
     return jsonError("신청 중 오류가 발생했습니다.", 500);
   }
@@ -138,10 +149,7 @@ export async function POST(request: Request) {
     const openChat = await getOpenChatSettings();
     chatUrl = openChat.chatUrl;
   } catch (openChatError) {
-    console.error(
-      "Open chat settings load failed:",
-      openChatError instanceof Error ? openChatError.message : openChatError
-    );
+    console.error("Open chat settings load failed:", openChatError);
   }
 
   return NextResponse.json(
