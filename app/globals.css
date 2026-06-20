@@ -743,7 +743,7 @@ img {
   right: clamp(0px, 5vw, 84px);
   display: grid;
   gap: 8px;
-  width: clamp(104px, 15vw, 188px);
+  width: clamp(150px, 17vw, 240px);
   padding: 8px;
   border: 1px solid #15191d;
   border-radius: 8px;
