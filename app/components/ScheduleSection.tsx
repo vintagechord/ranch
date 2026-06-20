@@ -34,7 +34,7 @@ const scheduleGroups = [
     id: "day-2",
     day: "2일차 · 7월 18일",
     items: [
-      { time: "08:30", label: "기상" },
+      { time: "08:00", label: "기상" },
       { time: "09:00", label: "체조 및 명상" },
       { time: "09:30", label: "아침 식사" },
       { time: "10:30", label: "기념품 증정" },
