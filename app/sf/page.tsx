@@ -64,8 +64,8 @@ const releases: Release[] = [
     displayTitle: "your seasons as mine",
     releaseDate: "2025.06.24",
     tag: "Winter Spring Summer Autumn",
-    videoId: "JNhjS5pxwfE",
-    videoType: "YouTube Topic",
+    videoId: "MbIR1g55-dk",
+    videoType: "YouTube Video",
     platformLinks: {
       melon: "https://www.melon.com/song/detail.htm?songId=39181950",
       spotify: "https://open.spotify.com/search/%EB%8D%94%EC%A6%8C%20%ED%81%AC%EB%A0%88%EC%9D%B4%ED%94%84%20%EC%84%9C%EB%A1%9C%EC%9D%98%20%EA%B3%84%EC%A0%88",
@@ -79,7 +79,10 @@ const releases: Release[] = [
     releaseDate: "2024.12.06",
     tag: "Odd Pop",
     videoId: "imtW6Jo6LE0",
-    videoType: "Official MV"
+    videoType: "Official MV",
+    platformLinks: {
+      melon: "https://www.melon.com/album/detail.htm?albumId=11659939"
+    }
   },
   {
     artist: "grooming shagatto",
@@ -88,7 +91,10 @@ const releases: Release[] = [
     releaseDate: "2025.09.26",
     tag: "Adventure Pop",
     videoId: "YlgCi9Fnikc",
-    videoType: "Official MV"
+    videoType: "Official MV",
+    platformLinks: {
+      melon: "https://www.melon.com/album/detail.htm?albumId=12137192"
+    }
   }
 ];
 

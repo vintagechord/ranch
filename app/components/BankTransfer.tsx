@@ -40,7 +40,6 @@ export default function BankTransfer() {
                   <li>펜션 대관비</li>
                   <li>식사 2회 및 주류</li>
                   <li>야식</li>
-                  <li>기념품 제작비 등</li>
                 </ul>
                 <p>
                   10만원 이상의 차액이 발생하면 다시 분배합니다. 10만원 이하의 차액은 위 저금통에 보관하여 다음 모임에 활용합니다.

@@ -14,6 +14,9 @@
   --surface-soft: #0d0d0d;
   --surface-card: #1a1a1a;
   --surface-elevated: #262626;
+  --panel-blue: #eef6ff;
+  --panel-blue-hover: #e2f1ff;
+  --panel-blue-line: rgba(136, 189, 242, 0.52);
   --line: rgba(255, 255, 255, 0.18);
   --shadow: 0 22px 60px rgba(0, 0, 0, 0.58);
   --max-width: 1180px;
@@ -905,8 +908,8 @@ img {
   border: 1px solid #15191d;
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(136, 189, 242, 0.32), rgba(253, 254, 254, 0) 42%),
-    #f7f2df;
+    linear-gradient(135deg, rgba(136, 189, 242, 0.42), rgba(253, 254, 254, 0) 48%),
+    var(--panel-blue);
   color: #15191d;
   box-shadow: 6px 6px 0 #1c69d4;
 }
@@ -1643,8 +1646,8 @@ img {
   border: 1px solid #15191d;
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(255, 217, 90, 0.18), rgba(253, 254, 254, 0) 42%),
-    #f7f2df;
+    linear-gradient(135deg, rgba(136, 189, 242, 0.4), rgba(253, 254, 254, 0) 46%),
+    var(--panel-blue);
   color: #15191d;
   box-shadow: 6px 6px 0 #1c69d4;
   transition:
@@ -1658,8 +1661,8 @@ img {
 .program-card:hover {
   border-color: #15191d;
   background:
-    linear-gradient(135deg, rgba(255, 217, 90, 0.38), rgba(253, 254, 254, 0) 48%),
-    #fff8d8;
+    linear-gradient(135deg, rgba(136, 189, 242, 0.62), rgba(253, 254, 254, 0) 52%),
+    var(--panel-blue-hover);
   box-shadow: 8px 8px 0 #e22718;
   transform: translateY(-4px) scale(1.015);
 }
@@ -1933,6 +1936,23 @@ img {
   overflow-wrap: break-word;
 }
 
+.schedule-duration {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 24px;
+  align-items: center;
+  margin-top: 6px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--body-strong);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .schedule-info {
   position: absolute;
   top: 0.08em;
@@ -2043,8 +2063,8 @@ img {
   border: 1px solid #15191d;
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(255, 217, 90, 0.2), rgba(253, 254, 254, 0) 46%),
-    #f7f2df;
+    linear-gradient(135deg, rgba(136, 189, 242, 0.44), rgba(253, 254, 254, 0) 48%),
+    var(--panel-blue);
   color: #15191d;
   box-shadow: 6px 6px 0 #1c69d4;
 }
@@ -2254,7 +2274,7 @@ img {
   padding: 14px;
   border: 1px dashed #15191d;
   border-radius: 6px;
-  background: #fff8d8;
+  background: rgba(255, 255, 255, 0.48);
   color: #15191d;
 }
 
@@ -3378,11 +3398,17 @@ img {
     min-height: 26px;
     font-size: 0.78rem;
     padding: 0 9px;
+    white-space: nowrap;
   }
 
   .schedule-title {
     font-size: clamp(1rem, 4.8vw, 1.28rem);
     line-height: 1.22;
+  }
+
+  .schedule-duration {
+    min-height: 22px;
+    font-size: 0.7rem;
   }
 
   .schedule-main.has-note {

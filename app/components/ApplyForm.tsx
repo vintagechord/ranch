@@ -134,12 +134,12 @@ export default function ApplyForm() {
             </label>
 
             <label>
-              <span>알레르기 / 못 먹는 음식</span>
+              <span>알레르기 / 못 먹는 음식 / 선호하는 음식 / 간식</span>
               <textarea className="compact-textarea" name="food_note" rows={2} />
             </label>
 
             <label>
-              <span>기타 메모 / 프로그램 제안하기</span>
+              <span>기타 의견 / 프로그램 제안하기</span>
               <textarea name="memo" rows={2} placeholder="하고 싶은 말이나 프로그램 제안" />
             </label>
           </div>

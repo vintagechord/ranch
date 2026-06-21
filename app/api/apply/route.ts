@@ -64,11 +64,11 @@ function buildApplicationMessage(body: ApplyPayload) {
   }
 
   if (foodNote) {
-    lines.push(`음식 메모: ${foodNote}`);
+    lines.push(`음식/간식 메모: ${foodNote}`);
   }
 
   if (memo) {
-    lines.push(`기타 메모: ${memo}`);
+    lines.push(`기타 의견: ${memo}`);
   }
 
   return lines.length > 0 ? lines.join("\n") : null;
