@@ -14,9 +14,9 @@
   --surface-soft: #0d0d0d;
   --surface-card: #1a1a1a;
   --surface-elevated: #262626;
-  --panel-blue: #eef6ff;
-  --panel-blue-hover: #e2f1ff;
-  --panel-blue-line: rgba(136, 189, 242, 0.52);
+  --panel-paper: #fdfefe;
+  --panel-paper-hover: #f1f1f1;
+  --panel-shadow: rgba(255, 255, 255, 0.38);
   --line: rgba(255, 255, 255, 0.18);
   --shadow: 0 22px 60px rgba(0, 0, 0, 0.58);
   --max-width: 1180px;
@@ -907,11 +907,9 @@ img {
   padding: clamp(20px, 4vw, 34px);
   border: 1px solid #15191d;
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(136, 189, 242, 0.42), rgba(253, 254, 254, 0) 48%),
-    var(--panel-blue);
+  background: var(--panel-paper);
   color: #15191d;
-  box-shadow: 6px 6px 0 #1c69d4;
+  box-shadow: 6px 6px 0 var(--panel-shadow);
 }
 
 .venue-main {
@@ -951,13 +949,16 @@ img {
 
 .venue-title-button:hover,
 .venue-title-button:focus-visible {
-  color: #1c69d4;
+  color: #15191d;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.1em;
   outline: none;
 }
 
 .venue-title-button:focus-visible {
   border-radius: 6px;
-  box-shadow: 0 0 0 4px rgba(28, 105, 212, 0.38);
+  box-shadow: 0 0 0 4px rgba(21, 25, 29, 0.18);
 }
 
 .venue-info-button {
@@ -974,12 +975,12 @@ img {
   font-size: 0.84rem;
   font-weight: 950;
   line-height: 1;
-  box-shadow: 3px 3px 0 var(--orange);
+  box-shadow: 3px 3px 0 rgba(21, 25, 29, 0.26);
 }
 
 .venue-info-button:hover,
 .venue-info-button:focus-visible {
-  background: #ffd95a;
+  background: #fdfefe;
   color: #15191d;
   outline: none;
 }
@@ -1645,11 +1646,9 @@ img {
   padding: 20px;
   border: 1px solid #15191d;
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(136, 189, 242, 0.4), rgba(253, 254, 254, 0) 46%),
-    var(--panel-blue);
+  background: var(--panel-paper);
   color: #15191d;
-  box-shadow: 6px 6px 0 #1c69d4;
+  box-shadow: 6px 6px 0 var(--panel-shadow);
   transition:
     background 180ms ease,
     border-color 180ms ease,
@@ -1660,10 +1659,8 @@ img {
 
 .program-card:hover {
   border-color: #15191d;
-  background:
-    linear-gradient(135deg, rgba(136, 189, 242, 0.62), rgba(253, 254, 254, 0) 52%),
-    var(--panel-blue-hover);
-  box-shadow: 8px 8px 0 #e22718;
+  background: var(--panel-paper-hover);
+  box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.48);
   transform: translateY(-4px) scale(1.015);
 }
 
@@ -1679,7 +1676,7 @@ img {
   color: #fdfefe;
   font-size: 0.85rem;
   font-weight: 950;
-  box-shadow: 3px 3px 0 var(--orange);
+  box-shadow: 3px 3px 0 rgba(21, 25, 29, 0.26);
 }
 
 .program-card h3 {
@@ -2062,11 +2059,9 @@ img {
   padding: clamp(16px, 2.3vw, 24px);
   border: 1px solid #15191d;
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(136, 189, 242, 0.44), rgba(253, 254, 254, 0) 48%),
-    var(--panel-blue);
+  background: var(--panel-paper);
   color: #15191d;
-  box-shadow: 6px 6px 0 #1c69d4;
+  box-shadow: 6px 6px 0 var(--panel-shadow);
 }
 
 .form-grid {
@@ -2160,7 +2155,7 @@ img {
   background: #15191d;
   color: #fdfefe;
   box-shadow:
-    4px 4px 0 var(--orange),
+    4px 4px 0 rgba(21, 25, 29, 0.26),
     inset 0 0 0 1px rgba(255, 255, 255, 0.28);
   transform: translate(-1px, -1px);
 }
@@ -2217,8 +2212,8 @@ img {
 
 .apply-form input:focus,
 .apply-form textarea:focus {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px rgba(28, 105, 212, 0.32);
+  border-color: #15191d;
+  box-shadow: 0 0 0 3px rgba(21, 25, 29, 0.2);
 }
 
 .apply-form .choice-option input {
@@ -2242,7 +2237,7 @@ img {
   clip: auto;
   clip-path: none;
   opacity: 1;
-  accent-color: var(--orange);
+  accent-color: #15191d;
 }
 
 .apply-form .choice-option input:focus {
@@ -2250,15 +2245,15 @@ img {
 }
 
 .apply-form .choice-option:has(input:focus-visible) {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px rgba(28, 105, 212, 0.32);
+  border-color: #15191d;
+  box-shadow: 0 0 0 3px rgba(21, 25, 29, 0.2);
 }
 
 .apply-form .choice-option:has(input:checked:focus-visible) {
   border-color: var(--ink);
   box-shadow:
-    4px 4px 0 var(--orange),
-    0 0 0 3px rgba(28, 105, 212, 0.42),
+    4px 4px 0 rgba(21, 25, 29, 0.26),
+    0 0 0 3px rgba(21, 25, 29, 0.24),
     inset 0 0 0 1px rgba(255, 255, 255, 0.28);
 }
 
@@ -2274,7 +2269,7 @@ img {
   padding: 14px;
   border: 1px dashed #15191d;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.48);
+  background: #f4f4f4;
   color: #15191d;
 }
 
@@ -2301,7 +2296,7 @@ img {
   border-color: #15191d;
   background: #15191d;
   color: #fdfefe;
-  box-shadow: 4px 4px 0 #1c69d4;
+  box-shadow: 4px 4px 0 rgba(21, 25, 29, 0.32);
   transition:
     background 180ms ease,
     box-shadow 180ms ease,
@@ -2310,14 +2305,14 @@ img {
 }
 
 .submit-button:hover {
-  background: #ffd95a;
+  background: #fdfefe;
   color: #15191d;
-  box-shadow: 6px 6px 0 #e22718;
+  box-shadow: 6px 6px 0 #15191d;
   transform: translate(-1px, -1px);
 }
 
 .submit-button:active {
-  box-shadow: 3px 3px 0 #e22718;
+  box-shadow: 3px 3px 0 #15191d;
   transform: translate(1px, 1px);
 }
 
@@ -2325,7 +2320,7 @@ img {
   cursor: wait;
   opacity: 0.72;
   transform: none;
-  box-shadow: 4px 4px 0 #1c69d4;
+  box-shadow: 4px 4px 0 rgba(21, 25, 29, 0.24);
 }
 
 .form-help {
@@ -2347,7 +2342,7 @@ img {
 }
 
 .form-message.success {
-  color: #1c69d4;
+  color: #15191d;
 }
 
 .form-message.error {
@@ -2362,12 +2357,12 @@ img {
   justify-content: center;
   border: 1px solid #15191d;
   border-radius: 6px;
-  background: #ffd95a;
+  background: #fdfefe;
   color: #15191d;
   padding: 0 14px;
   font-size: 0.9rem;
   font-weight: 950;
-  box-shadow: 4px 4px 0 var(--orange);
+  box-shadow: 4px 4px 0 rgba(21, 25, 29, 0.26);
 }
 
 .bank-section {
