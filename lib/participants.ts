@@ -35,8 +35,19 @@ export const participants: Participant[] = Array.from({ length: 16 }, (_, index)
 });
 
 export function applyParticipantNames(names: string[]) {
+  return buildParticipants({ names });
+}
+
+export function buildParticipants({
+  names = [],
+  imageUrlsBySlot = new Map<number, string>()
+}: {
+  names?: string[];
+  imageUrlsBySlot?: Map<number, string>;
+}) {
   return participants.map((participant, index) => ({
     ...participant,
-    name: names[index] ?? participant.name
+    name: names[index] ?? participant.name,
+    imageUrl: imageUrlsBySlot.get(index + 1) ?? participant.imageUrl
   }));
 }

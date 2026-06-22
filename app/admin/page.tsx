@@ -9,6 +9,16 @@ import {
   type OpenChatSettings
 } from "@/lib/openChat";
 import {
+  getParticipantFallbackImageUrl,
+  getParticipantImageSettings,
+  normalizeParticipantImageUrl,
+  parseParticipantSlot,
+  saveParticipantImageUrl,
+  uploadParticipantImage,
+  validateParticipantImageFile,
+  type ParticipantImageSetting
+} from "@/lib/participantImages";
+import {
   addPiggyBankAmount,
   getPiggyBankBalance,
   type PiggyBankBalance
@@ -21,6 +31,7 @@ type AdminSearchParams = Promise<{
   error?: string;
   piggy?: string;
   chat?: string;
+  participant?: string;
 }>;
 
 type PartyApplication = {
@@ -117,6 +128,39 @@ function getOpenChatMessage(status?: string) {
   return "";
 }
 
+function getParticipantMessage(status?: string) {
+  if (status === "url-saved") {
+    return "참가자 이미지 주소를 저장했습니다.";
+  }
+
+  if (status === "file-saved") {
+    return "참가자 이미지 파일을 업로드했습니다.";
+  }
+
+  if (status === "invalid") {
+    return "참가자 번호와 이미지 정보를 확인해 주세요.";
+  }
+
+  if (status === "auth") {
+    return "관리자 확인이 필요합니다. 다시 로그인해 주세요.";
+  }
+
+  if (status === "error") {
+    return "참가자 이미지를 저장하지 못했습니다.";
+  }
+
+  return "";
+}
+
+function getDefaultParticipantImageSettings(): ParticipantImageSetting[] {
+  return Array.from({ length: 16 }, (_, index) => ({
+    slotNumber: index + 1,
+    imageUrl: null,
+    imagePath: null,
+    updatedAt: null
+  }));
+}
+
 function parsePositiveAmount(value: FormDataEntryValue | null) {
   if (typeof value !== "string") {
     return 0;
@@ -207,6 +251,76 @@ async function saveOpenChatUrl(formData: FormData) {
   redirect("/admin?chat=saved");
 }
 
+async function saveParticipantImageUrlAction(formData: FormData) {
+  "use server";
+
+  const authenticated = await isAdminAuthenticated();
+
+  if (!authenticated) {
+    redirect("/admin?participant=auth");
+  }
+
+  const parsed = (() => {
+    try {
+      return {
+        slotNumber: parseParticipantSlot(formData.get("slotNumber")),
+        imageUrl: normalizeParticipantImageUrl(formData.get("imageUrl"))
+      };
+    } catch {
+      redirect("/admin?participant=invalid");
+    }
+  })();
+
+  try {
+    await saveParticipantImageUrl(parsed.slotNumber, parsed.imageUrl);
+  } catch (error) {
+    console.error(
+      "Participant image URL update failed:",
+      error instanceof Error ? error.message : error
+    );
+    redirect("/admin?participant=error");
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/participants");
+  redirect("/admin?participant=url-saved");
+}
+
+async function uploadParticipantImageAction(formData: FormData) {
+  "use server";
+
+  const authenticated = await isAdminAuthenticated();
+
+  if (!authenticated) {
+    redirect("/admin?participant=auth");
+  }
+
+  const parsed = (() => {
+    try {
+      return {
+        slotNumber: parseParticipantSlot(formData.get("slotNumber")),
+        file: validateParticipantImageFile(formData.get("imageFile"))
+      };
+    } catch {
+      redirect("/admin?participant=invalid");
+    }
+  })();
+
+  try {
+    await uploadParticipantImage(parsed.slotNumber, parsed.file);
+  } catch (error) {
+    console.error(
+      "Participant image upload failed:",
+      error instanceof Error ? error.message : error
+    );
+    redirect("/admin?participant=error");
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/participants");
+  redirect("/admin?participant=file-saved");
+}
+
 function AdminLogin({ error }: { error?: string }) {
   const message = getErrorMessage(error);
 
@@ -249,7 +363,7 @@ export default async function AdminPage({
 }: {
   searchParams: AdminSearchParams;
 }) {
-  const { error, piggy, chat } = await searchParams;
+  const { error, piggy, chat, participant } = await searchParams;
   const authenticated = await isAdminAuthenticated();
 
   if (!authenticated) {
@@ -265,9 +379,11 @@ export default async function AdminPage({
     chatUrl: null,
     updatedAt: null
   };
+  let participantImages = getDefaultParticipantImageSettings();
   let loadError = "";
   let piggyLoadError = "";
   let openChatLoadError = "";
+  let participantImageLoadError = "";
 
   try {
     applications = await getApplications();
@@ -296,6 +412,15 @@ export default async function AdminPage({
         : "오픈채팅방 링크를 불러오지 못했습니다.";
   }
 
+  try {
+    participantImages = await getParticipantImageSettings();
+  } catch (adminError) {
+    participantImageLoadError =
+      adminError instanceof Error
+        ? adminError.message
+        : "참가자 이미지를 불러오지 못했습니다.";
+  }
+
   const totalAttendees = applications.reduce(
     (sum, item) => sum + Math.max(Number(item.attendees ?? 0), 0),
     0
@@ -304,6 +429,7 @@ export default async function AdminPage({
   const latestCreatedAt = applications[0]?.created_at;
   const piggyMessage = getPiggyMessage(piggy);
   const openChatMessage = getOpenChatMessage(chat);
+  const participantMessage = getParticipantMessage(participant);
 
   return (
     <main className="admin-shell">
@@ -419,6 +545,96 @@ export default async function AdminPage({
 
       {openChatMessage ? <div className="admin-alert">{openChatMessage}</div> : null}
       {openChatLoadError ? <div className="admin-alert">{openChatLoadError}</div> : null}
+
+      <section className="admin-participant-section" aria-label="참가자 캐릭터 이미지 관리">
+        <div className="admin-table-heading">
+          <div>
+            <p className="admin-eyebrow">PARTICIPANTS</p>
+            <h2>참가자 이미지</h2>
+          </div>
+          <span>1번-16번</span>
+        </div>
+
+        {participantMessage ? <div className="admin-section-alert">{participantMessage}</div> : null}
+        {participantImageLoadError ? (
+          <div className="admin-section-alert">{participantImageLoadError}</div>
+        ) : null}
+
+        <div className="admin-participant-grid">
+          {participantImages.map((setting) => {
+            const fallbackImageUrl = getParticipantFallbackImageUrl(setting.slotNumber);
+            const currentImageUrl = setting.imageUrl ?? fallbackImageUrl;
+            const hasCustomImage = Boolean(setting.imageUrl);
+
+            return (
+              <article className="admin-participant-card" key={setting.slotNumber}>
+                <div className="admin-participant-preview">
+                  <img src={currentImageUrl} alt={`참가자 ${setting.slotNumber} 이미지`} />
+                </div>
+
+                <div className="admin-participant-copy">
+                  <p className="admin-eyebrow">
+                    PLAYER {String(setting.slotNumber).padStart(2, "0")}
+                  </p>
+                  <h3>참가자 {setting.slotNumber}</h3>
+                  <dl>
+                    <div>
+                      <dt>현재 이미지</dt>
+                      <dd>
+                        {hasCustomImage ? (
+                          <a href={currentImageUrl} target="_blank" rel="noreferrer">
+                            적용됨
+                          </a>
+                        ) : (
+                          "기본 이미지"
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>업데이트</dt>
+                      <dd>{formatDateOnly(setting.updatedAt)}</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <form className="admin-participant-form" action={saveParticipantImageUrlAction}>
+                  <input type="hidden" name="slotNumber" value={setting.slotNumber} />
+                  <label>
+                    <span>이미지 주소</span>
+                    <input
+                      name="imageUrl"
+                      type="url"
+                      inputMode="url"
+                      placeholder="https://..."
+                      defaultValue={setting.imageUrl ?? ""}
+                      required
+                    />
+                  </label>
+                  <button type="submit">주소 저장</button>
+                </form>
+
+                <form
+                  className="admin-participant-form"
+                  action={uploadParticipantImageAction}
+                  encType="multipart/form-data"
+                >
+                  <input type="hidden" name="slotNumber" value={setting.slotNumber} />
+                  <label>
+                    <span>파일 업로드</span>
+                    <input
+                      name="imageFile"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      required
+                    />
+                  </label>
+                  <button type="submit">파일 업로드</button>
+                </form>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <section className="admin-table-section" aria-label="신청 목록">
         <div className="admin-table-heading">

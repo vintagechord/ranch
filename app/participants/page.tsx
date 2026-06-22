@@ -3,8 +3,9 @@ import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
 import ParticipantSelector from "@/app/components/ParticipantSelector";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
+import { getParticipantImageUrlBySlot } from "@/lib/participantImages";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { applyParticipantNames } from "@/lib/participants";
+import { buildParticipants } from "@/lib/participants";
 
 export const dynamic = "force-dynamic";
 
@@ -76,9 +77,31 @@ async function getRegisteredParticipantNames() {
   }
 }
 
+async function getRegisteredParticipantImageUrls() {
+  try {
+    return await getParticipantImageUrlBySlot();
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Missing Supabase admin environment variables:")
+    ) {
+      return new Map<number, string>();
+    }
+
+    console.error(
+      "Participant images load failed:",
+      error instanceof Error ? error.message : error
+    );
+    return new Map<number, string>();
+  }
+}
+
 export default async function ParticipantsPage() {
-  const registeredNames = await getRegisteredParticipantNames();
-  const participantRoster = applyParticipantNames(registeredNames);
+  const [registeredNames, imageUrlsBySlot] = await Promise.all([
+    getRegisteredParticipantNames(),
+    getRegisteredParticipantImageUrls()
+  ]);
+  const participantRoster = buildParticipants({ names: registeredNames, imageUrlsBySlot });
 
   return (
     <>
