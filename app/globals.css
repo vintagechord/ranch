@@ -1903,13 +1903,14 @@ img {
   width: fit-content;
   min-height: 28px;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.38);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--red);
+  background: rgba(255, 255, 255, 0.13);
+  color: var(--ink);
   font-size: clamp(0.82rem, 1.08vw, 0.98rem);
   font-weight: 900;
   padding: 0 10px;
+  box-shadow: inset 3px 0 0 var(--red);
 }
 
 .schedule-main {
