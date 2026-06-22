@@ -94,13 +94,14 @@ export default function Hero() {
             <img src="/ranch-seal.svg" alt="" />
             <video
               className="hero-poster-video"
-              src="https://i.namu.wiki/i/SQ37DTzVcrHHon2WShuYbkWV-Lxw8Zlw3BwX5pqa_nJO-gdPYqG-FsSBtMLpc40iCZU4alwMkPv1oBFGCyKtRNwYvVzyTshJ3xAXnlgRmaA.mp4"
               autoPlay
               muted
               loop
               playsInline
-              preload="metadata"
-            />
+              preload="auto"
+            >
+              <source src="/hanma.mp4" type="video/mp4" />
+            </video>
           </div>
           <span>NO. 0001</span>
         </div>
