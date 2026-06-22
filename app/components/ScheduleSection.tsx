@@ -9,26 +9,26 @@ const scheduleGroups = [
       {
         time: "16:00-18:00",
         label: "갯바람 운동회",
-        duration: "총 2시간",
+        duration: "2시간",
         note:
           "청팀/백팀으로 나눠 진행합니다.\n현지 환경에 따라 종목을 선정합니다."
       },
       {
         time: "18:00-19:30",
         label: "해변 산책",
-        duration: "총 1시간 30분",
+        duration: "1시간 30분",
         note: "해변 이동 차량 지원"
       },
-      { time: "19:30-21:30", label: "저녁 식사", duration: "총 2시간" },
+      { time: "19:30-21:30", label: "저녁 식사", duration: "2시간" },
       {
         time: "21:30-22:30",
         label: "을왕리 옥션",
-        duration: "총 1시간",
+        duration: "1시간",
         note:
           "필수는 아니지만 가져오면 훨씬 재밌을걸요.\n1~3 만원 선의 저렴한 제품으로 가져오세요."
       },
       { time: "22:30-23:00", label: "쉬는 시간 / 자유 정리" },
-      { time: "23:00-01:00", label: "시네마 음주회", duration: "총 2시간" },
+      { time: "23:00-01:00", label: "시네마 음주회", duration: "2시간" },
       { time: "01:00-", label: "자유 시간" }
     ]
   },
@@ -37,8 +37,8 @@ const scheduleGroups = [
     day: "2일차 · 7월 18일",
     items: [
       { time: "08:00", label: "기상" },
-      { time: "08:30-09:30", label: "체조 및 명상", duration: "총 1시간" },
-      { time: "09:30-11:00", label: "아침 식사", duration: "총 1시간 30분" },
+      { time: "08:30-09:30", label: "체조 및 명상", duration: "1시간" },
+      { time: "09:30-11:00", label: "아침 식사", duration: "1시간 30분" },
       { time: "11:00", label: "럭키 드로우 / 해산" }
     ]
   }
