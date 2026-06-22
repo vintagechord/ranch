@@ -2684,12 +2684,14 @@ img {
   z-index: 2;
   display: grid;
   gap: 6px;
+  justify-items: center;
   padding: clamp(14px, 2.5vw, 22px);
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-left: 5px solid var(--participant-accent);
+  border-top: 5px solid var(--participant-accent);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.68);
   backdrop-filter: blur(10px);
+  text-align: center;
 }
 
 .participant-nameplate p {
@@ -2700,6 +2702,7 @@ img {
 }
 
 .participant-nameplate h1 {
+  width: 100%;
   margin: 0;
   color: var(--participant-accent);
   font-size: clamp(2.4rem, 7vw, 5.7rem);
