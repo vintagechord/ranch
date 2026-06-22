@@ -3,7 +3,7 @@ import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
 import ParticipantSelector from "@/app/components/ParticipantSelector";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
-import { getParticipantImageUrlBySlot } from "@/lib/participantImages";
+import { getParticipantImageSettings } from "@/lib/participantImages";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { buildParticipants, getParticipantInitials } from "@/lib/participants";
 
@@ -16,6 +16,11 @@ export const metadata: Metadata = {
 
 type ApplicationNameRow = {
   name: string | null;
+};
+
+type ParticipantSettingMaps = {
+  displayNamesBySlot: Map<number, string>;
+  imageUrlsBySlot: Map<number, string>;
 };
 
 function normalizeParticipantName(name: string | null) {
@@ -77,31 +82,55 @@ async function getRegisteredParticipantDisplayNames() {
   }
 }
 
-async function getRegisteredParticipantImageUrls() {
+function getEmptyParticipantSettingMaps(): ParticipantSettingMaps {
+  return {
+    displayNamesBySlot: new Map<number, string>(),
+    imageUrlsBySlot: new Map<number, string>()
+  };
+}
+
+async function getRegisteredParticipantSettings() {
   try {
-    return await getParticipantImageUrlBySlot();
+    const settings = await getParticipantImageSettings();
+
+    return {
+      displayNamesBySlot: new Map(
+        settings
+          .filter((setting) => Boolean(setting.displayName))
+          .map((setting) => [setting.slotNumber, setting.displayName as string])
+      ),
+      imageUrlsBySlot: new Map(
+        settings
+          .filter((setting) => Boolean(setting.imageUrl))
+          .map((setting) => [setting.slotNumber, setting.imageUrl as string])
+      )
+    };
   } catch (error) {
     if (
       error instanceof Error &&
       error.message.startsWith("Missing Supabase admin environment variables:")
     ) {
-      return new Map<number, string>();
+      return getEmptyParticipantSettingMaps();
     }
 
     console.error(
-      "Participant images load failed:",
+      "Participant settings load failed:",
       error instanceof Error ? error.message : error
     );
-    return new Map<number, string>();
+    return getEmptyParticipantSettingMaps();
   }
 }
 
 export default async function ParticipantsPage() {
-  const [registeredDisplayNames, imageUrlsBySlot] = await Promise.all([
+  const [registeredDisplayNames, participantSettings] = await Promise.all([
     getRegisteredParticipantDisplayNames(),
-    getRegisteredParticipantImageUrls()
+    getRegisteredParticipantSettings()
   ]);
-  const participantRoster = buildParticipants({ names: registeredDisplayNames, imageUrlsBySlot });
+  const participantRoster = buildParticipants({
+    names: registeredDisplayNames,
+    displayNamesBySlot: participantSettings.displayNamesBySlot,
+    imageUrlsBySlot: participantSettings.imageUrlsBySlot
+  });
 
   return (
     <>

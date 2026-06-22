@@ -19,12 +19,14 @@ const ALLOWED_PARTICIPANT_BUCKET_TYPES = [
 
 export type ParticipantImageSetting = {
   slotNumber: number;
+  displayName: string | null;
   imageUrl: string | null;
   imagePath: string | null;
   updatedAt: string | null;
 };
 
 type StoredParticipantImageSlot = {
+  displayName?: string | null;
   imageUrl?: string | null;
   imagePath?: string | null;
   updatedAt?: string | null;
@@ -67,6 +69,20 @@ export function normalizeParticipantImageUrl(value: FormDataEntryValue | null) {
   return parsedUrl.toString();
 }
 
+export function normalizeParticipantDisplayName(value: FormDataEntryValue | null) {
+  const displayName = typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
+
+  if (!displayName) {
+    return null;
+  }
+
+  if (displayName.length > 24) {
+    throw new Error("참가자 이름은 24자 이하로 입력해 주세요.");
+  }
+
+  return displayName;
+}
+
 export function getParticipantFallbackImageUrl(slotNumber: number) {
   return `/participants/participant-${String(slotNumber).padStart(2, "0")}.webp`;
 }
@@ -99,6 +115,7 @@ function normalizeSettingsFile(value: unknown): ParticipantImageSettingsFile {
     }
 
     settings.slots[slotKey] = {
+      displayName: typeof slotValue.displayName === "string" ? slotValue.displayName : null,
       imageUrl: typeof slotValue.imageUrl === "string" ? slotValue.imageUrl : null,
       imagePath: typeof slotValue.imagePath === "string" ? slotValue.imagePath : null,
       updatedAt: typeof slotValue.updatedAt === "string" ? slotValue.updatedAt : null
@@ -203,6 +220,7 @@ export async function getParticipantImageSettings() {
 
     return {
       slotNumber,
+      displayName: slot?.displayName ?? null,
       imageUrl: slot?.imageUrl ?? null,
       imagePath: slot?.imagePath ?? null,
       updatedAt: slot?.updatedAt ?? null
@@ -217,6 +235,16 @@ export async function getParticipantImageUrlBySlot() {
     settings
       .filter((setting) => Boolean(setting.imageUrl))
       .map((setting) => [setting.slotNumber, setting.imageUrl as string])
+  );
+}
+
+export async function getParticipantDisplayNameBySlot() {
+  const settings = await getParticipantImageSettings();
+
+  return new Map(
+    settings
+      .filter((setting) => Boolean(setting.displayName))
+      .map((setting) => [setting.slotNumber, setting.displayName as string])
   );
 }
 
@@ -254,10 +282,30 @@ export function validateParticipantImageFile(fileValue: FormDataEntryValue | nul
 
 export async function saveParticipantImageUrl(slotNumber: number, imageUrl: string) {
   const settings = await readParticipantImageSettingsFile();
+  const slotKey = getParticipantSlotKey(slotNumber);
+  const currentSlot = settings.slots[slotKey] ?? {};
 
-  settings.slots[getParticipantSlotKey(slotNumber)] = {
+  settings.slots[slotKey] = {
+    ...currentSlot,
     imageUrl,
     imagePath: null,
+    updatedAt: new Date().toISOString()
+  };
+
+  await writeParticipantImageSettingsFile(settings);
+}
+
+export async function saveParticipantDisplayName(
+  slotNumber: number,
+  displayName: string | null
+) {
+  const settings = await readParticipantImageSettingsFile();
+  const slotKey = getParticipantSlotKey(slotNumber);
+  const currentSlot = settings.slots[slotKey] ?? {};
+
+  settings.slots[slotKey] = {
+    ...currentSlot,
+    displayName,
     updatedAt: new Date().toISOString()
   };
 
@@ -285,8 +333,11 @@ export async function uploadParticipantImage(slotNumber: number, file: File) {
   const imageUrl = data.publicUrl;
 
   const settings = await readParticipantImageSettingsFile();
+  const slotKey = getParticipantSlotKey(slotNumber);
+  const currentSlot = settings.slots[slotKey] ?? {};
 
-  settings.slots[getParticipantSlotKey(slotNumber)] = {
+  settings.slots[slotKey] = {
+    ...currentSlot,
     imageUrl,
     imagePath: filePath,
     updatedAt: new Date().toISOString()

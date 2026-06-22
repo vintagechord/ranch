@@ -159,14 +159,16 @@ export function applyParticipantNames(names: string[]) {
 
 export function buildParticipants({
   names = [],
-  imageUrlsBySlot = new Map<number, string>()
+  imageUrlsBySlot = new Map<number, string>(),
+  displayNamesBySlot = new Map<number, string>()
 }: {
   names?: string[];
   imageUrlsBySlot?: Map<number, string>;
+  displayNamesBySlot?: Map<number, string>;
 }) {
   return participants.map((participant, index) => ({
     ...participant,
-    name: names[index] ?? participant.name,
+    name: displayNamesBySlot.get(index + 1) ?? names[index] ?? participant.name,
     imageUrl: imageUrlsBySlot.get(index + 1) ?? participant.imageUrl
   }));
 }

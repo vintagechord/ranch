@@ -11,8 +11,10 @@ import {
 import {
   getParticipantFallbackImageUrl,
   getParticipantImageSettings,
+  normalizeParticipantDisplayName,
   normalizeParticipantImageUrl,
   parseParticipantSlot,
+  saveParticipantDisplayName,
   saveParticipantImageUrl,
   uploadParticipantImage,
   validateParticipantImageFile,
@@ -129,6 +131,10 @@ function getOpenChatMessage(status?: string) {
 }
 
 function getParticipantMessage(status?: string) {
+  if (status === "name-saved") {
+    return "참가자 표시 이름을 저장했습니다.";
+  }
+
   if (status === "url-saved") {
     return "참가자 이미지 주소를 저장했습니다.";
   }
@@ -138,7 +144,7 @@ function getParticipantMessage(status?: string) {
   }
 
   if (status === "invalid") {
-    return "참가자 번호와 이미지 정보를 확인해 주세요.";
+    return "참가자 번호, 이름, 이미지 정보를 확인해 주세요.";
   }
 
   if (status === "auth") {
@@ -146,7 +152,7 @@ function getParticipantMessage(status?: string) {
   }
 
   if (status === "error") {
-    return "참가자 이미지를 저장하지 못했습니다.";
+    return "참가자 설정을 저장하지 못했습니다.";
   }
 
   return "";
@@ -155,6 +161,7 @@ function getParticipantMessage(status?: string) {
 function getDefaultParticipantImageSettings(): ParticipantImageSetting[] {
   return Array.from({ length: 16 }, (_, index) => ({
     slotNumber: index + 1,
+    displayName: null,
     imageUrl: null,
     imagePath: null,
     updatedAt: null
@@ -284,6 +291,41 @@ async function saveParticipantImageUrlAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/participants");
   redirect("/admin?participant=url-saved");
+}
+
+async function saveParticipantDisplayNameAction(formData: FormData) {
+  "use server";
+
+  const authenticated = await isAdminAuthenticated();
+
+  if (!authenticated) {
+    redirect("/admin?participant=auth");
+  }
+
+  const parsed = (() => {
+    try {
+      return {
+        slotNumber: parseParticipantSlot(formData.get("slotNumber")),
+        displayName: normalizeParticipantDisplayName(formData.get("displayName"))
+      };
+    } catch {
+      redirect("/admin?participant=invalid");
+    }
+  })();
+
+  try {
+    await saveParticipantDisplayName(parsed.slotNumber, parsed.displayName);
+  } catch (error) {
+    console.error(
+      "Participant display name update failed:",
+      error instanceof Error ? error.message : error
+    );
+    redirect("/admin?participant=error");
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/participants");
+  redirect("/admin?participant=name-saved");
 }
 
 async function uploadParticipantImageAction(formData: FormData) {
@@ -546,11 +588,11 @@ export default async function AdminPage({
       {openChatMessage ? <div className="admin-alert">{openChatMessage}</div> : null}
       {openChatLoadError ? <div className="admin-alert">{openChatLoadError}</div> : null}
 
-      <section className="admin-participant-section" aria-label="참가자 캐릭터 이미지 관리">
+      <section className="admin-participant-section" aria-label="참가자 이름과 캐릭터 이미지 관리">
         <div className="admin-table-heading">
           <div>
             <p className="admin-eyebrow">PARTICIPANTS</p>
-            <h2>참가자 이미지</h2>
+            <h2>참가자 설정</h2>
           </div>
           <span>1번-16번</span>
         </div>
@@ -591,11 +633,30 @@ export default async function AdminPage({
                       </dd>
                     </div>
                     <div>
+                      <dt>표시 이름</dt>
+                      <dd>{setting.displayName ?? "자동 이니셜"}</dd>
+                    </div>
+                    <div>
                       <dt>업데이트</dt>
                       <dd>{formatDateOnly(setting.updatedAt)}</dd>
                     </div>
                   </dl>
                 </div>
+
+                <form className="admin-participant-form" action={saveParticipantDisplayNameAction}>
+                  <input type="hidden" name="slotNumber" value={setting.slotNumber} />
+                  <label>
+                    <span>표시 이름</span>
+                    <input
+                      name="displayName"
+                      type="text"
+                      maxLength={24}
+                      placeholder="예: JY"
+                      defaultValue={setting.displayName ?? ""}
+                    />
+                  </label>
+                  <button type="submit">이름 저장</button>
+                </form>
 
                 <form className="admin-participant-form" action={saveParticipantImageUrlAction}>
                   <input type="hidden" name="slotNumber" value={setting.slotNumber} />
