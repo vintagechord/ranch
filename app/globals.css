@@ -3524,7 +3524,7 @@ img {
   }
 
   .participant-showcase {
-    min-height: 492px;
+    min-height: 260px;
     box-shadow:
       6px 6px 0 rgba(28, 105, 212, 0.34),
       inset 0 0 0 1px rgba(255, 255, 255, 0.06);
@@ -3544,7 +3544,7 @@ img {
   }
 
   .participant-portrait-frame {
-    width: 100%;
+    width: min(52vw, 210px);
   }
 
   .participant-roster {
@@ -3554,7 +3554,7 @@ img {
   }
 
   .participant-nameplate {
-    padding: 12px;
+    padding: 10px;
   }
 
   .participant-nameplate p,
@@ -3563,7 +3563,7 @@ img {
   }
 
   .participant-nameplate h1 {
-    font-size: clamp(2.1rem, 13vw, 3.7rem);
+    font-size: clamp(1.65rem, 9vw, 2.35rem);
   }
 
   .participant-grid {
