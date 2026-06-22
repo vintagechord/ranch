@@ -10,6 +10,8 @@ const homeNavItems = [
   { label: "INFO", hash: "#venue" }
 ];
 
+const pageNavItems = [{ label: "참가자", href: "/participants" }];
+
 const MAX_HEADER_COWS = 5;
 const HEADER_HERD_HALF_CYCLE_MS = 7500;
 type HeaderHerdMode = "filling" | "emptying";
@@ -146,10 +148,17 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
     return () => window.clearInterval(interval);
   }, []);
 
-  const navItems = homeNavItems.map((item) => ({
-    label: item.label,
-    href: pathname === "/" ? item.hash : `/${item.hash}`
-  }));
+  const navItems = [
+    ...homeNavItems.map((item) => ({
+      label: item.label,
+      href: pathname === "/" ? item.hash : `/${item.hash}`,
+      isActive: false
+    })),
+    ...pageNavItems.map((item) => ({
+      ...item,
+      isActive: pathname === item.href
+    }))
+  ];
 
   const topHref = pathname === "/" ? "#top" : "/";
   const mobileApplyHref = pathname === "/" ? "#apply" : "/#apply";
@@ -179,7 +188,7 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
             <a
               key={item.href}
               href={item.href}
-              className={pathname === item.href ? "is-active" : undefined}
+              className={item.isActive ? "is-active" : undefined}
               onClick={(event) => scrollToHash(event, item.href)}
             >
               {item.label}
