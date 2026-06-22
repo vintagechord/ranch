@@ -5,7 +5,7 @@ import ParticipantSelector from "@/app/components/ParticipantSelector";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
 import { getParticipantImageUrlBySlot } from "@/lib/participantImages";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { buildParticipants } from "@/lib/participants";
+import { buildParticipants, getParticipantInitials } from "@/lib/participants";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,7 @@ function isExcludedParticipantName(name: string) {
   return lowerName.includes("codex") || name === "테스트";
 }
 
-async function getRegisteredParticipantNames() {
+async function getRegisteredParticipantDisplayNames() {
   try {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
@@ -42,7 +42,7 @@ async function getRegisteredParticipantNames() {
     }
 
     const seenNames = new Set<string>();
-    const names: string[] = [];
+    const displayNames: string[] = [];
 
     for (const application of (data ?? []) as ApplicationNameRow[]) {
       const name = normalizeParticipantName(application.name);
@@ -53,14 +53,14 @@ async function getRegisteredParticipantNames() {
       }
 
       seenNames.add(nameKey);
-      names.push(name);
+      displayNames.push(getParticipantInitials(name));
 
-      if (names.length === 16) {
+      if (displayNames.length === 16) {
         break;
       }
     }
 
-    return names;
+    return displayNames;
   } catch (error) {
     if (
       error instanceof Error &&
@@ -97,11 +97,11 @@ async function getRegisteredParticipantImageUrls() {
 }
 
 export default async function ParticipantsPage() {
-  const [registeredNames, imageUrlsBySlot] = await Promise.all([
-    getRegisteredParticipantNames(),
+  const [registeredDisplayNames, imageUrlsBySlot] = await Promise.all([
+    getRegisteredParticipantDisplayNames(),
     getRegisteredParticipantImageUrls()
   ]);
-  const participantRoster = buildParticipants({ names: registeredNames, imageUrlsBySlot });
+  const participantRoster = buildParticipants({ names: registeredDisplayNames, imageUrlsBySlot });
 
   return (
     <>
