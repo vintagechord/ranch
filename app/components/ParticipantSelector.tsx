@@ -81,7 +81,6 @@ export default function ParticipantSelector({ participants }: ParticipantSelecto
         >
           <div className="participant-screen-meta">
             <span>PLAYER SELECT</span>
-            <span>{String(selectedIndex + 1).padStart(2, "0")}/16</span>
           </div>
 
           <div className="participant-portrait-frame" key={selectedParticipant.id}>
