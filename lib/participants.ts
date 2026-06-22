@@ -33,3 +33,10 @@ export const participants: Participant[] = Array.from({ length: 16 }, (_, index)
     accentColor: accentColors[index]
   };
 });
+
+export function applyParticipantNames(names: string[]) {
+  return participants.map((participant, index) => ({
+    ...participant,
+    name: names[index] ?? participant.name
+  }));
+}
