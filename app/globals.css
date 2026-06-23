@@ -3684,6 +3684,7 @@ img {
   }
 
   .participant-showcase {
+    --participant-feature-size: min(52vw, 210px);
     min-height: 260px;
     box-shadow:
       6px 6px 0 rgba(28, 105, 212, 0.34),
@@ -3704,7 +3705,7 @@ img {
   }
 
   .participant-portrait-frame {
-    width: min(52vw, 210px);
+    width: var(--participant-feature-size);
   }
 
   .participant-roster {
@@ -3714,16 +3715,30 @@ img {
   }
 
   .participant-nameplate {
-    padding: 10px;
+    right: auto;
+    bottom: 12px;
+    left: 50%;
+    width: min(calc(var(--participant-feature-size) + 72px), calc(100% - 28px));
+    gap: 3px;
+    padding: 8px 10px 9px;
+    border-top-width: 4px;
+    transform: translateX(-50%);
   }
 
-  .participant-nameplate p,
+  .participant-nameplate p {
+    font-size: 0.58rem;
+    line-height: 1;
+  }
+
   .participant-roster-header {
     font-size: 0.66rem;
   }
 
   .participant-nameplate h1 {
-    font-size: clamp(1.65rem, 9vw, 2.35rem);
+    font-size: clamp(1.38rem, 7.4vw, 2rem);
+    line-height: 0.94;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.72);
+    overflow-wrap: anywhere;
   }
 
   .participant-grid {
