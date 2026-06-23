@@ -1648,9 +1648,11 @@ img {
   padding: 20px;
   border: 1px solid #15191d;
   border-radius: 8px;
-  background: var(--panel-paper);
+  background:
+    linear-gradient(135deg, rgba(136, 189, 242, 0.4), rgba(253, 254, 254, 0) 46%),
+    #eef6ff;
   color: #15191d;
-  box-shadow: 6px 6px 0 var(--panel-shadow);
+  box-shadow: 6px 6px 0 #1c69d4;
   transition:
     background 180ms ease,
     border-color 180ms ease,
@@ -1661,8 +1663,10 @@ img {
 
 .program-card:hover {
   border-color: #15191d;
-  background: var(--panel-paper-hover);
-  box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.48);
+  background:
+    linear-gradient(135deg, rgba(136, 189, 242, 0.62), rgba(253, 254, 254, 0) 52%),
+    #e2f1ff;
+  box-shadow: 8px 8px 0 #e22718;
   transform: translateY(-4px) scale(1.015);
 }
 
@@ -1678,7 +1682,7 @@ img {
   color: #fdfefe;
   font-size: 0.85rem;
   font-weight: 950;
-  box-shadow: 3px 3px 0 rgba(21, 25, 29, 0.26);
+  box-shadow: 3px 3px 0 var(--orange);
 }
 
 .program-card h3 {
