@@ -14,6 +14,7 @@ const pageNavItems = [{ label: "참가자", href: "/participants" }];
 
 const MAX_HEADER_COWS = 5;
 const HEADER_HERD_HALF_CYCLE_MS = 7500;
+const PAGE_TOP_ACTIVE_OFFSET = 24;
 type HeaderHerdMode = "filling" | "emptying";
 
 function scrollToHash(event: MouseEvent<HTMLAnchorElement>, href: string) {
@@ -87,6 +88,7 @@ function SfFactoryLink({ isActive }: { isActive: boolean }) {
 export default function Header({ showApplyCta = true }: HeaderProps) {
   const pathname = usePathname();
   const [hideMobileCta, setHideMobileCta] = useState(false);
+  const [isAtPageTop, setIsAtPageTop] = useState(true);
   const [herdState, setHerdState] = useState<{ cowCount: number; mode: HeaderHerdMode }>({
     cowCount: 0,
     mode: "filling"
@@ -117,6 +119,17 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
 
     return () => observer.disconnect();
   }, [showApplyCta]);
+
+  useEffect(() => {
+    function updatePageTopState() {
+      setIsAtPageTop(window.scrollY <= PAGE_TOP_ACTIVE_OFFSET);
+    }
+
+    updatePageTopState();
+    window.addEventListener("scroll", updatePageTopState, { passive: true });
+
+    return () => window.removeEventListener("scroll", updatePageTopState);
+  }, [pathname]);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -156,7 +169,7 @@ export default function Header({ showApplyCta = true }: HeaderProps) {
     })),
     ...pageNavItems.map((item) => ({
       ...item,
-      isActive: pathname === item.href
+      isActive: pathname === item.href && isAtPageTop
     }))
   ];
 
