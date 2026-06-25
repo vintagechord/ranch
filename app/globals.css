@@ -3762,29 +3762,30 @@ img {
   }
 
   .hero-content {
-    grid-template-columns: 82px minmax(0, 1fr);
-    column-gap: 14px;
+    grid-template-columns: minmax(0, 1fr) clamp(78px, 23vw, 96px);
+    column-gap: clamp(10px, 3vw, 16px);
     min-height: auto;
     align-content: start;
     align-items: center;
   }
 
   .hero-title {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1;
-    font-size: clamp(2rem, 8.4vw, 3rem);
+    font-size: clamp(1.9rem, 8vw, 3rem);
     line-height: 0.9;
     max-width: 100%;
   }
 
   .hero-poster {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
     position: relative;
     top: auto;
     right: auto;
-    width: 82px;
-    margin: 4px 0 16px;
+    width: 100%;
+    justify-self: end;
+    margin: 4px 4px 16px 0;
   }
 
   .hero-copy,
