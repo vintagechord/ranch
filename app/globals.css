@@ -2661,19 +2661,8 @@ img {
   box-shadow:
     0 0 0 4px rgba(0, 0, 0, 0.38),
     0 32px 80px rgba(0, 0, 0, 0.58);
-  isolation: isolate;
   overflow: hidden;
   animation: participant-selected-pop 260ms ease-out both;
-}
-
-.participant-portrait-frame::before {
-  position: absolute;
-  inset: -8%;
-  z-index: 2;
-  border-radius: 12px;
-  content: "";
-  opacity: 0;
-  pointer-events: none;
 }
 
 .participant-portrait-frame::after {
@@ -2692,90 +2681,6 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.participant-portrait-frame.participant-fx-slot-1::before {
-  background:
-    repeating-linear-gradient(
-      92deg,
-      transparent 0 5%,
-      rgba(255, 247, 96, 0.9) 5.4% 6.2%,
-      rgba(255, 176, 0, 0.34) 7.1% 9.6%,
-      transparent 10.8% 17%
-    ),
-    repeating-linear-gradient(
-      -86deg,
-      transparent 0 7%,
-      rgba(255, 254, 155, 0.92) 7.5% 8.2%,
-      rgba(255, 187, 0, 0.36) 9% 12.5%,
-      transparent 13.5% 22%
-    ),
-    radial-gradient(ellipse at 50% 62%, rgba(255, 255, 144, 0.58) 0 18%, rgba(255, 197, 0, 0.54) 24%, transparent 46%),
-    radial-gradient(ellipse at 50% 88%, rgba(255, 190, 0, 0.88) 0 9%, rgba(255, 240, 85, 0.36) 18%, transparent 38%),
-    conic-gradient(
-      from -8deg at 50% 56%,
-      transparent 0 4%,
-      rgba(255, 235, 34, 0.72) 6%,
-      rgba(255, 153, 0, 0.42) 8%,
-      transparent 11% 17%,
-      rgba(255, 255, 118, 0.78) 20%,
-      rgba(255, 171, 0, 0.48) 23%,
-      transparent 26% 32%,
-      rgba(255, 236, 44, 0.74) 35%,
-      rgba(255, 146, 0, 0.44) 38%,
-      transparent 41% 50%,
-      rgba(255, 245, 82, 0.8) 53%,
-      rgba(255, 170, 0, 0.46) 56%,
-      transparent 59% 66%,
-      rgba(255, 237, 52, 0.72) 69%,
-      rgba(255, 150, 0, 0.42) 72%,
-      transparent 75% 100%
-    );
-  background-position:
-    0 0,
-    0 18px,
-    center,
-    center,
-    center;
-  background-size:
-    150% 180%,
-    145% 190%,
-    100% 100%,
-    100% 100%,
-    100% 100%;
-  clip-path: polygon(
-    49% 0,
-    57% 18%,
-    64% 5%,
-    66% 31%,
-    78% 14%,
-    73% 44%,
-    92% 32%,
-    77% 61%,
-    98% 58%,
-    77% 78%,
-    86% 100%,
-    59% 86%,
-    50% 100%,
-    41% 86%,
-    14% 100%,
-    23% 78%,
-    2% 58%,
-    23% 61%,
-    8% 32%,
-    27% 44%,
-    22% 14%,
-    34% 31%,
-    36% 5%,
-    43% 18%
-  );
-  filter: blur(3px) saturate(1.55) brightness(1.08);
-  mask-image: radial-gradient(ellipse at 50% 60%, transparent 0 32%, rgba(0, 0, 0, 0.92) 43% 100%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 60%, transparent 0 32%, rgba(0, 0, 0, 0.92) 43% 100%);
-  mix-blend-mode: screen;
-  opacity: 0.95;
-  transform-origin: 50% 64%;
-  animation: participant-fire-aura 620ms steps(2, end) infinite;
 }
 
 .participant-nameplate {
@@ -2927,44 +2832,6 @@ img {
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes participant-fire-aura {
-  0% {
-    background-position:
-      0 32px,
-      18px 48px,
-      center,
-      center,
-      center;
-    filter: blur(4px) saturate(1.35) brightness(1.01);
-    opacity: 0.7;
-    transform: scaleX(0.96) scaleY(1.02) translateY(8px);
-  }
-
-  45% {
-    background-position:
-      -24px -34px,
-      20px -18px,
-      center,
-      center,
-      center;
-    filter: blur(2.5px) saturate(1.72) brightness(1.22);
-    opacity: 0.98;
-    transform: scaleX(1.04) scaleY(1.08) translateY(-7px);
-  }
-
-  100% {
-    background-position:
-      20px -72px,
-      -18px -50px,
-      center,
-      center,
-      center;
-    filter: blur(3px) saturate(1.56) brightness(1.12);
-    opacity: 0.86;
-    transform: scaleX(1) scaleY(1.04) translateY(-3px);
   }
 }
 
@@ -4223,10 +4090,5 @@ img {
     opacity: 1;
     visibility: visible;
     font-size: clamp(3rem, 13vw, 7rem);
-  }
-
-  .participant-portrait-frame.participant-fx-slot-1::before {
-    opacity: 0.74;
-    transform: none;
   }
 }
