@@ -9,6 +9,7 @@ type ParticipantSelectorProps = {
 };
 
 const GRID_COLUMNS = 4;
+const EAGER_PARTICIPANT_COUNT = 6;
 
 export default function ParticipantSelector({ participants }: ParticipantSelectorProps) {
   const [selectedId, setSelectedId] = useState(participants[0]?.id ?? "");
@@ -84,7 +85,15 @@ export default function ParticipantSelector({ participants }: ParticipantSelecto
           </div>
 
           <div className="participant-portrait-frame" key={selectedParticipant.id}>
-            <img src={selectedParticipant.imageUrl} alt={`${selectedParticipant.name} 캐릭터`} />
+            <img
+              src={selectedParticipant.imageUrl}
+              alt={`${selectedParticipant.name} 캐릭터`}
+              width={640}
+              height={640}
+              loading="eager"
+              decoding="async"
+              fetchPriority={selectedIndex === 0 ? "high" : "auto"}
+            />
           </div>
 
           <div className="participant-nameplate">
@@ -120,7 +129,15 @@ export default function ParticipantSelector({ participants }: ParticipantSelecto
                   key={participant.id}
                   style={{ "--participant-tile-accent": participant.accentColor } as CSSProperties}
                 >
-                  <img src={participant.imageUrl} alt="" loading={index < 6 ? "eager" : "lazy"} />
+                  <img
+                    src={participant.imageUrl}
+                    alt=""
+                    width={640}
+                    height={640}
+                    loading={index < EAGER_PARTICIPANT_COUNT ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                  />
                   <span>{String(index + 1).padStart(2, "0")}</span>
                 </button>
               );

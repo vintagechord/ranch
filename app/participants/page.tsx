@@ -139,9 +139,13 @@ export default async function ParticipantsPage() {
     displayNamesBySlot: participantSettings.displayNamesBySlot,
     imageUrlsBySlot
   });
+  const initialParticipantImageUrl = participantRoster[0]?.imageUrl;
 
   return (
     <>
+      {initialParticipantImageUrl ? (
+        <link rel="preload" as="image" href={initialParticipantImageUrl} fetchPriority="high" />
+      ) : null}
       <Header showApplyCta={false} />
       <main id="top" className="participant-page">
         <ParticipantSelector participants={participantRoster} />
