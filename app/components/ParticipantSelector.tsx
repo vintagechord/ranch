@@ -84,7 +84,10 @@ export default function ParticipantSelector({ participants }: ParticipantSelecto
             <span>PLAYER SELECT</span>
           </div>
 
-          <div className="participant-portrait-frame" key={selectedParticipant.id}>
+          <div
+            className={`participant-portrait-frame participant-fx-slot-${selectedIndex + 1}`}
+            key={selectedParticipant.id}
+          >
             <img
               src={selectedParticipant.imageUrl}
               alt={`${selectedParticipant.name} 캐릭터`}
