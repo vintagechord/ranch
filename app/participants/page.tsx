@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: "목장의 아침 을왕리 에디션 참가자 캐릭터 선택 화면."
 };
 
+const REPO_MANAGED_PARTICIPANT_IMAGE_SLOTS = new Set([1]);
+
 type ApplicationNameRow = {
   name: string | null;
 };
@@ -126,10 +128,16 @@ export default async function ParticipantsPage() {
     getRegisteredParticipantDisplayNames(),
     getRegisteredParticipantSettings()
   ]);
+  const imageUrlsBySlot = new Map(participantSettings.imageUrlsBySlot);
+
+  for (const slotNumber of REPO_MANAGED_PARTICIPANT_IMAGE_SLOTS) {
+    imageUrlsBySlot.delete(slotNumber);
+  }
+
   const participantRoster = buildParticipants({
     names: registeredDisplayNames,
     displayNamesBySlot: participantSettings.displayNamesBySlot,
-    imageUrlsBySlot: participantSettings.imageUrlsBySlot
+    imageUrlsBySlot
   });
 
   return (
