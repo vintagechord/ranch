@@ -7,8 +7,7 @@ import PiggyBankButton from "@/app/components/PiggyBankButton";
 import { projects } from "@/lib/projects";
 
 const navItems = [
-  { label: "PROJECTS", hash: "#project-room" },
-  { label: "ABOUT", hash: "#about" }
+  { label: "PROJECTS", hash: "#project-room" }
 ];
 
 function scrollToHash(event: MouseEvent<HTMLAnchorElement>, href: string) {
