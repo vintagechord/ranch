@@ -4,20 +4,20 @@ import crypto from "node:crypto";
 import { cookies } from "next/headers";
 
 const ADMIN_COOKIE_NAME = "ranch_admin";
-const ADMIN_TOKEN_INPUT = "ranch-morning-admin";
+const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
 
 function getAdminPassword() {
   return process.env.ADMIN_PASSWORD ?? "";
 }
 
-function getAdminToken() {
+function signAdminSession(payload: string) {
   const password = getAdminPassword();
 
   if (!password) {
     return "";
   }
 
-  return crypto.createHmac("sha256", password).update(ADMIN_TOKEN_INPUT).digest("hex");
+  return crypto.createHmac("sha256", password).update(payload).digest("hex");
 }
 
 function timingSafeEqual(a: string, b: string) {
@@ -46,20 +46,41 @@ export function verifyAdminPassword(password: string) {
 }
 
 export function createAdminCookieValue() {
-  return getAdminToken();
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const nonce = crypto.randomBytes(18).toString("base64url");
+  const payload = `${issuedAt}.${nonce}`;
+  const signature = signAdminSession(payload);
+
+  return `${payload}.${signature}`;
 }
 
 export async function isAdminAuthenticated() {
-  const expectedToken = getAdminToken();
+  const cookieStore = await cookies();
+  const cookieValue = cookieStore.get(ADMIN_COOKIE_NAME)?.value ?? "";
+  const [issuedAtValue, nonce, signature, ...extra] = cookieValue.split(".");
 
-  if (!expectedToken) {
+  if (!issuedAtValue || !nonce || !signature || extra.length > 0) {
     return false;
   }
 
-  const cookieStore = await cookies();
-  const cookieValue = cookieStore.get(ADMIN_COOKIE_NAME)?.value ?? "";
+  const issuedAt = Number(issuedAtValue);
+  const now = Math.floor(Date.now() / 1000);
 
-  return timingSafeEqual(cookieValue, expectedToken);
+  if (
+    !Number.isSafeInteger(issuedAt) ||
+    issuedAt > now + 60 ||
+    now - issuedAt > ADMIN_SESSION_MAX_AGE_SECONDS
+  ) {
+    return false;
+  }
+
+  const expectedSignature = signAdminSession(`${issuedAtValue}.${nonce}`);
+
+  if (!expectedSignature) {
+    return false;
+  }
+
+  return timingSafeEqual(signature, expectedSignature);
 }
 
-export { ADMIN_COOKIE_NAME };
+export { ADMIN_COOKIE_NAME, ADMIN_SESSION_MAX_AGE_SECONDS };

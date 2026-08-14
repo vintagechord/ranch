@@ -25,6 +25,7 @@ import {
   getPiggyBankBalance,
   type PiggyBankBalance
 } from "@/lib/piggyBank";
+import type { ProjectProposalRow } from "@/lib/supabase";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +35,10 @@ type AdminSearchParams = Promise<{
   piggy?: string;
   chat?: string;
   participant?: string;
+  proposalPage?: string;
 }>;
+
+const PROJECT_PROPOSALS_PER_PAGE = 24;
 
 type PartyApplication = {
   id: string;
@@ -46,6 +50,18 @@ type PartyApplication = {
   attendees: number | null;
   message: string | null;
 };
+
+type ProjectProposalSummary = Pick<
+  ProjectProposalRow,
+  | "id"
+  | "created_at"
+  | "artist_name"
+  | "project_title"
+  | "project_type"
+  | "current_stage"
+  | "support_needed"
+  | "status"
+>;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
@@ -87,7 +103,27 @@ function getErrorMessage(error?: string) {
     return "비밀번호가 맞지 않습니다.";
   }
 
+  if (error === "rate") {
+    return "로그인 시도가 많습니다. 15분 후 다시 시도해 주세요.";
+  }
+
+  if (error === "unavailable") {
+    return "지금은 관리자 로그인을 확인할 수 없습니다. 잠시 후 다시 시도해 주세요.";
+  }
+
   return "";
+}
+
+function parsePositivePage(value?: string) {
+  const page = Number(value);
+  return Number.isSafeInteger(page) && page > 0 ? page : 1;
+}
+
+function proposalStatusLabel(status: string) {
+  if (status === "reviewing") return "검토 중";
+  if (status === "contacted") return "연락 완료";
+  if (status === "closed") return "종료";
+  return "새 제안";
 }
 
 function getPiggyMessage(status?: string) {
@@ -184,9 +220,9 @@ function parsePositiveAmount(value: FormDataEntryValue | null) {
 
 async function getApplications() {
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from("ranch_applications")
-    .select("id, created_at, name, phone, email, instagram, attendees, message")
+    .select("id, created_at, name, phone, email, instagram, attendees, message", { count: "exact" })
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -194,7 +230,74 @@ async function getApplications() {
     throw new Error(error.message);
   }
 
-  return (data ?? []) as PartyApplication[];
+  const items = (data ?? []) as PartyApplication[];
+  return { items, total: count ?? items.length };
+}
+
+async function getProjectProposals(page: number) {
+  const supabase = getSupabaseAdmin();
+  const { error: purgeError } = await supabase.rpc("purge_expired_project_proposals", {});
+
+  if (purgeError) {
+    throw new Error(purgeError.message);
+  }
+
+  const now = new Date().toISOString();
+  const { count, error: countError } = await supabase
+    .from("project_proposals")
+    .select("id", { count: "exact", head: true })
+    .gt("retention_until", now);
+
+  if (countError) {
+    throw new Error(countError.message);
+  }
+
+  const total = count ?? 0;
+  const pageCount = Math.max(1, Math.ceil(total / PROJECT_PROPOSALS_PER_PAGE));
+
+  if (page > pageCount) {
+    return {
+      items: [] as ProjectProposalSummary[],
+      total,
+      latestCreatedAt: null,
+      outOfRange: true
+    };
+  }
+
+  const from = (page - 1) * PROJECT_PROPOSALS_PER_PAGE;
+  const to = from + PROJECT_PROPOSALS_PER_PAGE - 1;
+  const { data, error } = await supabase
+    .from("project_proposals")
+    .select(
+      "id, created_at, artist_name, project_title, project_type, current_stage, support_needed, status"
+    )
+    .gt("retention_until", now)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const items = (data ?? []) as ProjectProposalSummary[];
+  const { data: latest, error: latestError } = await supabase
+    .from("project_proposals")
+    .select("created_at")
+    .gt("retention_until", now)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latestError) {
+    throw new Error(latestError.message);
+  }
+
+  return {
+    items,
+    total,
+    latestCreatedAt: latest?.created_at ?? null,
+    outOfRange: false
+  };
 }
 
 async function savePiggyBankAmount(formData: FormData) {
@@ -405,7 +508,7 @@ export default async function AdminPage({
 }: {
   searchParams: AdminSearchParams;
 }) {
-  const { error, piggy, chat, participant } = await searchParams;
+  const { error, piggy, chat, participant, proposalPage: proposalPageValue } = await searchParams;
   const authenticated = await isAdminAuthenticated();
 
   if (!authenticated) {
@@ -413,6 +516,11 @@ export default async function AdminPage({
   }
 
   let applications: PartyApplication[] = [];
+  let applicationCount = 0;
+  let projectProposals: ProjectProposalSummary[] = [];
+  let projectProposalCount = 0;
+  let latestProjectProposalCreatedAt: string | null = null;
+  let proposalPageOutOfRange = false;
   let piggyBank: PiggyBankBalance = {
     balanceAmount: 0,
     updatedAt: null
@@ -423,17 +531,33 @@ export default async function AdminPage({
   };
   let participantImages = getDefaultParticipantImageSettings();
   let loadError = "";
+  let proposalLoadError = "";
   let piggyLoadError = "";
   let openChatLoadError = "";
   let participantImageLoadError = "";
 
   try {
-    applications = await getApplications();
+    const result = await getApplications();
+    applications = result.items;
+    applicationCount = result.total;
   } catch (adminError) {
     loadError =
       adminError instanceof Error
         ? adminError.message
         : "신청 목록을 불러오지 못했습니다.";
+  }
+
+  try {
+    const result = await getProjectProposals(parsePositivePage(proposalPageValue));
+    projectProposals = result.items;
+    projectProposalCount = result.total;
+    latestProjectProposalCreatedAt = result.latestCreatedAt;
+    proposalPageOutOfRange = result.outOfRange;
+  } catch (adminError) {
+    proposalLoadError =
+      adminError instanceof Error
+        ? adminError.message
+        : "프로젝트 제안을 불러오지 못했습니다.";
   }
 
   try {
@@ -463,12 +587,23 @@ export default async function AdminPage({
         : "참가자 이미지를 불러오지 못했습니다.";
   }
 
-  const totalAttendees = applications.reduce(
-    (sum, item) => sum + Math.max(Number(item.attendees ?? 0), 0),
-    0
+  const proposalPage = parsePositivePage(proposalPageValue);
+  const proposalPageCount = Math.max(
+    1,
+    Math.ceil(projectProposalCount / PROJECT_PROPOSALS_PER_PAGE)
   );
-  const emailCount = applications.filter((item) => item.email?.trim()).length;
-  const latestCreatedAt = applications[0]?.created_at;
+
+  if (!proposalLoadError && proposalPageOutOfRange) {
+    redirect(
+      proposalPageCount === 1
+        ? "/admin#project-proposals"
+        : `/admin?proposalPage=${proposalPageCount}#project-proposals`
+    );
+  }
+
+  const latestCreatedAt = [latestProjectProposalCreatedAt, applications[0]?.created_at]
+    .filter((value): value is string => Boolean(value))
+    .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
   const piggyMessage = getPiggyMessage(piggy);
   const openChatMessage = getOpenChatMessage(chat);
   const participantMessage = getParticipantMessage(participant);
@@ -477,8 +612,8 @@ export default async function AdminPage({
     <main className="admin-shell">
       <header className="admin-topbar">
         <div>
-          <p className="admin-eyebrow">EULWANGNI EDITION</p>
-          <h1>신청 확인</h1>
+          <p className="admin-eyebrow">MORNING RANCH / OPERATIONS</p>
+          <h1>운영 관리</h1>
         </div>
         <div className="admin-actions">
           <Link href="/">사이트 보기</Link>
@@ -490,16 +625,16 @@ export default async function AdminPage({
 
       <section className="admin-summary" aria-label="신청 요약">
         <article>
-          <span>전체 신청</span>
-          <strong>{applications.length}</strong>
+          <span>프로젝트 제안</span>
+          <strong>{projectProposalCount}</strong>
         </article>
         <article>
-          <span>참석 인원</span>
-          <strong>{totalAttendees || "-"}</strong>
+          <span>이전 신청 기록</span>
+          <strong>{applicationCount}</strong>
         </article>
         <article>
-          <span>이메일 등록</span>
-          <strong>{emailCount}</strong>
+          <span>전체 접수</span>
+          <strong>{projectProposalCount + applicationCount}</strong>
         </article>
         <article>
           <span>최근 신청</span>
@@ -508,6 +643,75 @@ export default async function AdminPage({
       </section>
 
       {loadError ? <div className="admin-alert">{loadError}</div> : null}
+      {proposalLoadError ? <div className="admin-alert">{proposalLoadError}</div> : null}
+
+      <section id="project-proposals" className="admin-proposal-section" aria-label="프로젝트 제안 목록">
+        <div className="admin-table-heading">
+          <div>
+            <p className="admin-eyebrow">PROJECT PROPOSALS</p>
+            <h2>프로젝트 제안</h2>
+          </div>
+          <span>{proposalPage} / {proposalPageCount} 페이지 · 전체 {projectProposalCount}건</span>
+        </div>
+
+        {projectProposals.length === 0 && !proposalLoadError ? (
+          <div className="admin-empty">아직 접수된 프로젝트 제안이 없습니다.</div>
+        ) : (
+          <div className="admin-proposal-grid">
+            {projectProposals.map((proposal) => (
+              <article className="admin-proposal-card" key={proposal.id}>
+                <header>
+                  <div className="admin-proposal-badges">
+                    <span className="admin-status-badge">{proposalStatusLabel(proposal.status)}</span>
+                    <span>{proposal.project_type}</span>
+                  </div>
+                  <time dateTime={proposal.created_at}>{formatDate(proposal.created_at)}</time>
+                </header>
+
+                <div className="admin-proposal-title">
+                  <p>{proposal.artist_name}</p>
+                  <h3>{proposal.project_title}</h3>
+                </div>
+
+                <div className="admin-proposal-tags" aria-label="제안 분류">
+                  <span>{proposal.current_stage}</span>
+                  {proposal.support_needed.map((support) => <span key={support}>{support}</span>)}
+                </div>
+
+                <Link
+                  className="admin-proposal-detail-link"
+                  href={`/admin/proposals/${proposal.id}`}
+                  prefetch={false}
+                >
+                  제안서 상세 보기 <span aria-hidden="true">→</span>
+                </Link>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {proposalPageCount > 1 ? (
+          <nav className="admin-pagination" aria-label="프로젝트 제안 페이지">
+            {proposalPage > 1 ? (
+              <Link
+                href={proposalPage === 2 ? "/admin#project-proposals" : `/admin?proposalPage=${proposalPage - 1}#project-proposals`}
+                prefetch={false}
+              >
+                ← 이전
+              </Link>
+            ) : <span aria-hidden="true" />}
+            <span>{proposalPage} / {proposalPageCount}</span>
+            {proposalPage < proposalPageCount ? (
+              <Link
+                href={`/admin?proposalPage=${proposalPage + 1}#project-proposals`}
+                prefetch={false}
+              >
+                다음 →
+              </Link>
+            ) : <span aria-hidden="true" />}
+          </nav>
+        ) : null}
+      </section>
 
       <section className="admin-piggy-section" aria-label="저금통 관리">
         <div className="admin-piggy-info">
@@ -697,14 +901,14 @@ export default async function AdminPage({
         </div>
       </section>
 
-      <section className="admin-table-section" aria-label="신청 목록">
+      <section className="admin-table-section" aria-label="이전 신청 기록">
         <div className="admin-table-heading">
-          <h2>신청 목록</h2>
-          <span>최신 200건</span>
+          <h2>이전 신청 기록</h2>
+          <span>최신 {applications.length}건 / 전체 {applicationCount}건</span>
         </div>
 
         {applications.length === 0 && !loadError ? (
-          <div className="admin-empty">아직 접수된 신청이 없습니다.</div>
+          <div className="admin-empty">보관 중인 이전 신청 기록이 없습니다.</div>
         ) : (
           <div className="admin-table-wrap">
             <table className="admin-table">

@@ -1,139 +1,48 @@
-create extension if not exists "pgcrypto";
-create extension if not exists pg_cron with schema pg_catalog;
+alter table public.project_proposals
+  add column if not exists retention_until timestamptz;
 
-create table if not exists ranch_applications (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  phone text,
-  email text,
-  instagram text,
-  attendees integer,
-  message text,
-  created_at timestamptz default now()
-);
+update public.project_proposals
+set retention_until = consented_at + interval '1 year'
+where retention_until is null;
 
-alter table public.ranch_applications enable row level security;
+alter table public.project_proposals
+  alter column retention_until set default (now() + interval '1 year'),
+  alter column retention_until set not null;
 
-drop policy if exists "Allow public ranch application inserts" on public.ranch_applications;
+alter table public.project_proposals
+  drop constraint if exists project_proposals_retention_window_check;
 
-revoke all on table public.ranch_applications from public, anon, authenticated;
-grant select on table public.ranch_applications to service_role;
-
-create table if not exists party_applications (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz not null default now(),
-  name text not null,
-  phone text not null,
-  people_count integer not null default 1,
-  depositor_name text not null,
-  companions text,
-  auction_item text,
-  advance_team boolean not null default false,
-  creative_project text,
-  food_note text,
-  memo text,
-  privacy_agreed boolean not null default false,
-  payment_status text not null default '미확인',
-  application_status text not null default '대기'
-);
-
-alter table party_applications enable row level security;
-
-alter table party_applications
-  add column if not exists auction_item text;
-
-alter table party_applications
-  add column if not exists creative_project text;
-
-alter table party_applications
-  add column if not exists advance_team boolean not null default false;
-
-create table if not exists public.piggy_bank (
-  id integer primary key default 1 check (id = 1),
-  created_at timestamptz not null default now(),
-  balance_amount integer not null default 0 check (balance_amount >= 0),
-  updated_at timestamptz not null default now()
-);
-
-insert into public.piggy_bank (id, balance_amount)
-values (1, 0)
-on conflict (id) do nothing;
-
-alter table public.piggy_bank enable row level security;
-
-create table if not exists public.open_chat_settings (
-  id integer primary key default 1 check (id = 1),
-  created_at timestamptz not null default now(),
-  chat_url text,
-  updated_at timestamptz not null default now()
-);
-
-insert into public.open_chat_settings (id, chat_url)
-values (1, null)
-on conflict (id) do nothing;
-
-alter table public.open_chat_settings enable row level security;
-
-create table if not exists public.project_proposals (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz not null default now(),
-  contact_name text not null check (char_length(btrim(contact_name)) between 1 and 80),
-  phone text check (phone is null or char_length(btrim(phone)) between 7 and 40),
-  email text not null check (char_length(btrim(email)) between 3 and 254),
-  artist_name text not null check (char_length(btrim(artist_name)) between 1 and 100),
-  project_title text not null check (char_length(btrim(project_title)) between 1 and 140),
-  project_type text not null check (
-    project_type in ('싱글', 'EP / 앨범', '라이브 / 공연', '영상 / 콘텐츠', '기타')
-  ),
-  current_stage text not null check (
-    current_stage in ('아이디어 / 기획', '데모 제작', '녹음 / 제작', '믹싱 / 마스터링', '발매 준비')
-  ),
-  support_needed text[] not null check (
-    cardinality(support_needed) between 1 and 6
-    and support_needed <@ array[
-      '기획',
-      '프로듀싱 / 편곡',
-      '레코딩',
-      '믹싱 / 마스터링',
-      '콘텐츠 제작',
-      '발매 / 유통'
-    ]::text[]
-  ),
-  desired_schedule text check (
-    desired_schedule is null or char_length(btrim(desired_schedule)) between 1 and 120
-  ),
-  budget_range text check (
-    budget_range is null
-    or budget_range in ('협의 필요', '100만원 미만', '100–300만원', '300–500만원', '500만원 이상')
-  ),
-  reference_url text check (
-    reference_url is null
-    or (char_length(reference_url) <= 1000 and reference_url ~ '^https://')
-  ),
-  details text not null check (char_length(btrim(details)) between 20 and 3000),
-  status text not null default 'new' check (status in ('new', 'reviewing', 'contacted', 'closed')),
-  privacy_agreed boolean not null check (privacy_agreed),
-  consented_at timestamptz not null default now(),
-  privacy_notice_version text not null,
-  idempotency_key uuid not null unique,
-  payload_hash text not null check (payload_hash ~ '^[0-9a-f]{64}$'),
-  retention_until timestamptz not null default (now() + interval '1 year'),
-  constraint project_proposals_retention_window_check check (
+alter table public.project_proposals
+  add constraint project_proposals_retention_window_check
+  check (
     retention_until > consented_at
     and retention_until <= consented_at + interval '1 year'
-  )
-);
+  );
 
-create index if not exists project_proposals_status_created_at_idx
-  on public.project_proposals (status, created_at desc);
+alter table public.project_proposals
+  add column if not exists payload_hash text;
+
+update public.project_proposals
+set payload_hash = encode(extensions.digest(idempotency_key::text, 'sha256'), 'hex')
+where payload_hash is null;
+
+alter table public.project_proposals
+  alter column payload_hash set not null;
+
+alter table public.project_proposals
+  drop constraint if exists project_proposals_payload_hash_check;
+
+alter table public.project_proposals
+  add constraint project_proposals_payload_hash_check
+  check (payload_hash ~ '^[0-9a-f]{64}$');
+
+drop index if exists public.project_proposals_request_fingerprint_created_at_idx;
+
+alter table public.project_proposals
+  drop column if exists request_fingerprint;
 
 create index if not exists project_proposals_retention_until_idx
   on public.project_proposals (retention_until);
-
-alter table public.project_proposals enable row level security;
-
-revoke all on table public.project_proposals from anon, authenticated;
-grant select, insert, update, delete on table public.project_proposals to service_role;
 
 create table if not exists public.request_rate_limits (
   scope text not null check (char_length(scope) between 1 and 64),
@@ -342,6 +251,8 @@ begin
 end;
 $$;
 
+notify pgrst, 'reload schema';
+
 revoke all on function public.consume_request_rate_limit(text, text, integer, integer)
   from public, anon, authenticated;
 revoke all on function public.clear_request_rate_limit(text, text)
@@ -361,6 +272,10 @@ grant execute on function public.submit_project_proposal(
 ) to service_role;
 grant execute on function public.purge_expired_project_proposals()
   to service_role;
+
+revoke all on table public.ranch_applications from public, anon, authenticated;
+grant select on table public.ranch_applications to service_role;
+drop policy if exists "Allow public ranch application inserts" on public.ranch_applications;
 
 do $$
 declare
@@ -383,5 +298,3 @@ begin
   end if;
 end;
 $$;
-
-notify pgrst, 'reload schema';

@@ -3376,6 +3376,231 @@ img {
   white-space: nowrap;
 }
 
+.admin-proposal-section {
+  margin: 0 0 28px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--ivory);
+  box-shadow: 4px 4px 0 rgba(28, 105, 212, 0.82);
+  overflow: hidden;
+}
+
+.admin-proposal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.admin-proposal-card {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  padding: 18px;
+}
+
+.admin-proposal-card > header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-proposal-card time {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.admin-proposal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.admin-proposal-badges > span:not(.admin-status-badge) {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.admin-proposal-title p,
+.admin-proposal-detail-page > header p {
+  margin: 0 0 6px;
+  color: var(--red);
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.admin-proposal-title h3,
+.admin-proposal-detail-page > header h2 {
+  margin: 0;
+  color: var(--green);
+  font-size: clamp(1.7rem, 3vw, 2.8rem);
+  font-weight: 950;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.admin-proposal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-proposal-tags span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-elevated);
+  color: var(--body-strong);
+  padding: 6px 9px;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.admin-proposal-detail-link {
+  display: inline-flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: var(--ivory);
+  padding: 0 13px;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.admin-proposal-detail-link:hover,
+.admin-proposal-detail-link:focus-visible {
+  background: transparent;
+  color: var(--green);
+  outline: none;
+}
+
+.admin-proposal-detail-page {
+  display: grid;
+  gap: 24px;
+  margin-top: 28px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--ivory);
+  padding: clamp(18px, 4vw, 34px);
+  box-shadow: 4px 4px 0 rgba(28, 105, 212, 0.82);
+}
+
+.admin-proposal-detail-page > header {
+  display: flex;
+  gap: 24px;
+  align-items: start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 24px;
+}
+
+.admin-proposal-detail-page > header h2 {
+  font-size: clamp(2.2rem, 5vw, 4.8rem);
+}
+
+.admin-proposal-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.admin-proposal-detail-meta div {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  padding: 13px;
+}
+
+.admin-proposal-detail-meta dt,
+.admin-proposal-detail-copy > p {
+  margin: 0 0 7px;
+  color: var(--red);
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+}
+
+.admin-proposal-detail-meta dd {
+  margin: 0;
+  color: var(--body-strong);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.admin-proposal-detail-meta a {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-proposal-detail-copy {
+  border-top: 1px dashed var(--line);
+  padding-top: 24px;
+}
+
+.admin-proposal-detail-copy h2 {
+  margin: 0 0 18px;
+  color: var(--green);
+  font-size: clamp(1.7rem, 3vw, 2.8rem);
+}
+
+.admin-proposal-detail-copy div {
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--body-strong);
+  padding: clamp(16px, 3vw, 26px);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.admin-pagination {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding: 14px 18px;
+}
+
+.admin-pagination > span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.admin-pagination a {
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 950;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.admin-pagination a:last-child {
+  justify-self: end;
+}
+
 .admin-table-section {
   border: 1px solid var(--ink);
   border-radius: 8px;
@@ -3572,6 +3797,14 @@ img {
 
   .admin-summary {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-proposal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-proposal-detail-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin-piggy-section {
@@ -4012,6 +4245,18 @@ img {
 
   .admin-summary article {
     min-height: 104px;
+  }
+
+  .admin-proposal-grid {
+    padding: 14px;
+  }
+
+  .admin-proposal-detail-page > header {
+    display: grid;
+  }
+
+  .admin-proposal-detail-meta {
+    grid-template-columns: 1fr;
   }
 
   .admin-piggy-info dl {

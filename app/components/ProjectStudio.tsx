@@ -90,7 +90,7 @@ function MixingDesk() {
 export default function ProjectStudio({ projects }: ProjectStudioProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const projectCount = String(projects.length).padStart(2, "0");
-  const featuredProjects = projects.slice(0, 2);
+  const hasManyProjects = projects.length > 2;
 
   function moveLight(event: PointerEvent<HTMLDivElement>) {
     if (document.documentElement.classList.contains("site-motion-paused") || event.pointerType === "touch") {
@@ -128,7 +128,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
 
       <div
         ref={stageRef}
-        className="studio-stage"
+        className={`studio-stage${hasManyProjects ? " has-many-projects" : ""}`}
         onPointerMove={moveLight}
         onPointerLeave={resetLight}
       >
@@ -164,7 +164,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
         </div>
 
         <div className="studio-equipment-row">
-          {featuredProjects.map((project, index) => (
+          {projects.map((project, index) => (
             <Link
               className={`studio-project-object is-${project.visual} is-slot-${index + 1}`}
               href={`/projects/${project.slug}`}
@@ -186,7 +186,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
         </div>
 
         <div className="studio-stage-footer">
-          {featuredProjects.map((project) => (
+          {projects.map((project) => (
             <span key={project.slug}>INPUT {project.number} — {project.artist.toUpperCase()}</span>
           ))}
           <span>OUTPUT — ARCHIVE</span>

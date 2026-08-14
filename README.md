@@ -31,15 +31,15 @@ npm run dev
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+PROPOSAL_RATE_LIMIT_SECRET=
 DATABASE_URL=
 ADMIN_PASSWORD=
 ```
 
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase Project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 신청 API에서 `ranch_applications` insert에 사용하는 Supabase anon public key
-- `SUPABASE_SERVICE_ROLE_KEY`: 서버 Route Handler 전용 키
+- `SUPABASE_SERVICE_ROLE_KEY`: 프로젝트 제안 접수와 관리자 조회에 사용하는 서버 전용 키
+- `PROPOSAL_RATE_LIMIT_SECRET`: IP를 저장하지 않고 요청 제한용 HMAC을 만드는 선택 키. 없으면 service role key를 사용합니다.
 - `DATABASE_URL`: 직접 DB 연결 또는 마이그레이션용, 현재 런타임 필수는 아님
 - `ADMIN_PASSWORD`: `/admin` 관리자 페이지 로그인 비밀번호
 
@@ -63,12 +63,14 @@ supabase db push
 
 현재 스키마는 아래 테이블을 만듭니다.
 
-- `ranch_applications`: 참가 신청 폼 저장
+- `ranch_applications`: 종료된 을왕리 참가 신청 기록 보관
 - `party_applications`: 기존 관리자 신청 데이터 호환용
+- `project_proposals`: 프로젝트 제안 폼 저장(접수일 기준 최대 1년)
+- `request_rate_limits`: 프로젝트 제안·관리자 로그인 요청 제한용 단기 HMAC 저장
 - `piggy_bank`: 관리자 저금통 잔액 저장
 - `open_chat_settings`: 신청 완료 후 보여줄 오픈채팅방 링크 저장
 
-RLS는 켜져 있고 `ranch_applications`에는 이름과 연락처가 있는 anon insert만 허용합니다. 관리자 조회, 저금통 수정, 오픈채팅방 링크 관리는 service role key를 사용하는 서버 코드에서 처리합니다.
+RLS는 켜져 있고 `ranch_applications`의 공개 insert는 종료됐습니다. 기존 행은 그대로 보존되며 `/api/apply`는 `410 Gone`을 반환합니다. `project_proposals`는 공개 권한 없이 서버의 service role을 통해서만 저장·조회합니다. 관리자 조회, 저금통 수정, 오픈채팅방 링크 관리도 service role key를 사용하는 서버 코드에서 처리합니다.
 
 ## Vercel 배포
 
@@ -84,7 +86,6 @@ Vercel에 최소로 필요한 값:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_PASSWORD=
 ```
@@ -109,22 +110,11 @@ http://localhost:3000/admin
 https://배포도메인/admin
 ```
 
-관리자 페이지에서 신청 목록을 확인하고, 저금통 금액을 추가할 수 있습니다.
+관리자 페이지에서 프로젝트 제안 목록과 상세 신청서를 확인하고, 기존 을왕리 신청 기록과 저금통을 함께 관리할 수 있습니다.
 
-## 신청 폼 API 테스트
+## 프로젝트 제안 API
 
-```bash
-curl -X POST http://localhost:3000/api/apply \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "테스트",
-    "phone": "010-0000-0000",
-    "email": "test@example.com",
-    "instagram": "@test",
-    "attendees": 1,
-    "message": "테스트 신청입니다."
-  }'
-```
+메인의 `프로젝트 제안` 버튼에서 `/api/project-proposals`로 접수합니다. 제안은 전용 테이블에 저장되며 기존 을왕리 신청 기록과 섞이지 않습니다. 개인정보 동의 시각과 고지문 버전, 중복 제출 방지 키를 함께 보관하고 동일 요청의 반복 저장과 짧은 시간의 과도한 제출을 원자적으로 제한합니다. 제안은 접수 시 보관 만료일이 정해지며 Supabase Cron이 15분마다 만료 자료를 삭제합니다.
 
 ## GitHub 업로드 순서
 
