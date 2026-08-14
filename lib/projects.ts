@@ -1,9 +1,3 @@
-export type ProjectLog = {
-  label: string;
-  title: string;
-  detail?: string;
-};
-
 export type Project = {
   slug: string;
   number: string;
@@ -17,7 +11,6 @@ export type Project = {
   accent: string;
   accentAlt: string;
   label: string;
-  logs: ProjectLog[];
 };
 
 export const projects: Project[] = [
@@ -33,17 +26,7 @@ export const projects: Project[] = [
     visual: "reel",
     accent: "#ff5a36",
     accentAlt: "#ffd43b",
-    label: "PROJECT 01",
-    logs: [
-      {
-        label: "NOW",
-        title: "진행 중"
-      },
-      {
-        label: "NEXT",
-        title: "업데이트 예정"
-      }
-    ]
+    label: "PROJECT 01"
   },
   {
     slug: "vintagechord-post-production",
@@ -57,17 +40,7 @@ export const projects: Project[] = [
     visual: "speaker",
     accent: "#5765ff",
     accentAlt: "#a6ef5f",
-    label: "PROJECT 02",
-    logs: [
-      {
-        label: "NOW",
-        title: "포스트 프로덕션"
-      },
-      {
-        label: "NEXT",
-        title: "업데이트 예정"
-      }
-    ]
+    label: "PROJECT 02"
   }
 ];
 

@@ -1699,8 +1699,6 @@
 .project-label,
 .project-status,
 .project-section-number,
-.project-log-index,
-.project-log-label,
 .project-next-label {
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 0.64rem;
@@ -2090,56 +2088,6 @@
   color: #d9d6ce;
   font-size: clamp(0.82rem, 1.2vw, 1rem);
   font-weight: 760;
-}
-
-.project-log-list {
-  margin: 0;
-  padding: 0 0 clamp(90px, 12vw, 170px);
-  list-style: none;
-}
-
-.project-log-item {
-  display: grid;
-  grid-template-columns: 60px minmax(120px, 0.35fr) minmax(0, 1fr);
-  min-height: 108px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.project-log-index,
-.project-log-label {
-  padding-top: 20px;
-  color: #70716b;
-}
-
-.project-log-index {
-  text-align: center;
-}
-
-.project-log-label {
-  padding-left: 22px;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--project-accent);
-}
-
-.project-log-copy {
-  padding: 20px 0 24px clamp(24px, 5vw, 70px);
-}
-
-.project-log-copy h3 {
-  margin: 0;
-  font-size: clamp(1.2rem, 2.2vw, 2.25rem);
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-  word-break: keep-all;
-}
-
-.project-log-copy p {
-  max-width: 620px;
-  margin: 13px 0 0;
-  color: #91928b;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  word-break: keep-all;
 }
 
 .project-next {
@@ -2677,25 +2625,6 @@ html.site-motion-paused .studio-object-label {
 
   .project-fact:last-child {
     border-bottom: 0;
-  }
-
-  .project-log-item {
-    grid-template-columns: 48px 1fr;
-    min-height: 0;
-  }
-
-  .project-log-index {
-    grid-row: 1 / 3;
-  }
-
-  .project-log-label {
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .project-log-copy {
-    grid-column: 2;
-    padding: 12px 0 30px 16px;
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .project-next {

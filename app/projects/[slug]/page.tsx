@@ -139,7 +139,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <section className="project-overview" aria-labelledby="project-overview-title">
             <div className="project-section-heading">
               <span className="project-section-number">A</span>
-              <h2 id="project-overview-title">PROJECT OVERVIEW</h2>
+              <h2 id="project-overview-title">CURRENT STATUS</h2>
             </div>
             <div className="project-overview-body">
               <dl className="project-facts">
@@ -157,25 +157,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
               </dl>
             </div>
-          </section>
-
-          <section className="project-log" aria-labelledby="project-log-title">
-            <div className="project-section-heading">
-              <span className="project-section-number">B</span>
-              <h2 id="project-log-title">PROGRESS LOG</h2>
-            </div>
-            <ol className="project-log-list">
-              {project.logs.map((log, index) => (
-                <li className="project-log-item" key={`${log.label}-${log.title}`}>
-                  <span className="project-log-index">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="project-log-label">{log.label}</span>
-                  <div className="project-log-copy">
-                    <h3>{log.title}</h3>
-                    {log.detail ? <p>{log.detail}</p> : null}
-                  </div>
-                </li>
-              ))}
-            </ol>
           </section>
 
           <a className="project-next" href={`/projects/${nextProject.slug}`}>
