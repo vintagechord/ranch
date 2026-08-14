@@ -124,24 +124,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
 
   return (
     <section className="studio-hero" aria-labelledby="studio-title">
-      <div className="studio-hero-copy">
-        <div className="studio-kicker-row">
-          <p className="studio-kicker">
-            <span /> MORNING RANCH / PROJECT ROOM
-          </p>
-        </div>
-
-        <h1 id="studio-title">
-          지금, {projects.length}개의 프로젝트가
-          <br />
-          <span>재생 중입니다.</span>
-        </h1>
-        <p className="studio-hero-intro">
-          목장의 아침은 음악이 만들어지는 동안의 선택과 흔적을 기록합니다.
-          <br />
-          장비 위의 프로젝트를 선택해 각 작업실로 들어가세요.
-        </p>
-      </div>
+      <h1 id="studio-title" className="studio-visually-hidden">목장의 아침 프로젝트 룸</h1>
 
       <div
         ref={stageRef}
