@@ -123,7 +123,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
   }
 
   return (
-    <section className="studio-hero" aria-labelledby="studio-title">
+    <section id="project-room" className="studio-hero" aria-labelledby="studio-title">
       <h1 id="studio-title" className="studio-visually-hidden">목장의 아침 프로젝트 룸</h1>
 
       <div
@@ -193,10 +193,6 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
         </div>
       </div>
 
-      <a className="studio-scroll-cue" href="#projects" aria-label="프로젝트 목록으로 이동">
-        <span>SCROLL TO TRACKS</span>
-        <i />
-      </a>
     </section>
   );
 }

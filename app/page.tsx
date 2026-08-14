@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
 import ProjectStudio from "@/app/components/ProjectStudio";
@@ -30,64 +29,6 @@ export default function Home() {
             )}
           </div>
         </div>
-
-        <section id="projects" className="studio-projects" aria-labelledby="project-list-title">
-          <div className="studio-section-heading" data-section-title>
-            <p>ACTIVE SESSIONS / {projectCount}</p>
-            <h2 id="project-list-title">진행 중인 프로젝트</h2>
-            <span>각 세션을 열어 진행 상황과 공개된 기록을 확인하세요.</span>
-          </div>
-
-          <div className="studio-project-list">
-            {projects.map((project) => (
-              <a
-                className={`studio-project-card is-${project.visual}`}
-                href={`/projects/${project.slug}`}
-                aria-label={`${project.artist} ‘${project.title}’ 프로젝트 상세 보기`}
-                data-reveal-card
-                key={project.slug}
-                style={{
-                  "--project-accent": project.accent,
-                  "--project-accent-alt": project.accentAlt
-                } as CSSProperties}
-              >
-                <div className="studio-card-topline">
-                  <span>PROJECT {project.number}</span>
-                  <span className="studio-card-status"><i /> {project.status}</span>
-                </div>
-
-                <div className="studio-card-art" aria-hidden="true">
-                  {project.visual === "reel" ? (
-                    <div className="studio-card-reels">
-                      <span><i /></span>
-                      <b />
-                      <span><i /></span>
-                    </div>
-                  ) : (
-                    <div className="studio-card-speaker">
-                      <span><i /></span>
-                      <span><i /></span>
-                    </div>
-                  )}
-                  <div className="studio-card-signal">
-                    {Array.from({ length: 18 }, (_, index) => <i key={index} />)}
-                  </div>
-                </div>
-
-                <div className="studio-card-copy">
-                  <p>{project.artist}</p>
-                  <h3>{project.title}</h3>
-                  <span>{project.summary}</span>
-                </div>
-
-                <div className="studio-card-bottom">
-                  <span>CURRENT / {project.stage}</span>
-                  <strong>프로젝트 열기 <i>↗</i></strong>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
 
         <section id="about" className="studio-about" aria-labelledby="studio-about-title">
           <div className="studio-about-index" aria-hidden="true">MR—02</div>

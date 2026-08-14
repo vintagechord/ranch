@@ -114,7 +114,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <Header showApplyCta={false} />
       <main className="project-page" id="top" style={projectStyle}>
         <div className="project-shell">
-          <a className="project-back-link" href="/#projects">
+          <a className="project-back-link" href="/#project-room">
             <span aria-hidden="true">←</span> ALL PROJECTS
           </a>
 

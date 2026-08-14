@@ -37,7 +37,7 @@
   pointer-events: none;
 }
 
-#projects,
+#project-room,
 #about {
   scroll-margin-top: 110px;
 }
@@ -805,35 +805,6 @@
   background: #aaa89f;
   box-shadow: 0 2px 2px #000;
   transform: translate(-50%, -50%);
-}
-
-.studio-scroll-cue {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  width: fit-content;
-  margin: 30px auto 0;
-  color: #7b7c75;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-}
-
-.studio-scroll-cue i {
-  position: relative;
-  width: 34px;
-  height: 1px;
-  background: #6e6f69;
-  overflow: hidden;
-}
-
-.studio-scroll-cue i::after {
-  position: absolute;
-  inset: 0;
-  background: var(--studio-orange);
-  content: "";
-  transform: translateX(-100%);
-  animation: studio-scroll-line 2s ease-in-out infinite;
 }
 
 /* Ticker */
@@ -1894,12 +1865,6 @@
 @keyframes studio-meter {
   from { transform: scaleY(0.36); transform-origin: bottom; }
   to { transform: scaleY(1); transform-origin: bottom; }
-}
-
-@keyframes studio-scroll-line {
-  0% { transform: translateX(-100%); }
-  45%, 55% { transform: translateX(0); }
-  100% { transform: translateX(100%); }
 }
 
 @keyframes studio-ticker-move {

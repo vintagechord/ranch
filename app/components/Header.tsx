@@ -7,7 +7,7 @@ import PiggyBankButton from "@/app/components/PiggyBankButton";
 import { projects } from "@/lib/projects";
 
 const navItems = [
-  { label: "PROJECTS", hash: "#projects" },
+  { label: "PROJECTS", hash: "#project-room" },
   { label: "ABOUT", hash: "#about" }
 ];
 
@@ -86,7 +86,7 @@ export default function Header(_props: HeaderProps) {
             <a
               key={item.hash}
               href={href}
-              className={pathname.startsWith("/projects") && item.hash === "#projects" ? "is-active" : undefined}
+              className={pathname.startsWith("/projects") && item.hash === "#project-room" ? "is-active" : undefined}
               onClick={(event) => scrollToHash(event, href)}
             >
               {item.label}
