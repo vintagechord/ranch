@@ -19,7 +19,7 @@ export default function Home() {
       <main id="top" className="studio-home">
         <ProjectStudio projects={projects} />
 
-        <div className="studio-ticker" aria-label="현재 진행 중인 프로젝트">
+        <div className="studio-ticker" aria-label="프로젝트 채널 신호">
           <div>
             {[0, 1].flatMap((copyIndex) =>
               tickerItems.map((item, itemIndex) => (
