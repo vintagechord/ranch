@@ -881,7 +881,6 @@ export default async function AdminPage({
                 <form
                   className="admin-participant-form"
                   action={uploadParticipantImageAction}
-                  encType="multipart/form-data"
                 >
                   <input type="hidden" name="slotNumber" value={setting.slotNumber} />
                   <label>
