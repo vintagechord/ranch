@@ -1748,15 +1748,6 @@
   word-break: keep-all;
 }
 
-.project-summary {
-  max-width: 600px;
-  margin: 30px 0 0;
-  color: #9c9d96;
-  font-size: clamp(0.96rem, 1.45vw, 1.14rem);
-  line-height: 1.8;
-  word-break: keep-all;
-}
-
 .project-machine {
   position: relative;
   display: grid;
@@ -2064,35 +2055,26 @@
 }
 
 .project-overview-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-  gap: clamp(40px, 8vw, 130px);
-  padding: clamp(48px, 8vw, 104px) 0 clamp(90px, 12vw, 170px);
-}
-
-.project-description {
-  margin: 0;
-  color: var(--studio-paper);
-  font-size: clamp(1.7rem, 3.5vw, 4rem);
-  font-weight: 760;
-  line-height: 1.27;
-  letter-spacing: -0.045em;
-  word-break: keep-all;
+  padding: clamp(30px, 5vw, 58px) 0 clamp(74px, 9vw, 122px);
 }
 
 .project-facts {
   display: grid;
-  align-self: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-block: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .project-fact {
   display: grid;
-  grid-template-columns: 0.7fr 1.3fr;
-  gap: 18px;
-  padding: 18px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 9px;
+  min-width: 0;
+  padding: 20px clamp(14px, 2.5vw, 34px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.project-fact:last-child {
+  border-right: 0;
 }
 
 .project-fact dt {
@@ -2106,9 +2088,8 @@
 .project-fact dd {
   margin: 0;
   color: #d9d6ce;
-  font-size: 0.82rem;
+  font-size: clamp(0.82rem, 1.2vw, 1rem);
   font-weight: 760;
-  text-align: right;
 }
 
 .project-log-list {
@@ -2120,13 +2101,13 @@
 .project-log-item {
   display: grid;
   grid-template-columns: 60px minmax(120px, 0.35fr) minmax(0, 1fr);
-  min-height: 155px;
+  min-height: 108px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .project-log-index,
 .project-log-label {
-  padding-top: 25px;
+  padding-top: 20px;
   color: #70716b;
 }
 
@@ -2141,12 +2122,12 @@
 }
 
 .project-log-copy {
-  padding: 24px 0 32px clamp(24px, 5vw, 70px);
+  padding: 20px 0 24px clamp(24px, 5vw, 70px);
 }
 
 .project-log-copy h3 {
   margin: 0;
-  font-size: clamp(1.35rem, 2.6vw, 2.9rem);
+  font-size: clamp(1.2rem, 2.2vw, 2.25rem);
   line-height: 1.1;
   letter-spacing: -0.04em;
   word-break: keep-all;
@@ -2437,7 +2418,7 @@ html.site-motion-paused .studio-object-label {
   }
 
   .project-overview-body {
-    grid-template-columns: 1fr;
+    padding-bottom: 88px;
   }
 }
 
@@ -2682,11 +2663,20 @@ html.site-motion-paused .studio-object-label {
   }
 
   .project-overview-body {
-    padding: 44px 0 86px;
+    padding: 34px 0 76px;
   }
 
-  .project-description {
-    font-size: clamp(1.65rem, 7vw, 2.6rem);
+  .project-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .project-fact {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .project-fact:last-child {
+    border-bottom: 0;
   }
 
   .project-log-item {

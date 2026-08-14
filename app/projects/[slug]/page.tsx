@@ -131,7 +131,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <h1 className="project-title" id="project-title">
                 {project.title}
               </h1>
-              <p className="project-summary">{project.summary}</p>
             </div>
 
             <ProjectVisual project={project} />
@@ -143,7 +142,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <h2 id="project-overview-title">PROJECT OVERVIEW</h2>
             </div>
             <div className="project-overview-body">
-              <p className="project-description">{project.description}</p>
               <dl className="project-facts">
                 <div className="project-fact">
                   <dt>STATUS</dt>
@@ -173,7 +171,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <span className="project-log-label">{log.label}</span>
                   <div className="project-log-copy">
                     <h3>{log.title}</h3>
-                    <p>{log.detail}</p>
+                    {log.detail ? <p>{log.detail}</p> : null}
                   </div>
                 </li>
               ))}
