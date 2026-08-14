@@ -104,9 +104,24 @@ const services = [
   { label: "Apple Music", kind: "apple" }
 ] as const;
 
+const archiveTitle = "S/F Archive | 목장의 아침";
+const archiveDescription =
+  "스트레인지 팩토리에서 만든 음원 발매 정보와 유튜브 영상을 모아둔 아카이브.";
+
 export const metadata: Metadata = {
-  title: "S/F Archive | 목장의 아침",
-  description: "스트레인지 팩토리에서 만든 음원 발매 정보와 유튜브 영상을 모아둔 아카이브."
+  title: archiveTitle,
+  description: archiveDescription,
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    title: archiveTitle,
+    description: archiveDescription
+  },
+  twitter: {
+    card: "summary",
+    title: archiveTitle,
+    description: archiveDescription
+  }
 };
 
 function searchUrl(service: ServiceKind, query: string) {

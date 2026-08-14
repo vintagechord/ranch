@@ -1,0 +1,197 @@
+import type { CSSProperties } from "react";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Footer from "@/app/components/Footer";
+import Header from "@/app/components/Header";
+import { getProjectBySlug, projects, type Project } from "@/lib/projects";
+
+type ProjectPageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+type ProjectStyle = CSSProperties & {
+  "--project-accent": string;
+  "--project-accent-alt": string;
+};
+
+function ReelDeckVisual() {
+  return (
+    <div className="project-reel-visual" aria-hidden="true">
+      <div className="project-reel-brand">MR / MASTER RECORDER</div>
+      <div className="project-reel-window">
+        <span className="project-reel-wheel"><i /></span>
+        <b className="project-reel-tape" />
+        <span className="project-reel-wheel is-secondary"><i /></span>
+      </div>
+      <div className="project-reel-console">
+        <span className="project-reel-knob" />
+        <span className="project-reel-knob" />
+        <span className="project-reel-meter"><i /><i /><i /><i /><i /></span>
+        <span className="project-reel-button" />
+        <span className="project-reel-button" />
+      </div>
+    </div>
+  );
+}
+
+function SpeakerVisual() {
+  return (
+    <div className="project-speaker-visual" aria-hidden="true">
+      <span className="project-sound-wave is-left" />
+      <span className="project-sound-wave is-right" />
+      <div className="project-speaker-cabinet">
+        <div className="project-speaker-brand"><i /> VC / POST</div>
+        <span className="project-speaker-driver is-tweeter"><i /></span>
+        <span className="project-speaker-driver is-woofer"><i /></span>
+        <b className="project-speaker-port" />
+      </div>
+    </div>
+  );
+}
+
+function ProjectVisual({ project }: { project: Project }) {
+  return (
+    <div className={`project-machine project-machine-${project.visual}`}>
+      <span className="project-machine-label">{project.shortTitle}</span>
+      {project.visual === "reel" ? <ReelDeckVisual /> : <SpeakerVisual />}
+      <span className="project-machine-index" aria-hidden="true">
+        {project.number}
+      </span>
+    </div>
+  );
+}
+
+export function generateStaticParams() {
+  return projects.map(({ slug }) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const project = getProjectBySlug(slug);
+
+  if (!project) {
+    return {};
+  }
+
+  const title = `${project.artist} — ${project.title} | 목장의 아침`;
+
+  return {
+    title,
+    description: project.summary,
+    openGraph: {
+      type: "website",
+      locale: "ko_KR",
+      title,
+      description: project.summary,
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: "목장의 아침 Project Room" }]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: project.summary,
+      images: ["/og.png"]
+    }
+  };
+}
+
+export default async function ProjectPage({ params }: ProjectPageProps) {
+  const { slug } = await params;
+  const project = getProjectBySlug(slug);
+
+  if (!project) {
+    notFound();
+  }
+
+  const projectIndex = projects.findIndex((item) => item.slug === project.slug);
+  const nextProject = projects[(projectIndex + 1) % projects.length];
+  const projectStyle: ProjectStyle = {
+    "--project-accent": project.accent,
+    "--project-accent-alt": project.accentAlt
+  };
+
+  return (
+    <>
+      <Header showApplyCta={false} />
+      <main className="project-page" id="top" style={projectStyle}>
+        <div className="project-shell">
+          <a className="project-back-link" href="/#projects">
+            <span aria-hidden="true">←</span> ALL PROJECTS
+          </a>
+
+          <section className="project-hero" aria-labelledby="project-title">
+            <div className="project-hero-copy">
+              <div className="project-meta-row">
+                <span className="project-label">{project.label}</span>
+                <span className="project-status">
+                  <span className="project-status-dot" aria-hidden="true" />
+                  {project.status}
+                </span>
+              </div>
+              <p className="project-artist">{project.artist}</p>
+              <h1 className="project-title" id="project-title">
+                {project.title}
+              </h1>
+              <p className="project-summary">{project.summary}</p>
+            </div>
+
+            <ProjectVisual project={project} />
+          </section>
+
+          <section className="project-overview" aria-labelledby="project-overview-title">
+            <div className="project-section-heading">
+              <span className="project-section-number">A</span>
+              <h2 id="project-overview-title">PROJECT OVERVIEW</h2>
+            </div>
+            <div className="project-overview-body">
+              <p className="project-description">{project.description}</p>
+              <dl className="project-facts">
+                <div className="project-fact">
+                  <dt>STATUS</dt>
+                  <dd>{project.status}</dd>
+                </div>
+                <div className="project-fact">
+                  <dt>CURRENT STAGE</dt>
+                  <dd>{project.stage}</dd>
+                </div>
+                <div className="project-fact">
+                  <dt>ARTIST</dt>
+                  <dd>{project.artist}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
+          <section className="project-log" aria-labelledby="project-log-title">
+            <div className="project-section-heading">
+              <span className="project-section-number">B</span>
+              <h2 id="project-log-title">PROGRESS LOG</h2>
+            </div>
+            <ol className="project-log-list">
+              {project.logs.map((log, index) => (
+                <li className="project-log-item" key={`${log.label}-${log.title}`}>
+                  <span className="project-log-index">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="project-log-label">{log.label}</span>
+                  <div className="project-log-copy">
+                    <h3>{log.title}</h3>
+                    <p>{log.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <a className="project-next" href={`/projects/${nextProject.slug}`}>
+            <span className="project-next-label">NEXT PROJECT</span>
+            <span className="project-next-title">
+              {nextProject.artist} — {nextProject.title}
+            </span>
+            <span className="project-next-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
