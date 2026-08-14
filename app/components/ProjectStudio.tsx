@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 
 type StudioProject = {
   slug: string;
@@ -16,24 +16,297 @@ type ProjectStudioProps = {
   projects: StudioProject[];
 };
 
+function AcousticDisplay() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvasElement = canvasRef.current;
+
+    if (!canvasElement) {
+      return;
+    }
+
+    const canvas = canvasElement;
+    const canvasContext = canvas.getContext("2d");
+
+    if (!canvasContext) {
+      return;
+    }
+
+    const context = canvasContext;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let animationFrame = 0;
+    let previousFrame = 0;
+    let visible = true;
+    let pausedByUser = document.documentElement.classList.contains("site-motion-paused");
+    let paused = reducedMotion.matches || pausedByUser || document.hidden;
+
+    function resizeCanvas() {
+      const bounds = canvas.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(Math.round(bounds.width), 1);
+      const height = Math.max(Math.round(bounds.height), 1);
+
+      if (canvas.width !== Math.round(width * pixelRatio) || canvas.height !== Math.round(height * pixelRatio)) {
+        canvas.width = Math.round(width * pixelRatio);
+        canvas.height = Math.round(height * pixelRatio);
+      }
+
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      return { width, height };
+    }
+
+    function drawRibbon(
+      width: number,
+      height: number,
+      time: number,
+      options: {
+        center: number;
+        amplitude: number;
+        thickness: number;
+        frequency: number;
+        phase: number;
+        speed: number;
+        colors: [string, string, string];
+        glow: string;
+      }
+    ) {
+      const pointStep = Math.max(width / 110, 3);
+      const topPoints: Array<[number, number]> = [];
+      const bottomPoints: Array<[number, number]> = [];
+
+      for (let x = -pointStep; x <= width + pointStep; x += pointStep) {
+        const progress = x / width;
+        const carrier =
+          Math.sin(progress * Math.PI * 2 * options.frequency + time * options.speed + options.phase) *
+          options.amplitude;
+        const harmonic =
+          Math.sin(progress * Math.PI * 2 * (options.frequency * 1.83) - time * options.speed * 0.46 + options.phase * 1.7) *
+          options.amplitude * 0.28;
+        const body = options.thickness * (0.76 + Math.sin(progress * Math.PI * 4 + time * 0.38) * 0.24);
+        const center = height * options.center + height * (carrier + harmonic);
+
+        topPoints.push([x, center - height * body]);
+        bottomPoints.unshift([x, center + height * body]);
+      }
+
+      const gradient = context.createLinearGradient(0, height, width, 0);
+      gradient.addColorStop(0, options.colors[0]);
+      gradient.addColorStop(0.5, options.colors[1]);
+      gradient.addColorStop(1, options.colors[2]);
+
+      context.save();
+      context.beginPath();
+      [...topPoints, ...bottomPoints].forEach(([x, y], index) => {
+        if (index === 0) context.moveTo(x, y);
+        else context.lineTo(x, y);
+      });
+      context.closePath();
+      context.fillStyle = gradient;
+      context.shadowColor = options.glow;
+      context.shadowBlur = Math.max(16, height * 0.14);
+      context.fill();
+      context.shadowBlur = 0;
+
+      const highlight = context.createLinearGradient(0, 0, width, 0);
+      highlight.addColorStop(0, "rgba(255,255,255,0.06)");
+      highlight.addColorStop(0.48, "rgba(255,255,255,0.46)");
+      highlight.addColorStop(1, "rgba(255,255,255,0.08)");
+      context.beginPath();
+      topPoints.forEach(([x, y], index) => {
+        if (index === 0) context.moveTo(x, y + 1);
+        else context.lineTo(x, y + 1);
+      });
+      context.strokeStyle = highlight;
+      context.lineWidth = Math.max(1, height * 0.009);
+      context.stroke();
+      context.restore();
+    }
+
+    function draw(timestamp: number) {
+      const { width, height } = resizeCanvas();
+      const time = timestamp / 1000;
+
+      context.clearRect(0, 0, width, height);
+
+      const grid = context.createLinearGradient(0, 0, 0, height);
+      grid.addColorStop(0, "rgba(113, 238, 255, 0.09)");
+      grid.addColorStop(1, "rgba(113, 238, 255, 0.015)");
+      context.strokeStyle = grid;
+      context.lineWidth = 1;
+
+      for (let x = width / 12; x < width; x += width / 12) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, height);
+        context.stroke();
+      }
+
+      for (let y = height / 4; y < height; y += height / 4) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(width, y);
+        context.stroke();
+      }
+
+      drawRibbon(width, height, time, {
+        center: 0.48,
+        amplitude: 0.2,
+        thickness: 0.105,
+        frequency: 1.48,
+        phase: 2.3,
+        speed: 0.38,
+        colors: ["#00b9ed", "#315dff", "#7135f5"],
+        glow: "rgba(0, 189, 255, 0.5)"
+      });
+      drawRibbon(width, height, time, {
+        center: 0.5,
+        amplitude: 0.19,
+        thickness: 0.13,
+        frequency: 1.16,
+        phase: 0.4,
+        speed: -0.28,
+        colors: ["#6828e8", "#ec167b", "#b918e4"],
+        glow: "rgba(225, 24, 154, 0.52)"
+      });
+      drawRibbon(width, height, time, {
+        center: 0.5,
+        amplitude: 0.135,
+        thickness: 0.055,
+        frequency: 1.72,
+        phase: -0.8,
+        speed: 0.54,
+        colors: ["#ff9345", "#ff4c45", "#ff7651"],
+        glow: "rgba(255, 91, 63, 0.58)"
+      });
+
+      context.beginPath();
+      for (let x = 0; x <= width; x += 2) {
+        const progress = x / width;
+        const y =
+          height * 0.5 +
+          Math.sin(progress * Math.PI * 18 + time * 1.2) * height * 0.012 +
+          Math.sin(progress * Math.PI * 43 - time * 0.7) * height * 0.007;
+
+        if (x === 0) context.moveTo(x, y);
+        else context.lineTo(x, y);
+      }
+      context.strokeStyle = "rgba(224, 252, 255, 0.64)";
+      context.lineWidth = 1;
+      context.shadowColor = "rgba(121, 230, 255, 0.9)";
+      context.shadowBlur = 8;
+      context.stroke();
+      context.shadowBlur = 0;
+    }
+
+    function animate(timestamp: number) {
+      if (timestamp - previousFrame >= 32) {
+        draw(timestamp);
+        previousFrame = timestamp;
+      }
+
+      if (!paused) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+    }
+
+    function syncAnimation() {
+      paused = pausedByUser || reducedMotion.matches || !visible || document.hidden;
+      window.cancelAnimationFrame(animationFrame);
+
+      if (visible && !document.hidden) {
+        draw(paused ? 1300 : performance.now());
+      }
+
+      if (!paused) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+    }
+
+    function handleMotionChange(event: Event) {
+      pausedByUser = (event as CustomEvent<{ paused: boolean }>).detail.paused;
+      syncAnimation();
+    }
+
+    function handleReducedMotionChange() {
+      syncAnimation();
+    }
+
+    function handleVisibilityChange() {
+      syncAnimation();
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (visible && !document.hidden) {
+        draw(paused ? 1300 : performance.now());
+      }
+    });
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      syncAnimation();
+    });
+
+    resizeObserver.observe(canvas);
+    intersectionObserver.observe(canvas);
+    window.addEventListener("morning-ranch-motion-change", handleMotionChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    reducedMotion.addEventListener("change", handleReducedMotionChange);
+    draw(paused ? 1300 : performance.now());
+
+    if (!paused) {
+      animationFrame = window.requestAnimationFrame(animate);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      window.removeEventListener("morning-ranch-motion-change", handleMotionChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      reducedMotion.removeEventListener("change", handleReducedMotionChange);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="studio-acoustic-canvas" />;
+}
+
 function ReelDeck() {
   return (
     <div className="studio-reel-deck" aria-hidden="true">
-      <div className="studio-deck-brand">MORNING TAPE SYSTEM</div>
+      <div className="studio-deck-top-rail" />
       <div className="studio-reels">
         <span className="studio-reel">
-          <i />
+          <span className="studio-reel-slots"><b /><b /><b /></span>
+          <i className="studio-reel-hub"><b /></i>
         </span>
         <span className="studio-tape-path" />
         <span className="studio-reel studio-reel-secondary">
-          <i />
+          <span className="studio-reel-slots"><b /><b /><b /></span>
+          <i className="studio-reel-hub"><b /></i>
         </span>
       </div>
-      <div className="studio-deck-controls">
-        <span className="studio-deck-counter">02:17:AM</span>
-        <span className="studio-deck-button is-red" />
-        <span className="studio-deck-button" />
-        <span className="studio-deck-button" />
+      <div className="studio-tape-transport">
+        <span className="studio-tape-guide is-left" />
+        <span className="studio-head-cover" />
+        <span className="studio-tape-guide is-right" />
+      </div>
+      <div className="studio-deck-control-panel">
+        <div className="studio-deck-toggle-bank">
+          {Array.from({ length: 4 }, (_, index) => <span key={index}><i /></span>)}
+        </div>
+        <div className="studio-deck-knob-bank">
+          {Array.from({ length: 4 }, (_, index) => <span key={index}><i /></span>)}
+        </div>
+        <div className="studio-deck-vu-pair">
+          <span><i /></span>
+          <span><i /></span>
+        </div>
+        <div className="studio-deck-transport-buttons">
+          {Array.from({ length: 6 }, (_, index) => (
+            <span className={index === 5 ? "is-record" : ""} key={index} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -42,17 +315,20 @@ function ReelDeck() {
 function SpeakerStack() {
   return (
     <div className="studio-speaker-stack" aria-hidden="true">
-      <div className="studio-speaker-top">
+      <div className="studio-speaker-depth" />
+      <div className="studio-mm45-baffle">
+        <div className="studio-mm45-woofer">
+          <span><i /></span>
+          <b className="studio-driver-screws" />
+        </div>
+        <div className="studio-mm45-array">
+          <div className="studio-mm45-mid is-top"><span /></div>
+          <div className="studio-mm45-tweeter"><span /></div>
+          <div className="studio-mm45-mid is-bottom"><span /></div>
+          <b className="studio-driver-screws" />
+        </div>
         <span className="studio-speaker-light" />
-        <small>VC / POST</small>
       </div>
-      <div className="studio-speaker-cone studio-speaker-cone-small">
-        <i />
-      </div>
-      <div className="studio-speaker-cone studio-speaker-cone-large">
-        <i />
-      </div>
-      <div className="studio-speaker-port" />
     </div>
   );
 }
@@ -60,24 +336,36 @@ function SpeakerStack() {
 function MixingDesk() {
   return (
     <div className="studio-mixer" aria-hidden="true">
-      <div className="studio-vu-row">
-        {Array.from({ length: 12 }, (_, index) => (
-          <span
-            key={index}
-            style={{
-              "--meter-index": index,
-              "--meter-height": `${22 + (index % 6) * 13}%`
-            } as CSSProperties}
-          />
-        ))}
+      <div className="studio-mixer-meter-bridge">
+        <div className="studio-mixer-meter-bank">
+          {Array.from({ length: 3 }, (_, index) => (
+            <span className={index === 2 ? "is-correlation" : ""} key={index}><i /></span>
+          ))}
+        </div>
+        <div className="studio-mixer-signal-lights">
+          {Array.from({ length: 4 }, (_, index) => <span key={index} />)}
+        </div>
       </div>
       <div className="studio-mixer-channels">
-        {Array.from({ length: 7 }, (_, index) => (
-          <div className="studio-channel" key={index}>
-            <i className="studio-knob" />
-            <i className="studio-knob studio-knob-small" />
+        {Array.from({ length: 8 }, (_, index) => (
+          <div
+            className={`studio-channel${index >= 6 ? " is-master" : ""}`}
+            key={index}
+            style={{ "--channel-index": index } as CSSProperties}
+          >
+            <span className="studio-channel-cap" />
+            <div className="studio-channel-knobs">
+              <i className="studio-knob is-gain" />
+              <i className="studio-knob is-eq" />
+              <i className="studio-knob is-aux" />
+              <i className="studio-knob is-pan" />
+            </div>
+            <div className="studio-channel-switches"><i /><i /></div>
             <span className="studio-fader-track">
-              <b style={{ "--fader": `${22 + ((index * 17) % 58)}%` } as CSSProperties} />
+              <b
+                className={index === 6 ? "is-blue" : index === 7 ? "is-red" : ""}
+                style={{ "--fader": `${20 + ((index * 13) % 56)}%` } as CSSProperties}
+              />
             </span>
             <em>{String(index + 1).padStart(2, "0")}</em>
           </div>
@@ -93,7 +381,11 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
   const hasManyProjects = projects.length > 2;
 
   function moveLight(event: PointerEvent<HTMLDivElement>) {
-    if (document.documentElement.classList.contains("site-motion-paused") || event.pointerType === "touch") {
+    if (
+      document.documentElement.classList.contains("site-motion-paused") ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      event.pointerType === "touch"
+    ) {
       return;
     }
 
@@ -142,25 +434,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
         </div>
 
         <div className="studio-monitor" aria-hidden="true">
-          <div className="studio-monitor-topline">
-            <span>SESSION://MORNING-RANCH</span>
-            <span>STEREO</span>
-          </div>
-          <div className="studio-waveform">
-            {Array.from({ length: 44 }, (_, index) => (
-              <i
-                key={index}
-                style={{
-                  "--wave-index": index,
-                  "--wave-height": `${12 + ((index * 37) % 82)}%`
-                } as CSSProperties}
-              />
-            ))}
-          </div>
-          <div className="studio-monitor-copy">
-            <strong>SELECT YOUR SIGNAL</strong>
-            <span>프로젝트 아이콘을 클릭하세요</span>
-          </div>
+          <AcousticDisplay />
         </div>
 
         <div className="studio-equipment-row">
