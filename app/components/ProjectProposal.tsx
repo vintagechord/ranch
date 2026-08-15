@@ -220,7 +220,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
           <p>PROJECT PROPOSAL / CHANNEL {channelNumber}</p>
           <h2 id="project-proposal-title">프로젝트 제안</h2>
         </div>
-        <p>함께 만들고 싶은 소리를 연결해 주세요.</p>
+        <p>What’s next?</p>
         <button
           ref={openButtonRef}
           className="studio-proposal-open"
