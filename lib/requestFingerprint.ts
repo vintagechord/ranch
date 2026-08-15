@@ -28,9 +28,28 @@ export function createRequestFingerprint(request: Request, scope: string) {
     .digest("hex");
 }
 
-export function createPayloadHash(payload: Record<string, unknown>) {
+export function createValueFingerprint(scope: string, value: string) {
+  if (!/^[a-z0-9-]{1,64}$/.test(scope)) {
+    throw new Error("Value fingerprint scope is invalid.");
+  }
+
   return crypto
     .createHmac("sha256", getFingerprintSecret())
-    .update(`project-proposal-payload\0${JSON.stringify(payload)}`)
+    .update(`value-fingerprint\0${scope}\0${value}`)
     .digest("hex");
+}
+
+export function createScopedPayloadHash(scope: string, payload: Record<string, unknown>) {
+  if (!/^[a-z0-9-]{1,64}$/.test(scope)) {
+    throw new Error("Payload hash scope is invalid.");
+  }
+
+  return crypto
+    .createHmac("sha256", getFingerprintSecret())
+    .update(`${scope}-payload\0${JSON.stringify(payload)}`)
+    .digest("hex");
+}
+
+export function createPayloadHash(payload: Record<string, unknown>) {
+  return createScopedPayloadHash("project-proposal", payload);
 }

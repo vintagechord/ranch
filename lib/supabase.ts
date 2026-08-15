@@ -68,6 +68,194 @@ export type ProjectProposalInsert = {
   retention_until?: string;
 };
 
+export type ReleaseRoleTypeRow = {
+  code: string;
+  label_ko: string;
+  category: string;
+  description: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReleaseRoleTypeInsert = {
+  code: string;
+  label_ko: string;
+  category: string;
+  description?: string | null;
+  is_active?: boolean;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type MusicReleaseRow = {
+  id: string;
+  project_slug: string;
+  release_number: number;
+  title: string;
+  artist_name: string;
+  release_date: string | null;
+  state: string;
+  youtube_video_id: string | null;
+  cover_image_url: string | null;
+  summary: string | null;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MusicReleaseInsert = {
+  id?: string;
+  project_slug: string;
+  release_number: number;
+  title: string;
+  artist_name: string;
+  release_date?: string | null;
+  state?: string;
+  youtube_video_id?: string | null;
+  cover_image_url?: string | null;
+  summary?: string | null;
+  is_published?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ReleaseRoleRow = {
+  id: string;
+  release_id: string;
+  role_type_code: string;
+  state: string;
+  is_public: boolean;
+  brief: string | null;
+  requirements: string | null;
+  capacity: number;
+  application_deadline: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReleaseRoleInsert = {
+  id?: string;
+  release_id: string;
+  role_type_code: string;
+  state?: string;
+  is_public?: boolean;
+  brief?: string | null;
+  requirements?: string | null;
+  capacity?: number;
+  application_deadline?: string | null;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ReleaseParticipationApplicationRow = {
+  id: string;
+  release_role_id: string;
+  applicant_name: string;
+  credit_name: string;
+  email: string;
+  phone: string | null;
+  profile_url: string | null;
+  portfolio_url: string | null;
+  availability: string;
+  message: string;
+  status: string;
+  admin_note: string | null;
+  status_changed_at: string;
+  privacy_agreed: boolean;
+  consented_at: string;
+  privacy_notice_version: string;
+  credit_publication_agreed: boolean;
+  credit_publication_consented_at: string;
+  credit_publication_notice_version: string;
+  idempotency_key: string;
+  payload_hash: string;
+  retention_until: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReleaseParticipationApplicationInsert = {
+  id?: string;
+  release_role_id: string;
+  applicant_name: string;
+  credit_name: string;
+  email: string;
+  phone?: string | null;
+  profile_url?: string | null;
+  portfolio_url?: string | null;
+  availability: string;
+  message: string;
+  status?: string;
+  admin_note?: string | null;
+  status_changed_at?: string;
+  privacy_agreed: boolean;
+  consented_at?: string;
+  privacy_notice_version: string;
+  credit_publication_agreed: boolean;
+  credit_publication_consented_at?: string;
+  credit_publication_notice_version: string;
+  idempotency_key: string;
+  payload_hash: string;
+  retention_until?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ReleaseCreditRow = {
+  id: string;
+  release_role_id: string;
+  display_name: string;
+  is_ranch_member: boolean;
+  participant_slot: number | null;
+  source_application_id: string | null;
+  publication_basis: string;
+  publication_agreed: boolean | null;
+  publication_consented_at: string | null;
+  publication_notice_version: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReleaseCreditInsert = {
+  id?: string;
+  release_role_id: string;
+  display_name: string;
+  is_ranch_member?: boolean;
+  participant_slot?: number | null;
+  source_application_id?: string | null;
+  publication_basis?: string;
+  publication_agreed?: boolean | null;
+  publication_consented_at?: string | null;
+  publication_notice_version?: string | null;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ReleaseApplicationStatusEventRow = {
+  id: number;
+  application_id: string;
+  from_status: string | null;
+  to_status: string;
+  note: string | null;
+  created_at: string;
+};
+
+export type ReleaseApplicationStatusEventInsert = {
+  id?: number;
+  application_id: string;
+  from_status?: string | null;
+  to_status: string;
+  note?: string | null;
+  created_at?: string;
+};
+
 type RequestRateLimitRow = {
   scope: string;
   request_fingerprint: string;
@@ -127,6 +315,88 @@ export type Database = {
         Update: Partial<ProjectProposalInsert>;
         Relationships: [];
       };
+      release_role_types: {
+        Row: ReleaseRoleTypeRow;
+        Insert: ReleaseRoleTypeInsert;
+        Update: Partial<ReleaseRoleTypeInsert>;
+        Relationships: [];
+      };
+      music_releases: {
+        Row: MusicReleaseRow;
+        Insert: MusicReleaseInsert;
+        Update: Partial<MusicReleaseInsert>;
+        Relationships: [];
+      };
+      release_roles: {
+        Row: ReleaseRoleRow;
+        Insert: ReleaseRoleInsert;
+        Update: Partial<ReleaseRoleInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "release_roles_release_id_fkey";
+            columns: ["release_id"];
+            isOneToOne: false;
+            referencedRelation: "music_releases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "release_roles_role_type_code_fkey";
+            columns: ["role_type_code"];
+            isOneToOne: false;
+            referencedRelation: "release_role_types";
+            referencedColumns: ["code"];
+          }
+        ];
+      };
+      release_participation_applications: {
+        Row: ReleaseParticipationApplicationRow;
+        Insert: ReleaseParticipationApplicationInsert;
+        Update: Partial<ReleaseParticipationApplicationInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "release_participation_applications_release_role_id_fkey";
+            columns: ["release_role_id"];
+            isOneToOne: false;
+            referencedRelation: "release_roles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      release_credits: {
+        Row: ReleaseCreditRow;
+        Insert: ReleaseCreditInsert;
+        Update: Partial<ReleaseCreditInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "release_credits_release_role_id_fkey";
+            columns: ["release_role_id"];
+            isOneToOne: false;
+            referencedRelation: "release_roles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "release_credits_source_application_id_fkey";
+            columns: ["source_application_id"];
+            isOneToOne: true;
+            referencedRelation: "release_participation_applications";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      release_application_status_events: {
+        Row: ReleaseApplicationStatusEventRow;
+        Insert: ReleaseApplicationStatusEventInsert;
+        Update: Partial<ReleaseApplicationStatusEventInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "release_application_status_events_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: false;
+            referencedRelation: "release_participation_applications";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       request_rate_limits: {
         Row: RequestRateLimitRow;
         Insert: RequestRateLimitInsert;
@@ -168,6 +438,48 @@ export type Database = {
           p_request_fingerprint: string;
         };
         Returns: string;
+      };
+      submit_release_participation_application: {
+        Args: {
+          p_release_role_id: string;
+          p_applicant_name: string;
+          p_credit_name: string;
+          p_email: string;
+          p_phone: string | null;
+          p_profile_url: string | null;
+          p_portfolio_url: string | null;
+          p_availability: string;
+          p_message: string;
+          p_privacy_notice_version: string;
+          p_credit_publication_notice_version: string;
+          p_idempotency_key: string;
+          p_payload_hash: string;
+          p_request_fingerprint: string;
+          p_email_fingerprint: string;
+        };
+        Returns: string;
+      };
+      set_release_role_state: {
+        Args: {
+          p_role_id: string;
+          p_state: string;
+        };
+        Returns: string;
+      };
+      review_release_participation_application: {
+        Args: {
+          p_application_id: string;
+          p_status: string;
+          p_admin_note?: string | null;
+          p_credit_display_name?: string | null;
+          p_credit_is_ranch_member?: boolean;
+          p_credit_participant_slot?: number | null;
+        };
+        Returns: string;
+      };
+      purge_expired_release_participation_applications: {
+        Args: Record<PropertyKey, never>;
+        Returns: number;
       };
       consume_request_rate_limit: {
         Args: {

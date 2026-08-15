@@ -63,6 +63,11 @@ type ProjectProposalSummary = Pick<
   | "status"
 >;
 
+type ReleaseApplicationOverview = {
+  total: number;
+  latestCreatedAt: string | null;
+};
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
     dateStyle: "medium",
@@ -300,6 +305,36 @@ async function getProjectProposals(page: number) {
   };
 }
 
+async function getReleaseApplicationOverview(): Promise<ReleaseApplicationOverview> {
+  const supabase = getSupabaseAdmin();
+  const now = new Date().toISOString();
+  const { count, error: countError } = await supabase
+    .from("release_participation_applications")
+    .select("id", { count: "exact", head: true })
+    .gt("retention_until", now);
+
+  if (countError) {
+    throw new Error(countError.message);
+  }
+
+  const { data: latest, error: latestError } = await supabase
+    .from("release_participation_applications")
+    .select("created_at")
+    .gt("retention_until", now)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latestError) {
+    throw new Error(latestError.message);
+  }
+
+  return {
+    total: count ?? 0,
+    latestCreatedAt: latest?.created_at ?? null
+  };
+}
+
 async function savePiggyBankAmount(formData: FormData) {
   "use server";
 
@@ -520,6 +555,8 @@ export default async function AdminPage({
   let projectProposals: ProjectProposalSummary[] = [];
   let projectProposalCount = 0;
   let latestProjectProposalCreatedAt: string | null = null;
+  let releaseApplicationCount = 0;
+  let latestReleaseApplicationCreatedAt: string | null = null;
   let proposalPageOutOfRange = false;
   let piggyBank: PiggyBankBalance = {
     balanceAmount: 0,
@@ -535,6 +572,7 @@ export default async function AdminPage({
   let piggyLoadError = "";
   let openChatLoadError = "";
   let participantImageLoadError = "";
+  let releaseApplicationLoadError = "";
 
   try {
     const result = await getApplications();
@@ -587,6 +625,17 @@ export default async function AdminPage({
         : "참가자 이미지를 불러오지 못했습니다.";
   }
 
+  try {
+    const result = await getReleaseApplicationOverview();
+    releaseApplicationCount = result.total;
+    latestReleaseApplicationCreatedAt = result.latestCreatedAt;
+  } catch (adminError) {
+    releaseApplicationLoadError =
+      adminError instanceof Error
+        ? adminError.message
+        : "음원 참여 신청 요약을 불러오지 못했습니다.";
+  }
+
   const proposalPage = parsePositivePage(proposalPageValue);
   const proposalPageCount = Math.max(
     1,
@@ -601,7 +650,11 @@ export default async function AdminPage({
     );
   }
 
-  const latestCreatedAt = [latestProjectProposalCreatedAt, applications[0]?.created_at]
+  const latestCreatedAt = [
+    latestProjectProposalCreatedAt,
+    latestReleaseApplicationCreatedAt,
+    applications[0]?.created_at
+  ]
     .filter((value): value is string => Boolean(value))
     .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
   const piggyMessage = getPiggyMessage(piggy);
@@ -623,6 +676,27 @@ export default async function AdminPage({
         </div>
       </header>
 
+      <nav className="admin-workspace-nav" aria-label="음원 참여 관리">
+        <Link href="/admin/releases" prefetch={false}>
+          <strong>발매 · 참여 파트 관리</strong>
+          <span aria-hidden="true">→</span>
+          <small>음원, 모집 상태, 참여 크레딧</small>
+        </Link>
+        <Link href="/admin/release-applications" prefetch={false}>
+          <strong>음원 참여 신청</strong>
+          <span>{releaseApplicationCount}건</span>
+          <small>
+            최근 접수 {latestReleaseApplicationCreatedAt
+              ? formatDate(latestReleaseApplicationCreatedAt)
+              : "-"}
+          </small>
+        </Link>
+      </nav>
+
+      {releaseApplicationLoadError ? (
+        <div className="admin-alert">{releaseApplicationLoadError}</div>
+      ) : null}
+
       <section className="admin-summary" aria-label="신청 요약">
         <article>
           <span>프로젝트 제안</span>
@@ -634,7 +708,7 @@ export default async function AdminPage({
         </article>
         <article>
           <span>전체 접수</span>
-          <strong>{projectProposalCount + applicationCount}</strong>
+          <strong>{projectProposalCount + applicationCount + releaseApplicationCount}</strong>
         </article>
         <article>
           <span>최근 신청</span>

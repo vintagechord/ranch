@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
+import VintageChordReleases from "@/app/components/VintageChordReleases";
 import { getProjectBySlug, projects, type Project } from "@/lib/projects";
+import { RELEASE_PROJECT_SLUG } from "@/lib/releaseParticipation";
+import { getPublicMusicReleases } from "@/lib/releaseParticipation.server";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
@@ -13,6 +16,8 @@ type ProjectStyle = CSSProperties & {
   "--project-accent": string;
   "--project-accent-alt": string;
 };
+
+export const dynamic = "force-dynamic";
 
 function ReelDeckVisual() {
   return (
@@ -73,22 +78,28 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     return {};
   }
 
-  const title = `${project.artist} — ${project.title} | 목장의 아침`;
+  const isReleaseProject = project.slug === RELEASE_PROJECT_SLUG;
+  const title = isReleaseProject
+    ? "빈티지코드 Releases | 목장의 아침"
+    : `${project.artist} — ${project.title} | 목장의 아침`;
+  const description = isReleaseProject
+    ? "빈티지코드 발매 음원과 참여 가능한 파트."
+    : project.summary;
 
   return {
     title,
-    description: project.summary,
+    description,
     openGraph: {
       type: "website",
       locale: "ko_KR",
       title,
-      description: project.summary,
+      description,
       images: [{ url: "/og.png", width: 1200, height: 630, alt: "목장의 아침 Project Room" }]
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: project.summary,
+      description,
       images: ["/og.png"]
     }
   };
@@ -104,6 +115,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   const projectIndex = projects.findIndex((item) => item.slug === project.slug);
   const nextProject = projects[(projectIndex + 1) % projects.length];
+  const isReleaseProject = project.slug === RELEASE_PROJECT_SLUG;
+  const musicReleases = isReleaseProject
+    ? await getPublicMusicReleases()
+    : [];
   const projectStyle: ProjectStyle = {
     "--project-accent": project.accent,
     "--project-accent-alt": project.accentAlt
@@ -112,52 +127,62 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <>
       <Header showApplyCta={false} />
-      <main className="project-page" id="top" style={projectStyle}>
+      <main
+        className={`project-page${isReleaseProject ? " project-page-releases" : ""}`}
+        id="top"
+        style={projectStyle}
+      >
         <div className="project-shell">
           <a className="project-back-link" href="/#project-room">
             <span aria-hidden="true">←</span> ALL PROJECTS
           </a>
 
-          <section className="project-hero" aria-labelledby="project-title">
-            <div className="project-hero-copy">
-              <div className="project-meta-row">
-                <span className="project-label">{project.label}</span>
-                <span className="project-status">
-                  <span className="project-status-dot" aria-hidden="true" />
-                  {project.status}
-                </span>
-              </div>
-              <p className="project-artist">{project.artist}</p>
-              <h1 className="project-title" id="project-title">
-                {project.title}
-              </h1>
-            </div>
+          {isReleaseProject ? (
+            <VintageChordReleases releases={musicReleases} />
+          ) : (
+            <>
+              <section className="project-hero" aria-labelledby="project-title">
+                <div className="project-hero-copy">
+                  <div className="project-meta-row">
+                    <span className="project-label">{project.label}</span>
+                    <span className="project-status">
+                      <span className="project-status-dot" aria-hidden="true" />
+                      {project.status}
+                    </span>
+                  </div>
+                  <p className="project-artist">{project.artist}</p>
+                  <h1 className="project-title" id="project-title">
+                    {project.title}
+                  </h1>
+                </div>
 
-            <ProjectVisual project={project} />
-          </section>
+                <ProjectVisual project={project} />
+              </section>
 
-          <section className="project-overview" aria-labelledby="project-overview-title">
-            <div className="project-section-heading">
-              <span className="project-section-number">A</span>
-              <h2 id="project-overview-title">CURRENT STATUS</h2>
-            </div>
-            <div className="project-overview-body">
-              <dl className="project-facts">
-                <div className="project-fact">
-                  <dt>STATUS</dt>
-                  <dd>{project.status}</dd>
+              <section className="project-overview" aria-labelledby="project-overview-title">
+                <div className="project-section-heading">
+                  <span className="project-section-number">A</span>
+                  <h2 id="project-overview-title">CURRENT STATUS</h2>
                 </div>
-                <div className="project-fact">
-                  <dt>CURRENT STAGE</dt>
-                  <dd>{project.stage}</dd>
+                <div className="project-overview-body">
+                  <dl className="project-facts">
+                    <div className="project-fact">
+                      <dt>STATUS</dt>
+                      <dd>{project.status}</dd>
+                    </div>
+                    <div className="project-fact">
+                      <dt>CURRENT STAGE</dt>
+                      <dd>{project.stage}</dd>
+                    </div>
+                    <div className="project-fact">
+                      <dt>ARTIST</dt>
+                      <dd>{project.artist}</dd>
+                    </div>
+                  </dl>
                 </div>
-                <div className="project-fact">
-                  <dt>ARTIST</dt>
-                  <dd>{project.artist}</dd>
-                </div>
-              </dl>
-            </div>
-          </section>
+              </section>
+            </>
+          )}
 
           <a className="project-next" href={`/projects/${nextProject.slug}`}>
             <span className="project-next-label">NEXT PROJECT</span>
