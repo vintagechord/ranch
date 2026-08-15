@@ -266,6 +266,8 @@ async function reviewApplication(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/releases");
+  revalidatePath("/admin/projects/ibyeol-ui-dosu");
+  revalidatePath("/admin/projects/vintagechord-post-production");
   revalidatePath("/admin/release-applications");
   revalidatePath(`/admin/release-applications/${applicationId}`);
   revalidatePath("/projects/ibyeol-ui-dosu");
@@ -300,11 +302,8 @@ export default async function AdminReleaseApplicationDetailPage({
           <h1>참여 신청 확인</h1>
         </div>
         <div className="admin-actions">
-          <Link href="/admin/release-applications">신청 목록</Link>
-          <Link href="/admin/releases">프로젝트 · 파트 관리</Link>
-          <form action="/api/admin/logout" method="post">
-            <button type="submit">로그아웃</button>
-          </form>
+          <Link href={`/admin/release-applications?project=${release.project_slug}`}>프로젝트 신청 목록</Link>
+          <Link href={`/admin/projects/${release.project_slug}`}>프로젝트 관리</Link>
         </div>
       </header>
 

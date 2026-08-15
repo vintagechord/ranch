@@ -4,16 +4,7 @@ import { type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import MotionToggle from "@/app/components/MotionToggle";
 import PiggyBankButton from "@/app/components/PiggyBankButton";
-import { activeProjects } from "@/lib/projects";
-
-const navItems = [
-  ...activeProjects.map((project) => ({
-    kind: "project" as const,
-    label: project.shortTitle,
-    href: `/projects/${project.slug}`
-  })),
-  { kind: "proposal" as const, label: "프로젝트 제안", href: "/#project-proposal" }
-];
+import { activeProjects, type Project } from "@/lib/projects";
 
 function scrollToHash(event: MouseEvent<HTMLAnchorElement>, href: string) {
   const url = new URL(href, window.location.href);
@@ -36,6 +27,7 @@ function scrollToHash(event: MouseEvent<HTMLAnchorElement>, href: string) {
 
 type HeaderProps = {
   showApplyCta?: boolean;
+  projects?: Project[];
 };
 
 function SfFactoryLink({ isActive }: { isActive: boolean }) {
@@ -63,10 +55,18 @@ function SfFactoryLink({ isActive }: { isActive: boolean }) {
   );
 }
 
-export default function Header(_props: HeaderProps) {
+export default function Header({ projects = activeProjects }: HeaderProps) {
   const pathname = usePathname();
   const topHref = pathname === "/" ? "#top" : "/";
-  const activeProjectCount = activeProjects.length;
+  const navItems = [
+    ...projects.map((project) => ({
+      kind: "project" as const,
+      label: project.shortTitle,
+      href: `/projects/${project.slug}`
+    })),
+    { kind: "proposal" as const, label: "프로젝트 제안", href: "/#project-proposal" }
+  ];
+  const activeProjectCount = projects.length;
   const activeProjectCountLabel = String(activeProjectCount).padStart(2, "0");
 
   return (

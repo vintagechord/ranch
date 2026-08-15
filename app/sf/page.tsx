@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
+import { getPublicActiveProjects } from "@/lib/projectSiteSettings.server";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
 import SfHero from "@/app/components/SfHero";
 
@@ -146,10 +147,17 @@ function youtubeUrl(videoId: string) {
   return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
-export default function StrangeFactoryPage() {
+export const dynamic = "force-dynamic";
+
+export default async function StrangeFactoryPage() {
+  const activeProjects = await getPublicActiveProjects().catch((error) => {
+    console.error("S/F public project settings load failed:", error);
+    return [];
+  });
+
   return (
     <>
-      <Header showApplyCta={false} />
+      <Header projects={activeProjects} showApplyCta={false} />
       <main id="top" className="sf-page">
         <SfHero releaseCount={releases.length} />
 

@@ -7,6 +7,10 @@ import ProjectParticipationBoard from "@/app/components/ProjectParticipationBoar
 import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 import VintageChordReleases from "@/app/components/VintageChordReleases";
 import { getProjectBySlug, getProjectStatusLabel, projects, type Project } from "@/lib/projects";
+import {
+  getPublicActiveProjects,
+  getPublicProjectBySlug
+} from "@/lib/projectSiteSettings.server";
 import { RELEASE_PROJECT_SLUG } from "@/lib/releaseParticipation";
 import { getPublicMusicReleases } from "@/lib/releaseParticipation.server";
 
@@ -86,14 +90,33 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const [projectResult, publicProjectsResult] = await Promise.allSettled([
+    getPublicProjectBySlug(slug),
+    getPublicActiveProjects()
+  ]);
 
+  if (projectResult.status === "rejected") {
+    console.error("Public project setting load failed:", projectResult.reason);
+    notFound();
+  }
+
+  const project = projectResult.value;
   if (!project) {
     notFound();
   }
 
-  const projectIndex = projects.findIndex((item) => item.slug === project.slug);
-  const nextProject = projects[(projectIndex + 1) % projects.length];
+  const publicProjects = publicProjectsResult.status === "fulfilled"
+    ? publicProjectsResult.value
+    : [];
+
+  if (publicProjectsResult.status === "rejected") {
+    console.error("Public project navigation settings load failed:", publicProjectsResult.reason);
+  }
+
+  const projectIndex = publicProjects.findIndex((item) => item.slug === project.slug);
+  const nextProject = publicProjects.length > 1
+    ? publicProjects[(projectIndex + 1) % publicProjects.length]
+    : null;
   const isReleaseProject = project.slug === RELEASE_PROJECT_SLUG;
   const projectReleases = await getPublicMusicReleases(project.slug);
   const participationRelease = [...projectReleases]
@@ -111,7 +134,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <>
-      <Header showApplyCta={false} />
+      <Header projects={publicProjects} showApplyCta={false} />
       <main
         className={`project-page project-page-compact${isReleaseProject ? " project-page-releases" : " project-page-participation"}`}
         id="top"
@@ -157,15 +180,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </>
           )}
 
-          <a className="project-next" href={`/projects/${nextProject.slug}`}>
-            <span className="project-next-label">NEXT PROJECT</span>
-            <span className="project-next-title">
-              {nextProject.artist} — {nextProject.title}
-            </span>
-            <span className="project-next-arrow" aria-hidden="true">
-              ↗
-            </span>
-          </a>
+          {nextProject ? (
+            <a className="project-next" href={`/projects/${nextProject.slug}`}>
+              <span className="project-next-label">NEXT PROJECT</span>
+              <span className="project-next-title">
+                {nextProject.artist} — {nextProject.title}
+              </span>
+              <span className="project-next-arrow" aria-hidden="true">↗</span>
+            </a>
+          ) : null}
         </div>
       </main>
       <Footer />

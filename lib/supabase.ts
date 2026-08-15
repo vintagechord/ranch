@@ -46,6 +46,88 @@ export type ProjectProposalInsert = {
   retention_until?: string;
 };
 
+export type ProjectPageLifecycle = "active" | "completed" | "archived";
+
+export type ProjectPageSettingsRow = {
+  project_slug: string;
+  lifecycle: ProjectPageLifecycle;
+  is_public: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProjectPageSettingsInsert = {
+  project_slug: string;
+  lifecycle?: ProjectPageLifecycle;
+  is_public?: boolean;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ProjectLifecycleClosedRoleSnapshot = {
+  role_id: string;
+  release_id: string;
+  role_type_code: string;
+  previous_state: "open" | "paused";
+};
+
+export type ProjectLifecycleEventRow = {
+  id: string;
+  project_slug: string;
+  from_lifecycle: ProjectPageLifecycle;
+  to_lifecycle: ProjectPageLifecycle;
+  from_is_public: boolean;
+  to_is_public: boolean;
+  from_sort_order: number;
+  to_sort_order: number;
+  closed_role_snapshots: ProjectLifecycleClosedRoleSnapshot[];
+  created_at: string;
+};
+
+export type ProjectLifecycleEventInsert = {
+  id?: string;
+  project_slug: string;
+  from_lifecycle: ProjectPageLifecycle;
+  to_lifecycle: ProjectPageLifecycle;
+  from_is_public: boolean;
+  to_is_public: boolean;
+  from_sort_order: number;
+  to_sort_order: number;
+  closed_role_snapshots?: ProjectLifecycleClosedRoleSnapshot[];
+  created_at?: string;
+};
+
+export type SiteSettingsRow = {
+  id: number;
+  next_meeting_at: string;
+  venue: string;
+  is_visible: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SiteSettingsInsert = {
+  id?: number;
+  next_meeting_at: string;
+  venue: string;
+  is_visible?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type AdminUpdateProjectPageSettingsResult = {
+  status: "updated" | "not_found" | "conflict" | "invalid_input";
+  project_slug: string | null;
+  updated_at: string | null;
+};
+
+export type AdminUpdateNextMeetingSettingResult = {
+  status: "updated" | "not_found" | "conflict" | "invalid_input";
+  updated_at: string | null;
+};
+
 export type ReleaseRoleTypeRow = {
   code: string;
   label_ko: string;
@@ -313,6 +395,32 @@ type OpenChatSettingsInsert = {
 export type Database = {
   public: {
     Tables: {
+      project_page_settings: {
+        Row: ProjectPageSettingsRow;
+        Insert: ProjectPageSettingsInsert;
+        Update: Partial<ProjectPageSettingsInsert>;
+        Relationships: [];
+      };
+      project_lifecycle_events: {
+        Row: ProjectLifecycleEventRow;
+        Insert: ProjectLifecycleEventInsert;
+        Update: Partial<ProjectLifecycleEventInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "project_lifecycle_events_project_slug_fkey";
+            columns: ["project_slug"];
+            isOneToOne: false;
+            referencedRelation: "project_page_settings";
+            referencedColumns: ["project_slug"];
+          }
+        ];
+      };
+      site_settings: {
+        Row: SiteSettingsRow;
+        Insert: SiteSettingsInsert;
+        Update: Partial<SiteSettingsInsert>;
+        Relationships: [];
+      };
       project_proposals: {
         Row: ProjectProposalRow;
         Insert: ProjectProposalInsert;
@@ -428,6 +536,25 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      admin_update_project_page_settings: {
+        Args: {
+          p_project_slug: string;
+          p_expected_updated_at: string;
+          p_lifecycle: ProjectPageLifecycle;
+          p_is_public: boolean;
+          p_sort_order: number;
+        };
+        Returns: AdminUpdateProjectPageSettingsResult;
+      };
+      admin_update_next_meeting_setting: {
+        Args: {
+          p_expected_updated_at: string;
+          p_next_meeting_at: string;
+          p_venue: string;
+          p_is_visible: boolean;
+        };
+        Returns: AdminUpdateNextMeetingSettingResult;
+      };
       admin_create_next_ppp_release: {
         Args: {
           p_creation_id: string;

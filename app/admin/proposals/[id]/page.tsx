@@ -79,10 +79,7 @@ export default async function ProjectProposalDetailPage({
           <h1>제안서 확인</h1>
         </div>
         <div className="admin-actions">
-          <Link href="/admin">목록으로</Link>
-          <form action="/api/admin/logout" method="post">
-            <button type="submit">로그아웃</button>
-          </form>
+          <Link href="/admin/proposals">제안 목록</Link>
         </div>
       </header>
 

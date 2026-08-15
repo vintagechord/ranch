@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { getProjectBySlug, projects } from "@/lib/projects";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ const APPLICATION_STATUSES = [
 type SearchParams = Promise<{
   page?: string;
   status?: string;
+  project?: string;
   release?: string;
   role?: string;
 }>;
@@ -56,6 +58,7 @@ type ApplicationListRow = {
 
 type Filters = {
   status: string;
+  projectSlug: string;
   releaseId: string;
   roleCode: string;
 };
@@ -93,6 +96,7 @@ function statusLabel(status: string) {
 function buildListHref(filters: Filters, page: number) {
   const params = new URLSearchParams();
   if (filters.status) params.set("status", filters.status);
+  if (filters.projectSlug) params.set("project", filters.projectSlug);
   if (filters.releaseId) params.set("release", filters.releaseId);
   if (filters.roleCode) params.set("role", filters.roleCode);
   if (page > 1) params.set("page", String(page));
@@ -148,7 +152,7 @@ async function loadApplications(page: number, filters: Filters, matchingRoleIds:
     .range(from, to);
 
   if (filters.status) query = query.eq("status", filters.status);
-  if (filters.releaseId || filters.roleCode) {
+  if (filters.projectSlug || filters.releaseId || filters.roleCode) {
     query = matchingRoleIds.length > 0
       ? query.in("release_role_id", matchingRoleIds)
       : query.eq("release_role_id", NIL_UUID);
@@ -173,14 +177,21 @@ export default async function AdminReleaseApplicationsPage({
   const params = await searchParams;
   const page = parsePositivePage(params.page);
   const { releases, roleTypes, roles } = await loadCatalog();
+  const projectSlug = getProjectBySlug(params.project ?? "")?.slug ?? "";
+  const projectReleases = projectSlug
+    ? releases.filter((release) => release.project_slug === projectSlug)
+    : releases;
   const filters: Filters = {
     status: APPLICATION_STATUSES.includes(params.status as never) ? params.status! : "",
-    releaseId: releases.some((release) => release.id === params.release) ? params.release! : "",
+    projectSlug,
+    releaseId: projectReleases.some((release) => release.id === params.release) ? params.release! : "",
     roleCode: roleTypes.some((roleType) => roleType.code === params.role) ? params.role! : ""
   };
+  const projectReleaseIds = new Set(projectReleases.map((release) => release.id));
   const matchingRoleIds = roles
     .filter(
       (role) =>
+        (!filters.projectSlug || projectReleaseIds.has(role.release_id)) &&
         (!filters.releaseId || role.release_id === filters.releaseId) &&
         (!filters.roleCode || role.role_type_code === filters.roleCode)
     )
@@ -200,10 +211,11 @@ export default async function AdminReleaseApplicationsPage({
         <div>
           <p className="admin-eyebrow">PROJECT PARTICIPATION / APPLICATIONS</p>
           <h1>프로젝트 참여 신청</h1>
+          {filters.projectSlug ? <p>{projectLabel(filters.projectSlug)} 프로젝트 신청만 표시합니다.</p> : null}
         </div>
         <div className="admin-actions">
-          <Link href="/admin">운영 관리</Link>
-          <Link href="/admin/releases">프로젝트 · 파트 관리</Link>
+          <Link href="/admin">운영 대시보드</Link>
+          <Link href="/admin/projects">프로젝트 목록</Link>
           <form action="/api/admin/logout" method="post">
             <button type="submit">로그아웃</button>
           </form>
@@ -222,6 +234,15 @@ export default async function AdminReleaseApplicationsPage({
 
           <form className="admin-filter-form" method="get">
             <label className="admin-form-field">
+              <span>프로젝트</span>
+              <select name="project" defaultValue={filters.projectSlug}>
+                <option value="">전체 프로젝트</option>
+                {projects.map((project) => (
+                  <option value={project.slug} key={project.slug}>{project.shortTitle}</option>
+                ))}
+              </select>
+            </label>
+            <label className="admin-form-field">
               <span>상태</span>
               <select name="status" defaultValue={filters.status}>
                 <option value="">전체 상태</option>
@@ -234,7 +255,7 @@ export default async function AdminReleaseApplicationsPage({
               <span>프로젝트 항목</span>
               <select name="release" defaultValue={filters.releaseId}>
                 <option value="">전체 항목</option>
-                {releases.map((release) => (
+                {projectReleases.map((release) => (
                   <option value={release.id} key={release.id}>
                     {projectLabel(release.project_slug)} · {release.release_number}. {release.title}
                   </option>
@@ -253,7 +274,9 @@ export default async function AdminReleaseApplicationsPage({
               </select>
             </label>
             <button type="submit">필터 적용</button>
-            <Link href="/admin/release-applications">초기화</Link>
+            <Link href={filters.projectSlug ? `/admin/release-applications?project=${filters.projectSlug}` : "/admin/release-applications"}>
+              필터 초기화
+            </Link>
           </form>
 
           {items.length === 0 ? (

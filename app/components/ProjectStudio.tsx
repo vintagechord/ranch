@@ -22,7 +22,7 @@ type ProjectStudioProps = {
     dateLabel: string;
     timeLabel: string;
     venue: string;
-  };
+  } | null;
   projects: StudioProject[];
 };
 
@@ -387,21 +387,23 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
 
         <div className="studio-monitor">
           <AcousticDisplay />
-          <div className="studio-monitor-session">
-            <span className="studio-monitor-session-label">
-              <small>다음 모임:</small>
-              <strong aria-hidden="true">NEXT SESSION</strong>
-            </span>
-            <time
-              aria-label={nextMeeting.accessibleDateTime}
-              dateTime={nextMeeting.dateTime}
-            >
-              <span aria-hidden="true">{nextMeeting.dateLabel}</span>
-              <b aria-hidden="true">/</b>
-              <strong aria-hidden="true">{nextMeeting.timeLabel}</strong>
-            </time>
-            <LocationJourneyDialog venue={nextMeeting.venue} />
-          </div>
+          {nextMeeting ? (
+            <div className="studio-monitor-session">
+              <span className="studio-monitor-session-label">
+                <small>다음 모임:</small>
+                <strong aria-hidden="true">NEXT SESSION</strong>
+              </span>
+              <time
+                aria-label={nextMeeting.accessibleDateTime}
+                dateTime={nextMeeting.dateTime}
+              >
+                <span aria-hidden="true">{nextMeeting.dateLabel}</span>
+                <b aria-hidden="true">/</b>
+                <strong aria-hidden="true">{nextMeeting.timeLabel}</strong>
+              </time>
+              <LocationJourneyDialog venue={nextMeeting.venue} />
+            </div>
+          ) : null}
         </div>
 
         <div className="studio-equipment-row">
