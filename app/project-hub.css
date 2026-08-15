@@ -7720,25 +7720,6 @@ html.site-motion-paused .studio-project-object.is-mixer:focus-visible .studio-kn
   white-space: nowrap;
 }
 
-.vc-release-closed-note {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 46px;
-  padding: 9px 12px;
-  border-top: 1px solid var(--vc-line);
-  color: #85867f;
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 0.56rem;
-}
-
-.vc-release-closed-note strong {
-  color: #c69a76;
-  font-size: 0.55rem;
-  letter-spacing: 0.1em;
-}
-
 /* A softer console-style participation control shared across project rooms. */
 .project-page-releases.project-page-compact .vc-release-roles button,
 .project-participation-grid button {
@@ -7837,12 +7818,6 @@ html.site-motion-paused .project-participation-grid button > span {
   .vc-release-section-heading-copy p {
     font-size: 0.5rem;
     white-space: normal;
-  }
-
-  .vc-release-closed-note {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
   }
 
   .vc-release-card-identity {

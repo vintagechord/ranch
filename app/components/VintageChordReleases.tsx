@@ -161,13 +161,6 @@ function UpcomingReleaseCard({
           ))}
         </ul>
       ) : null}
-
-      {!applicationOpen ? (
-        <div className="vc-release-closed-note">
-          <strong>APPLICATION CLOSED</strong>
-          <span>참여 모집이 종료된 프로젝트입니다.</span>
-        </div>
-      ) : null}
     </article>
   );
 }
