@@ -382,6 +382,7 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
           <AcousticDisplay />
           <div className="studio-monitor-session">
             <span className="studio-visually-hidden">다음 모임: </span>
+            <span className="studio-monitor-session-label" aria-hidden="true">NEXT SESSION</span>
             <time
               aria-label={nextMeeting.accessibleDateTime}
               dateTime={nextMeeting.dateTime}

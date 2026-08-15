@@ -3700,10 +3700,12 @@ html.site-motion-paused .studio-object-label {
   right: 24px;
   bottom: 21px;
   z-index: 4;
-  display: inline-flex;
-  min-height: 38px;
-  padding: 6px 11px 6px 27px;
-  gap: 10px;
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  min-height: 52px;
+  padding: 7px 11px 7px 27px;
+  column-gap: 10px;
+  row-gap: 4px;
   align-items: center;
   border: 1px solid rgba(255, 91, 50, 0.4);
   border-radius: 3px;
@@ -3722,7 +3724,7 @@ html.site-motion-paused .studio-object-label {
 
 .studio-monitor-session::before {
   position: absolute;
-  top: 50%;
+  top: 11px;
   left: 11px;
   width: 7px;
   height: 7px;
@@ -3732,8 +3734,17 @@ html.site-motion-paused .studio-object-label {
     0 0 0 3px rgba(255, 59, 34, 0.12),
     0 0 12px rgba(255, 59, 34, 0.94);
   content: "";
-  transform: translateY(-50%);
   animation: studio-monitor-rec-light 1.65s ease-in-out infinite alternate;
+}
+
+.studio-monitor-session-label {
+  grid-column: 1 / -1;
+  color: rgba(255, 169, 126, 0.72);
+  font-size: 0.47rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 8px rgba(255, 92, 48, 0.5);
 }
 
 .studio-monitor-session time {
@@ -4633,12 +4644,14 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
   .studio-monitor-session {
     right: 15px;
     bottom: 14px;
-    min-height: 32px;
-    padding: 5px 8px 5px 23px;
-    gap: 7px;
+    min-height: 45px;
+    padding: 6px 8px 6px 23px;
+    column-gap: 7px;
+    row-gap: 3px;
   }
 
   .studio-monitor-session::before {
+    top: 9px;
     left: 9px;
     width: 6px;
     height: 6px;
@@ -4647,6 +4660,10 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
   .studio-monitor-session time {
     gap: 6px;
     font-size: 0.61rem;
+  }
+
+  .studio-monitor-session-label {
+    font-size: 0.42rem;
   }
 
   .studio-monitor-session time strong {
