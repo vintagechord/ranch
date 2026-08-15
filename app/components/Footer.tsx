@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div>
         <strong>목장의 아침</strong>
-        <span>Eulwangli Edition</span>
+        <span>Gimpo Edition</span>
       </div>
       <p>Made for friends, somewhere near the west sea.</p>
     </footer>
