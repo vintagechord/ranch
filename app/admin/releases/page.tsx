@@ -322,7 +322,7 @@ export default async function AdminReleasesPage({
         <section className="admin-management-section" aria-labelledby="release-list-title">
           <div className="admin-table-heading">
             <div>
-              <p className="admin-eyebrow">VINTAGECHORD RELEASES</p>
+              <p className="admin-eyebrow">PPP RELEASES</p>
               <h2 id="release-list-title">음원과 참여 파트</h2>
             </div>
             <span>음원 {releases.length}개</span>

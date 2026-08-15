@@ -58,10 +58,10 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
   const isReleaseProject = project.slug === RELEASE_PROJECT_SLUG;
   const title = isReleaseProject
-    ? "빈티지코드 Releases | 목장의 아침"
+    ? "PPP | 목장의 아침"
     : `${project.artist} — ${project.title} | 목장의 아침`;
   const description = isReleaseProject
-    ? "빈티지코드 발매 음원과 참여 가능한 파트."
+    ? "PPP 발매 음원과 참여 가능한 파트."
     : project.summary;
 
   return {

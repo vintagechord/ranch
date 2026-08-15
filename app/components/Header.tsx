@@ -7,7 +7,12 @@ import PiggyBankButton from "@/app/components/PiggyBankButton";
 import { projects } from "@/lib/projects";
 
 const navItems = [
-  { label: "PROJECTS", hash: "#project-room" }
+  ...projects.map((project) => ({
+    kind: "project" as const,
+    label: project.shortTitle,
+    href: `/projects/${project.slug}`
+  })),
+  { kind: "proposal" as const, label: "프로젝트 제안", href: "/#project-proposal" }
 ];
 
 function scrollToHash(event: MouseEvent<HTMLAnchorElement>, href: string) {
@@ -79,14 +84,16 @@ export default function Header(_props: HeaderProps) {
 
       <nav className="site-nav" aria-label="주요 메뉴">
         {navItems.map((item) => {
-          const href = pathname === "/" ? item.hash : `/${item.hash}`;
+          const isActive = item.kind === "project" && pathname === item.href;
 
           return (
             <a
-              key={item.hash}
-              href={href}
-              className={pathname.startsWith("/projects") && item.hash === "#project-room" ? "is-active" : undefined}
-              onClick={(event) => scrollToHash(event, href)}
+              key={item.href}
+              href={item.href}
+              aria-current={isActive ? "page" : undefined}
+              aria-haspopup={item.kind === "proposal" ? "dialog" : undefined}
+              className={isActive ? "is-active" : undefined}
+              onClick={item.kind === "proposal" ? undefined : (event) => scrollToHash(event, item.href)}
             >
               {item.label}
             </a>

@@ -260,8 +260,8 @@ export default function VintageChordReleases({ releases }: VintageChordReleasesP
     <>
       <header className="vc-release-hero">
         <div className="vc-release-hero-copy">
-          <p>VINTAGECHORD / RELEASES</p>
-          <h1 id="project-title">빈티지코드</h1>
+          <p>PPP / RELEASES</p>
+          <h1 id="project-title">PPP</h1>
         </div>
         <div className="vc-release-hero-equipment" aria-hidden="true">
           <span className="project-sound-wave is-left" />

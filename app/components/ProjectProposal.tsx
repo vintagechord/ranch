@@ -28,6 +28,9 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
   const formRef = useRef<HTMLFormElement>(null);
   const successButtonRef = useRef<HTMLButtonElement>(null);
   const idempotencyKeyRef = useRef("");
+  const openedFromHashRef = useRef(false);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const submittingRef = useRef(false);
   const [submitState, setSubmitState] = useState<SubmitState>({
     status: "idle",
     message: ""
@@ -41,11 +44,71 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
     }
   }, [submitState.status]);
 
-  function openDialog() {
+  function openDialog(trigger?: HTMLElement | null, fromHash = false) {
+    const dialog = dialogRef.current;
+
+    if (!dialog || dialog.open) {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    returnFocusRef.current = trigger
+      ?? (activeElement instanceof HTMLElement && activeElement !== document.body ? activeElement : null);
+    openedFromHashRef.current = fromHash;
     idempotencyKeyRef.current = window.crypto.randomUUID();
     setSubmitState({ status: "idle", message: "" });
-    dialogRef.current?.showModal();
+    dialog.showModal();
   }
+
+  useEffect(() => {
+    let animationFrame = 0;
+
+    function openFromHash() {
+      if (window.location.hash !== "#project-proposal") {
+        const dialog = dialogRef.current;
+
+        if (openedFromHashRef.current && dialog?.open) {
+          if (submittingRef.current) {
+            window.history.replaceState(
+              null,
+              "",
+              `${window.location.pathname}${window.location.search}#project-proposal`
+            );
+          } else {
+            openedFromHashRef.current = false;
+            dialog.close();
+          }
+        }
+
+        return;
+      }
+
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => openDialog(undefined, true));
+    }
+
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("hashchange", openFromHash);
+    };
+  }, []);
+
+  useEffect(() => {
+    submittingRef.current = isSubmitting;
+
+    if (
+      !isSubmitting
+      && openedFromHashRef.current
+      && window.location.hash !== "#project-proposal"
+      && dialogRef.current?.open
+    ) {
+      openedFromHashRef.current = false;
+      dialogRef.current.close();
+    }
+  }, [isSubmitting]);
 
   function closeDialog() {
     if (!isSubmitting) {
@@ -148,6 +211,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
   return (
     <>
       <section
+        id="project-proposal"
         className="studio-proposal-section"
         aria-labelledby="project-proposal-title"
         data-reveal-card
@@ -163,7 +227,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
           type="button"
           aria-haspopup="dialog"
           aria-label="프로젝트 제안서 열기"
-          onClick={openDialog}
+          onClick={(event) => openDialog(event.currentTarget)}
         >
           <span aria-hidden="true">＋</span>
           <small>OPEN</small>
@@ -181,10 +245,24 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
         }}
         onClick={handleBackdropClick}
         onClose={() => {
+          const returnFocusTarget = returnFocusRef.current;
+          openedFromHashRef.current = false;
+          returnFocusRef.current = null;
           formRef.current?.reset();
           idempotencyKeyRef.current = "";
           setSubmitState({ status: "idle", message: "" });
-          openButtonRef.current?.focus();
+
+          if (window.location.hash === "#project-proposal") {
+            window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+          }
+
+          window.requestAnimationFrame(() => {
+            if (returnFocusTarget?.isConnected) {
+              returnFocusTarget.focus();
+            } else {
+              openButtonRef.current?.focus();
+            }
+          });
         }}
       >
         <div className="proposal-dialog-panel">
