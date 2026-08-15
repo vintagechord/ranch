@@ -3493,6 +3493,18 @@ a.vc-released-card-media:focus-visible {
   padding: 18px;
 }
 
+.project-page-participation .project-machine.is-bare {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+
+.project-page-participation .project-machine.is-bare::after {
+  display: none;
+}
+
 .project-page-participation .project-equipment-reel {
   width: min(100%, 245px);
 }

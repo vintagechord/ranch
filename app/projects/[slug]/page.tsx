@@ -29,8 +29,10 @@ function ProjectVisual({ project }: { project: Project }) {
   const isSpeaker = project.visual === "speaker";
 
   return (
-    <div className={`project-machine project-machine-${project.visual}`}>
-      <span className="project-machine-label">{project.shortTitle}</span>
+    <div
+      className={`project-machine project-machine-${project.visual}${isSpeaker ? "" : " is-bare"}`}
+    >
+      {isSpeaker ? <span className="project-machine-label">{project.shortTitle}</span> : null}
       <div className={`project-equipment project-equipment-${project.visual}`}>
         {isSpeaker ? (
           <>
@@ -42,9 +44,11 @@ function ProjectVisual({ project }: { project: Project }) {
           <StudioReelDeck />
         )}
       </div>
-      <span className="project-machine-index" aria-hidden="true">
-        {project.number}
-      </span>
+      {isSpeaker ? (
+        <span className="project-machine-index" aria-hidden="true">
+          {project.number}
+        </span>
+      ) : null}
     </div>
   );
 }
