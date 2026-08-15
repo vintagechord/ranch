@@ -284,7 +284,7 @@ export default function VintageChordReleases({ releases, subcopy }: VintageChord
               <ReleaseSectionHeading
                 number={releasedSectionNumber}
                 title="RELEASED"
-                description="YouTube · 발매 완료"
+                description="발매 완료"
                 titleId="released-tracks-title"
               />
 
