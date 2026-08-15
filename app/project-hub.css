@@ -6255,10 +6255,16 @@ html.site-motion-paused .studio-monitor-session::before {
   box-shadow: inset -3px -4px 7px #000, 1px 2px 3px rgba(255, 255, 255, 0.08);
 }
 
-.studio-project-object:hover .studio-mm45-woofer > span,
 .studio-project-object:focus-visible .studio-mm45-woofer > span {
   filter: brightness(1.08);
   transform: scale(1.012);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .studio-project-object:hover .studio-mm45-woofer > span {
+    filter: brightness(1.08);
+    transform: scale(1.012);
+  }
 }
 
 html.site-motion-paused .studio-project-object:hover .studio-mm45-woofer > span,
@@ -6611,6 +6617,124 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
   100% { transform: rotate(19deg); }
 }
 
+/* The console wakes only while it is being inspected. */
+.studio-mixer-meter-bank > span::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(2, 4, 3, 0.76), rgba(6, 8, 7, 0.58));
+  content: "";
+  opacity: 0.72;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.studio-mixer-meter-bank > span::after {
+  z-index: 3;
+}
+
+.studio-mixer-meter-bank i {
+  animation: none;
+  transform: rotate(-19deg);
+}
+
+.studio-mixer-signal-lights span {
+  opacity: 0.22;
+  transition: opacity 180ms ease;
+}
+
+.studio-mixer .studio-knob {
+  --mixer-knob-rest: -10deg;
+  --mixer-knob-live: 8deg;
+  --mixer-knob-duration: 420ms;
+  transform: rotate(var(--mixer-knob-rest));
+  transform-origin: center;
+  transition: transform var(--mixer-knob-duration) cubic-bezier(0.2, 1.35, 0.32, 1);
+  transition-delay: calc(var(--channel-index) * 11ms);
+}
+
+.studio-mixer .studio-knob.is-eq {
+  --mixer-knob-rest: 9deg;
+  --mixer-knob-live: -8deg;
+  --mixer-knob-duration: 470ms;
+}
+
+.studio-mixer .studio-knob.is-aux {
+  --mixer-knob-rest: -4deg;
+  --mixer-knob-live: 12deg;
+  --mixer-knob-duration: 390ms;
+}
+
+.studio-mixer .studio-knob.is-pan {
+  --mixer-knob-rest: 7deg;
+  --mixer-knob-live: -10deg;
+  --mixer-knob-duration: 510ms;
+}
+
+.studio-mixer .studio-channel:nth-child(even) .studio-knob.is-gain {
+  --mixer-knob-live: 3deg;
+}
+
+.studio-mixer .studio-channel:nth-child(even) .studio-knob.is-eq {
+  --mixer-knob-live: -13deg;
+}
+
+.studio-mixer .studio-channel:nth-child(even) .studio-knob.is-aux {
+  --mixer-knob-live: 8deg;
+}
+
+.studio-mixer .studio-channel:nth-child(even) .studio-knob.is-pan {
+  --mixer-knob-live: -5deg;
+}
+
+@keyframes studio-mixer-signal-live {
+  0%, 28% { opacity: 0.36; }
+  42%, 74% { opacity: 1; }
+  100% { opacity: 0.62; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .studio-mixer:hover .studio-mixer-meter-bank > span::before {
+    opacity: 0.04;
+  }
+
+  .studio-mixer:hover .studio-mixer-meter-bank i {
+    animation: studio-vu-needle 1.35s ease-in-out infinite alternate;
+  }
+
+  .studio-mixer:hover .studio-mixer-meter-bank > span:nth-child(2) i {
+    animation-delay: -620ms;
+    animation-duration: 1.78s;
+  }
+
+  .studio-mixer:hover .studio-mixer-meter-bank > span:nth-child(3) i {
+    animation-delay: -1.08s;
+    animation-duration: 2.14s;
+  }
+
+  .studio-mixer:hover .studio-mixer-signal-lights span {
+    animation: studio-mixer-signal-live 1.18s steps(3, end) infinite;
+  }
+
+  .studio-mixer:hover .studio-mixer-signal-lights span:nth-child(2) {
+    animation-delay: -430ms;
+  }
+
+  .studio-mixer:hover .studio-mixer-signal-lights span:nth-child(3) {
+    animation-delay: -790ms;
+    animation-duration: 1.46s;
+  }
+
+  .studio-mixer:hover .studio-mixer-signal-lights span:nth-child(4) {
+    animation-delay: -210ms;
+    animation-duration: 1.72s;
+  }
+
+  .studio-mixer:hover .studio-knob {
+    transform: rotate(var(--mixer-knob-live));
+  }
+}
+
 @media (max-width: 1100px) {
   .studio-monitor {
     width: min(68%, 620px);
@@ -6839,18 +6963,37 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
   z-index: 2;
 }
 
-.studio-speaker-stack.is-playing .studio-mm45-woofer > span {
+.studio-speaker-stack.is-playing .studio-mm45-woofer > span,
+.studio-project-object.is-speaker:focus-visible .studio-mm45-woofer > span {
   animation: studio-mm45-playback 720ms cubic-bezier(0.42, 0, 0.3, 1) infinite alternate;
   transform-origin: center;
 }
 
-.studio-speaker-stack.is-playing .studio-mm45-mid span {
+.studio-speaker-stack.is-playing .studio-mm45-mid span,
+.studio-project-object.is-speaker:focus-visible .studio-mm45-mid span {
   animation: studio-mm45-mid-playback 940ms ease-in-out infinite alternate;
 }
 
-.studio-speaker-stack.is-playing .studio-mm45-mid.is-bottom span {
+.studio-speaker-stack.is-playing .studio-mm45-mid.is-bottom span,
+.studio-project-object.is-speaker:focus-visible .studio-mm45-mid.is-bottom span {
   animation-delay: -470ms;
   animation-duration: 1.12s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .studio-project-object.is-speaker:hover .studio-mm45-woofer > span {
+    animation: studio-mm45-playback 720ms cubic-bezier(0.42, 0, 0.3, 1) infinite alternate;
+    transform-origin: center;
+  }
+
+  .studio-project-object.is-speaker:hover .studio-mm45-mid span {
+    animation: studio-mm45-mid-playback 940ms ease-in-out infinite alternate;
+  }
+
+  .studio-project-object.is-speaker:hover .studio-mm45-mid.is-bottom span {
+    animation-delay: -470ms;
+    animation-duration: 1.12s;
+  }
 }
 
 .vc-release-hero-equipment {
@@ -6899,10 +7042,41 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
 }
 
 html.site-motion-paused .studio-speaker-stack.is-playing .studio-mm45-woofer > span,
-html.site-motion-paused .studio-speaker-stack.is-playing .studio-mm45-mid span {
+html.site-motion-paused .studio-speaker-stack.is-playing .studio-mm45-mid span,
+html.site-motion-paused .studio-project-object.is-speaker:hover .studio-mm45-woofer > span,
+html.site-motion-paused .studio-project-object.is-speaker:hover .studio-mm45-mid span,
+html.site-motion-paused .studio-project-object.is-speaker:focus-visible .studio-mm45-woofer > span,
+html.site-motion-paused .studio-project-object.is-speaker:focus-visible .studio-mm45-mid span {
   animation: none;
   filter: none;
   transform: none;
+  transition: none;
+}
+
+html.site-motion-paused .studio-mixer-meter-bank > span::before,
+html.site-motion-paused .studio-mixer-signal-lights span,
+html.site-motion-paused .studio-mixer .studio-knob {
+  animation: none;
+  transition: none;
+}
+
+html.site-motion-paused .studio-mixer-meter-bank i {
+  animation: none;
+  transform: rotate(-19deg);
+}
+
+html.site-motion-paused .studio-mixer:hover .studio-mixer-meter-bank i,
+html.site-motion-paused .studio-mixer:hover .studio-mixer-signal-lights span {
+  animation: none;
+}
+
+html.site-motion-paused .studio-mixer .studio-knob {
+  transform: rotate(var(--mixer-knob-rest));
+}
+
+html.site-motion-paused .studio-mixer:hover .studio-knob {
+  transform: rotate(var(--mixer-knob-rest));
+  transition: none;
 }
 
 @media (max-width: 820px) {
@@ -6938,10 +7112,41 @@ html.site-motion-paused .studio-speaker-stack.is-playing .studio-mm45-mid span {
 
   .studio-speaker-stack.is-playing .studio-mm45-woofer > span,
   .studio-speaker-stack.is-playing .studio-mm45-mid span,
+  .studio-project-object.is-speaker:hover .studio-mm45-woofer > span,
+  .studio-project-object.is-speaker:hover .studio-mm45-mid span,
+  .studio-project-object.is-speaker:focus-visible .studio-mm45-woofer > span,
+  .studio-project-object.is-speaker:focus-visible .studio-mm45-mid span,
   .project-equipment-speaker .project-sound-wave,
   .vc-release-hero-equipment .project-sound-wave {
     animation: none;
     filter: none;
     transform: none;
+    transition: none;
+  }
+
+  .studio-mixer-meter-bank > span::before,
+  .studio-mixer-signal-lights span,
+  .studio-mixer .studio-knob {
+    animation: none;
+    transition: none;
+  }
+
+  .studio-mixer-meter-bank i {
+    animation: none;
+    transform: rotate(-19deg);
+  }
+
+  .studio-mixer:hover .studio-mixer-meter-bank i,
+  .studio-mixer:hover .studio-mixer-signal-lights span {
+    animation: none;
+  }
+
+  .studio-mixer .studio-knob {
+    transform: rotate(var(--mixer-knob-rest));
+  }
+
+  .studio-mixer:hover .studio-knob {
+    transform: rotate(var(--mixer-knob-rest));
+    transition: none;
   }
 }
