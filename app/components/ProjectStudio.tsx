@@ -390,8 +390,7 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
           {nextMeeting ? (
             <div className="studio-monitor-session">
               <span className="studio-monitor-session-label">
-                <small>다음 모임:</small>
-                <strong aria-hidden="true">NEXT SESSION</strong>
+                <strong>NEXT SESSION</strong>
               </span>
               <time
                 aria-label={nextMeeting.accessibleDateTime}

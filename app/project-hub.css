@@ -4448,17 +4448,9 @@ html.site-motion-paused .studio-object-label {
   position: relative;
   z-index: 1;
   display: inline-flex;
-  gap: 9px;
   align-items: baseline;
   justify-content: center;
   text-shadow: 0 0 8px rgba(255, 92, 48, 0.5);
-}
-
-.studio-monitor-session-label small {
-  color: rgba(240, 229, 220, 0.72);
-  font-size: 0.55rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
 }
 
 .studio-monitor-session-label strong {
@@ -7026,14 +7018,6 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
     left: 10px;
     width: 6px;
     height: 6px;
-  }
-
-  .studio-monitor-session-label {
-    gap: 6px;
-  }
-
-  .studio-monitor-session-label small {
-    font-size: 0.54rem;
   }
 
   .studio-monitor-session-label strong {
