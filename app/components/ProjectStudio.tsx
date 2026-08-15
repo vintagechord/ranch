@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
+import LocationJourneyDialog from "@/app/components/LocationJourneyDialog";
 import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 
 type StudioProject = {
@@ -393,10 +394,7 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
               <b aria-hidden="true">/</b>
               <strong aria-hidden="true">{nextMeeting.timeLabel}</strong>
             </time>
-            <span className="studio-monitor-session-location">
-              <small>장소:</small>
-              <strong>{nextMeeting.venue}</strong>
-            </span>
+            <LocationJourneyDialog venue={nextMeeting.venue} />
           </div>
         </div>
 
