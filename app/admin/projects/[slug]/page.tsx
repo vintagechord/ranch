@@ -1111,8 +1111,13 @@ export default async function AdminProjectPage({
                     />
                   </label>
                   <label className="admin-form-field is-wide">
-                    <span>짧은 표기</span>
-                    <input name="summary" type="text" maxLength={1000} placeholder="Prod. / 메모" />
+                    <span>프로젝트 설명</span>
+                    <textarea
+                      name="summary"
+                      maxLength={1000}
+                      rows={3}
+                      placeholder="공개 프로젝트 카드에서 왼쪽으로 흐르는 설명입니다."
+                    />
                   </label>
                   <AdminActionButton pendingLabel={`PPP ${nextPppReleaseLabel} 만드는 중…`}>
                     PPP {nextPppReleaseLabel} 초안 만들기
@@ -1191,6 +1196,11 @@ export default async function AdminProjectPage({
                       <li data-ready={release.is_published}>
                         <strong>{release.is_published ? "사이트 공개" : "사이트 비공개"}</strong>
                       </li>
+                      {projectSlug === PPP_PROJECT_SLUG ? (
+                        <li data-ready={Boolean(release.summary?.trim())}>
+                          프로젝트 설명 <strong>{release.summary?.trim() ? "완료" : "없음"}</strong>
+                        </li>
+                      ) : null}
                     </ul>
 
                     <AdminReleaseCoverManager
@@ -1234,8 +1244,18 @@ export default async function AdminProjectPage({
                           <input name="youtubeVideoId" type="text" maxLength={11} defaultValue={release.youtube_video_id ?? ""} />
                         </label>
                         <label className="admin-form-field is-wide">
-                          <span>짧은 표기</span>
-                          <input name="summary" type="text" maxLength={1000} defaultValue={release.summary ?? ""} />
+                          <span>{projectSlug === PPP_PROJECT_SLUG ? "프로젝트 설명" : "짧은 표기"}</span>
+                          {projectSlug === PPP_PROJECT_SLUG ? (
+                            <textarea
+                              name="summary"
+                              maxLength={1000}
+                              rows={3}
+                              defaultValue={release.summary ?? ""}
+                              placeholder="공개 프로젝트 카드에서 왼쪽으로 흐르는 설명입니다."
+                            />
+                          ) : (
+                            <input name="summary" type="text" maxLength={1000} defaultValue={release.summary ?? ""} />
+                          )}
                         </label>
                         <label className="admin-check-field">
                           <input name="isPublished" type="checkbox" defaultChecked={release.is_published} />

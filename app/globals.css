@@ -5037,6 +5037,10 @@ html.site-motion-paused .sf-platforms a:active {
     border-radius: 6px;
   }
 
+  .admin-release-readiness li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
   .admin-release-card > header,
   .admin-lead-row {
     display: grid;

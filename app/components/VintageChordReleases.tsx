@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import ParticipationRequest, {
   type OpenParticipationRequest
 } from "@/app/components/ParticipationRequest";
@@ -20,6 +21,17 @@ type RoleRow = {
   label: string;
   lead: PublicReleaseLead;
   credits: PublicReleaseCredit[];
+};
+
+type DescriptionTickerStyle = CSSProperties & {
+  "--vc-description-duration": string;
+  "--vc-description-distance": string;
+};
+
+type DescriptionTickerMetrics = {
+  copyCount: number;
+  distance: number;
+  duration: number;
 };
 
 const ROLE_ORDER = new Map([
@@ -75,6 +87,92 @@ function getRoleRows(release: PublicMusicRelease) {
     });
 }
 
+function ProjectDescriptionTicker({ text }: { text: string }) {
+  const normalizedText = text.trim();
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const [metrics, setMetrics] = useState<DescriptionTickerMetrics | null>(null);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    const measure = measureRef.current;
+
+    if (!viewport || !measure) {
+      return;
+    }
+
+    let disposed = false;
+    let frame = 0;
+    const updateMetrics = () => {
+      if (disposed) {
+        return;
+      }
+
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (disposed) {
+          return;
+        }
+
+        const viewportWidth = Math.ceil(viewport.getBoundingClientRect().width);
+        const distance = Math.max(1, Math.ceil(measure.getBoundingClientRect().width));
+        const copyCount = Math.max(2, Math.ceil(viewportWidth / distance) + 1);
+        const duration = Math.max(12, Number((distance / 42).toFixed(2)));
+
+        setMetrics((current) => {
+          if (
+            current?.copyCount === copyCount &&
+            current.distance === distance &&
+            current.duration === duration
+          ) {
+            return current;
+          }
+
+          return { copyCount, distance, duration };
+        });
+      });
+    };
+
+    const observer = new ResizeObserver(updateMetrics);
+    observer.observe(viewport);
+    observer.observe(measure);
+    updateMetrics();
+    document.fonts?.ready.then(updateMetrics).catch(() => undefined);
+
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [normalizedText]);
+
+  const tickerStyle: DescriptionTickerStyle = {
+    "--vc-description-duration": `${metrics?.duration ?? 16}s`,
+    "--vc-description-distance": metrics ? `${metrics.distance}px` : "max-content"
+  };
+
+  return (
+    <div className="vc-release-description" role="note">
+      <span className="studio-visually-hidden">프로젝트 설명: {normalizedText}</span>
+      <div ref={viewportRef} className="vc-release-description-viewport" aria-hidden="true">
+        <span ref={measureRef} className="vc-release-description-measure">
+          {normalizedText}<i aria-hidden="true">◆</i>
+        </span>
+        <div
+          className={`vc-release-description-track${metrics ? " is-ready" : ""}`}
+          style={tickerStyle}
+        >
+          {Array.from({ length: metrics?.copyCount ?? 1 }, (_, index) => (
+            <span className="vc-release-description-copy" key={index}>
+              {normalizedText}<i aria-hidden="true">◆</i>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function UpcomingReleaseCard({
   release,
   openRequest,
@@ -124,9 +222,12 @@ function UpcomingReleaseCard({
         </time>
       </div>
 
-      <div className="vc-release-card-identity">
+      <div className={`vc-release-card-identity${release.summary?.trim() ? " has-description" : ""}`}>
         <h3 id={titleId}>{release.title || `Release ${number}`}</h3>
-        <span>{release.artistName}</span>
+        {release.summary?.trim() ? (
+          <ProjectDescriptionTicker text={release.summary} />
+        ) : null}
+        <span className="vc-release-card-artist">{release.artistName}</span>
       </div>
 
       {rows.length > 0 ? (
