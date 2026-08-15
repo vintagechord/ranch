@@ -126,10 +126,14 @@
 .header-motion-toggle:hover,
 .header-motion-toggle:focus-visible,
 .header-motion-toggle[aria-pressed="true"] {
-  border-color: var(--studio-lime, #c8ff4a);
-  background: rgba(200, 255, 74, 0.09);
-  color: var(--studio-lime, #c8ff4a);
-  outline: none;
+  border-color: #f4f0e7;
+  background: #f4f0e7;
+  color: #090a09;
+}
+
+.header-motion-toggle:focus-visible {
+  outline: 2px solid #f4f0e7;
+  outline-offset: 3px;
 }
 
 .header-session-light i,
