@@ -9,28 +9,66 @@ import {
 import { createPortal } from "react-dom";
 
 const TRACE_STAGES = [
-  { key: "space", label: "우주", system: "ORBITAL SEARCH", duration: 1100 },
-  { key: "earth", label: "지구", system: "PLANET LOCK", duration: 1050 },
-  { key: "asia", label: "아시아", system: "REGION LOCK", duration: 950 },
-  { key: "korea", label: "대한민국", system: "NATIONAL GRID", duration: 900 },
-  { key: "gimpo", label: "김포", system: "CITY LOCK", duration: 900 },
-  { key: "sau", label: "사우동", system: "DISTRICT LOCK", duration: 900 },
-  { key: "exit", label: "사우역 2번 출구", system: "EXIT 02 LOCK", duration: 1000 },
-  { key: "venue", label: "시그마프라자", system: "TARGET LOCKED", duration: 0 }
+  {
+    key: "solar",
+    label: "태양계",
+    system: "SOLAR SYSTEM LOCK",
+    duration: 1100,
+    media: "solar-system",
+    mobileMedia: "solar-system-mobile"
+  },
+  {
+    key: "earth",
+    label: "지구",
+    system: "PLANET LOCK",
+    duration: 1050,
+    media: "earth-orbit"
+  },
+  {
+    key: "asia",
+    label: "아시아",
+    system: "REGION LOCK",
+    duration: 950,
+    media: "earth-orbit"
+  },
+  {
+    key: "korea",
+    label: "대한민국",
+    system: "NATIONAL GRID",
+    duration: 900,
+    media: "korea-orbit"
+  },
+  {
+    key: "gimpo",
+    label: "김포",
+    system: "CITY LOCK",
+    duration: 900,
+    media: "gimpo-aerial"
+  },
+  {
+    key: "sau",
+    label: "사우동",
+    system: "DISTRICT LOCK",
+    duration: 900,
+    media: "gimpo-aerial"
+  },
+  {
+    key: "exit",
+    label: "사우역 2번 출구",
+    system: "EXIT 02 LOCK",
+    duration: 1000,
+    media: "sau-station-exit"
+  },
+  {
+    key: "venue",
+    label: "시그마프라자",
+    system: "TARGET LOCKED",
+    duration: 0,
+    media: "sigma-plaza"
+  }
 ] as const;
 
 const LAST_STAGE = TRACE_STAGES.length - 1;
-
-const ROAD_SEGMENTS = [
-  { left: "7%", top: "19%", width: "72%", rotate: "12deg" },
-  { left: "18%", top: "29%", width: "74%", rotate: "-17deg" },
-  { left: "4%", top: "47%", width: "88%", rotate: "4deg" },
-  { left: "11%", top: "66%", width: "76%", rotate: "-9deg" },
-  { left: "27%", top: "8%", width: "68%", rotate: "61deg" },
-  { left: "51%", top: "4%", width: "72%", rotate: "94deg" },
-  { left: "66%", top: "22%", width: "55%", rotate: "117deg" },
-  { left: "13%", top: "84%", width: "69%", rotate: "-31deg" }
-] as const;
 
 type LocationJourneyDialogProps = {
   venue: string;
@@ -52,6 +90,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
   const [motionLimited, setMotionLimited] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const [announcement, setAnnouncement] = useState("");
+  const [readyStages, setReadyStages] = useState<Set<number>>(() => new Set());
 
   const stage = TRACE_STAGES[activeStage];
   const isComplete = activeStage === LAST_STAGE;
@@ -105,7 +144,15 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
   }, [isOpen, motionLimited]);
 
   useEffect(() => {
-    if (!isOpen || motionLimited || playbackPaused || !pageVisible || isComplete) {
+    if (
+      !isOpen ||
+      motionLimited ||
+      playbackPaused ||
+      !pageVisible ||
+      isComplete ||
+      !readyStages.has(activeStage) ||
+      !readyStages.has(activeStage + 1)
+    ) {
       return;
     }
 
@@ -129,7 +176,16 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
         clock.remaining = Math.max(0, remaining - (performance.now() - clock.startedAt));
       }
     };
-  }, [activeStage, isComplete, isOpen, motionLimited, pageVisible, playbackPaused, stage.duration]);
+  }, [
+    activeStage,
+    isComplete,
+    isOpen,
+    motionLimited,
+    pageVisible,
+    playbackPaused,
+    readyStages,
+    stage.duration
+  ]);
 
   useEffect(() => {
     if (!isOpen || motionLimited) {
@@ -174,6 +230,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
     };
     setPlaybackPaused(false);
     setAnnouncement("");
+    setReadyStages(new Set());
     setIsOpen(true);
     document.documentElement.classList.add("location-trace-open");
     dialog.showModal();
@@ -194,6 +251,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
     setActiveStage(0);
     setPlaybackPaused(false);
     setAnnouncement("");
+    setReadyStages(new Set());
     stageClockRef.current = {
       stage: 0,
       remaining: TRACE_STAGES[0].duration,
@@ -229,6 +287,18 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
     setActiveStage(0);
   }
 
+  function markStageReady(index: number) {
+    setReadyStages((current) => {
+      if (current.has(index)) {
+        return current;
+      }
+
+      const next = new Set(current);
+      next.add(index);
+      return next;
+    });
+  }
+
   const dialog = (
     <dialog
       ref={dialogRef}
@@ -248,48 +318,58 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
           {venue} 위치 추적
         </h2>
         <p id="location-trace-description" className="studio-visually-hidden">
-          우주에서 지구, 아시아, 대한민국, 김포, 사우동, 사우역 2번 출구를 거쳐
+          태양계에서 지구, 아시아, 대한민국, 김포, 사우동, 사우역 2번 출구를 거쳐{" "}
           {venue}까지 위치를 추적합니다.
         </p>
 
         <div className="location-trace-visual" aria-hidden="true">
-          <div className="location-trace-stars is-far" />
-          <div className="location-trace-stars is-near" />
+          <div className="location-trace-media-stack">
+            {TRACE_STAGES.map((traceStage, index) => {
+              const distance = Math.abs(index - activeStage);
+              const shouldRender = isOpen && (distance <= 2 || (motionLimited && index === LAST_STAGE));
 
-          <div className="location-trace-orbit">
-            <div className="location-trace-earth"><i /><i /><i /><i /></div>
-            <div className="location-trace-orbit-line" />
-            <div className="location-trace-satellite"><i /></div>
+              if (!shouldRender) {
+                return null;
+              }
+
+              const mediaPath = `/location-trace/${traceStage.media}`;
+              const mobileMedia = "mobileMedia" in traceStage
+                ? `/location-trace/${traceStage.mobileMedia}`
+                : null;
+
+              return (
+                <picture
+                  className={`location-trace-media-frame${index === activeStage ? " is-active" : ""}${index < activeStage ? " is-before" : ""}${readyStages.has(index) ? " is-ready" : ""}`}
+                  data-trace-stage={traceStage.key}
+                  key={traceStage.key}
+                >
+                  {mobileMedia ? (
+                    <>
+                      <source media="(max-width: 720px) and (orientation: portrait)" srcSet={`${mobileMedia}.avif`} type="image/avif" />
+                      <source media="(max-width: 720px) and (orientation: portrait)" srcSet={`${mobileMedia}.webp`} type="image/webp" />
+                    </>
+                  ) : null}
+                  <source srcSet={`${mediaPath}.avif`} type="image/avif" />
+                  <img
+                    src={`${mediaPath}.webp`}
+                    alt=""
+                    width="1672"
+                    height="941"
+                    draggable={false}
+                    decoding="async"
+                    loading={distance <= 1 ? "eager" : "lazy"}
+                    onLoad={() => markStageReady(index)}
+                    onError={(event) => {
+                      event.currentTarget.hidden = true;
+                      markStageReady(index);
+                    }}
+                  />
+                </picture>
+              );
+            })}
           </div>
 
-          <div className="location-trace-map">
-            <div className="location-trace-contours"><i /><i /><i /></div>
-            <div className="location-trace-region is-asia"><i /><i /></div>
-            <div className="location-trace-region is-korea"><i /><i /><i /></div>
-            <div className="location-trace-roads">
-              {ROAD_SEGMENTS.map((road, index) => (
-                <i
-                  key={index}
-                  style={{
-                    left: road.left,
-                    top: road.top,
-                    width: road.width,
-                    transform: `rotate(${road.rotate})`
-                  }}
-                />
-              ))}
-            </div>
-            <div className="location-trace-blocks">
-              {Array.from({ length: 20 }, (_, index) => (
-                <i key={index} />
-              ))}
-            </div>
-            <div className="location-trace-rail">
-              <span /><span /><span className="is-exit-two" /><span />
-            </div>
-            <div className="location-trace-building"><i /><i /><i /></div>
-          </div>
-
+          <div className="location-trace-media-grade" />
           <div className="location-trace-sweep" />
           <div className="location-trace-reticle">
             <i /><i /><span /><span />

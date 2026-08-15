@@ -3911,13 +3911,6 @@ html.location-trace-open body {
 }
 
 .location-trace-shell {
-  --earth-opacity: 0.9;
-  --earth-scale: 0.46;
-  --earth-x: 0%;
-  --earth-y: 0%;
-  --map-opacity: 0;
-  --map-scale: 0.68;
-  --orbit-opacity: 0.82;
   --reticle-size: 250px;
   --reticle-color: rgba(121, 230, 255, 0.44);
   position: relative;
@@ -4041,7 +4034,116 @@ html.location-trace-open body {
   background:
     radial-gradient(circle at 50% 50%, rgba(19, 48, 56, 0.24), transparent 45%),
     linear-gradient(145deg, #020708, #010203 66%, #090302);
+  isolation: isolate;
   overflow: hidden;
+}
+
+.location-trace-media-stack,
+.location-trace-media-frame,
+.location-trace-media-frame img,
+.location-trace-media-grade {
+  position: absolute;
+  inset: 0;
+}
+
+.location-trace-media-stack {
+  z-index: 0;
+  overflow: hidden;
+  background: #010304;
+}
+
+.location-trace-media-frame {
+  --trace-shot-scale: 1;
+  z-index: 0;
+  display: block;
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(38, 83, 94, 0.28), transparent 34%),
+    linear-gradient(145deg, #020708, #010203 66%, #090302);
+  opacity: 0;
+  overflow: hidden;
+  transform: scale(1.075);
+  transform-origin: center;
+  transition:
+    opacity 620ms ease,
+    transform 1.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.location-trace-media-frame.is-before {
+  z-index: 1;
+  opacity: 0;
+  transform: scale(0.99);
+}
+
+.location-trace-media-frame.is-active {
+  z-index: 2;
+  transform: scale(1);
+}
+
+.location-trace-media-frame.is-active.is-ready {
+  opacity: 1;
+}
+
+.location-trace-media-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  filter: saturate(0.9) contrast(1.07) brightness(0.82);
+  transform: scale(var(--trace-shot-scale));
+  transform-origin: center;
+  user-select: none;
+}
+
+.location-trace-media-frame[data-trace-stage="solar"] img {
+  object-position: 50% 50%;
+  filter: saturate(0.94) contrast(1.06) brightness(0.94);
+}
+
+.location-trace-media-frame[data-trace-stage="earth"] img {
+  object-position: 54% 50%;
+}
+
+.location-trace-media-frame[data-trace-stage="asia"] {
+  --trace-shot-scale: 1.15;
+}
+
+.location-trace-media-frame[data-trace-stage="asia"] img {
+  object-position: 57% 56%;
+}
+
+.location-trace-media-frame[data-trace-stage="korea"] img {
+  object-position: 50% 53%;
+}
+
+.location-trace-media-frame[data-trace-stage="gimpo"] img {
+  object-position: 50% 52%;
+}
+
+.location-trace-media-frame[data-trace-stage="sau"] {
+  --trace-shot-scale: 1.14;
+}
+
+.location-trace-media-frame[data-trace-stage="sau"] img {
+  object-position: 51% 58%;
+}
+
+.location-trace-media-frame[data-trace-stage="exit"] img {
+  object-position: 50% 55%;
+}
+
+.location-trace-media-frame[data-trace-stage="venue"] img {
+  object-position: 50% 48%;
+  filter: saturate(0.86) contrast(1.08) brightness(0.78);
+}
+
+.location-trace-media-grade {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(0, 5, 8, 0.62), transparent 23%, transparent 58%, rgba(0, 3, 5, 0.68)),
+    linear-gradient(90deg, rgba(0, 4, 6, 0.52), transparent 24%, transparent 72%, rgba(0, 3, 5, 0.3)),
+    radial-gradient(circle at 50% 48%, transparent 0 24%, rgba(1, 6, 8, 0.12) 52%, rgba(0, 0, 0, 0.48) 100%);
+  pointer-events: none;
 }
 
 .location-trace-stars {
@@ -4069,7 +4171,7 @@ html.location-trace-open body {
   animation: location-trace-stars-near 17s linear infinite;
 }
 
-.location-trace-shell:not([data-stage="space"]):not([data-stage="earth"]) .location-trace-stars {
+.location-trace-shell:not([data-stage="solar"]):not([data-stage="earth"]) .location-trace-stars {
   opacity: 0.08;
   transform: scale(1.28);
 }
@@ -4493,6 +4595,7 @@ html.location-trace-open body {
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 3;
   width: min(74vw, 760px);
   aspect-ratio: 1;
   border-radius: 50%;
@@ -4506,6 +4609,7 @@ html.location-trace-open body {
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 3;
   width: var(--reticle-size);
   aspect-ratio: 1;
   border: 1px solid var(--reticle-color);
@@ -4837,6 +4941,32 @@ html.location-trace-open body {
     width: 100%;
     height: 100%;
     max-height: none;
+  }
+
+  .location-trace-media-frame[data-trace-stage="solar"] img {
+    object-position: 50% 44%;
+  }
+
+  .location-trace-media-frame[data-trace-stage="earth"] img,
+  .location-trace-media-frame[data-trace-stage="asia"] img {
+    object-position: 62% 47%;
+  }
+
+  .location-trace-media-frame[data-trace-stage="korea"] img {
+    object-position: 50% 46%;
+  }
+
+  .location-trace-media-frame[data-trace-stage="gimpo"] img,
+  .location-trace-media-frame[data-trace-stage="sau"] img {
+    object-position: 51% 50%;
+  }
+
+  .location-trace-media-frame[data-trace-stage="exit"] img {
+    object-position: 50% 48%;
+  }
+
+  .location-trace-media-frame[data-trace-stage="venue"] img {
+    object-position: 50% 44%;
   }
 
   .location-trace-shell[data-stage="earth"] {
