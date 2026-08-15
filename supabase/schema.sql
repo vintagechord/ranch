@@ -1214,7 +1214,7 @@ with inserted_release as (
   values (
     'ibyeol-ui-dosu',
     1,
-    '이별의 도수',
+    '이밤의 도수',
     'SunizShine',
     null,
     'upcoming',
@@ -3003,3 +3003,10 @@ where project_slug = 'vintagechord-post-production'
   and release_number = 4
   and title = '미정 프로젝트'
   and summary = 'Prod.Jinbo';
+
+-- Rename the public project/release title without changing its stable route slug.
+update public.music_releases
+set title = '이밤의 도수'
+where project_slug = 'ibyeol-ui-dosu'
+  and release_number = 1
+  and title = '이별의 도수';

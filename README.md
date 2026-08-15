@@ -10,7 +10,7 @@
 
 현재 공개 중인 프로젝트:
 
-- SunizShine — `이별의 도수`
+- SunizShine — `이밤의 도수`
 - 빈티지코드 — `PPP` (Post Production Project)
 
 이전 을왕리 참가자 공개 경로(`/participants`)는 메인으로 이동하며, 관리자에서 사용하던 참가자 설정과 을왕리 참가 신청 기록은 운영 시스템에서 제거했습니다.

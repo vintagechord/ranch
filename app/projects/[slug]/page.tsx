@@ -81,13 +81,13 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
       locale: "ko_KR",
       title,
       description,
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: "목장의 아침 Project Room" }]
+      images: [{ url: "/og-ibam.png", width: 1200, height: 630, alt: "목장의 아침 Project Room" }]
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og.png"]
+      images: ["/og-ibam.png"]
     }
   };
 }
