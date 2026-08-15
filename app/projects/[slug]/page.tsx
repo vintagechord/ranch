@@ -189,7 +189,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
           {nextProject ? (
             <a className="project-next" href={`/projects/${nextProject.slug}`}>
-              <span className="project-next-label">NEXT PROJECT</span>
+              <span className="project-next-label">ANOTHER PROJECT</span>
               <span className="project-next-title">
                 {nextProject.artist} — {nextProject.title}
               </span>
