@@ -168,14 +168,14 @@ export default function VintageChordReleases({ releases }: VintageChordReleasesP
                                 <button
                                   type="button"
                                   aria-haspopup="dialog"
-                                  aria-label={`Release ${number} ${row.label} 참여 신청`}
+                                  aria-label={`Release ${number} ${row.label} 참여 희망`}
                                   onClick={(event) => openRequest(event, {
                                     leadId: row.lead.leadId,
                                     contextLabel: `RELEASE ${number}`,
                                     roleLabel: row.label
                                   })}
                                 >
-                                  참여 신청 <span aria-hidden="true">↗</span>
+                                  참여 희망 <span aria-hidden="true">↗</span>
                                 </button>
                               ) : null}
                             </li>

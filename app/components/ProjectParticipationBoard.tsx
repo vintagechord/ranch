@@ -59,14 +59,14 @@ export default function ProjectParticipationBoard({
                     <button
                       type="button"
                       aria-haspopup="dialog"
-                      aria-label={`${projectTitle} ${lead.roleLabel} 참여 신청`}
+                      aria-label={`${projectTitle} ${lead.roleLabel} 참여 희망`}
                       onClick={(event) => openRequest(event, {
                         leadId: lead.leadId,
                         contextLabel: projectTitle,
                         roleLabel: lead.roleLabel
                       })}
                     >
-                      참여 신청 <span aria-hidden="true">↗</span>
+                      참여 희망 <span aria-hidden="true">↗</span>
                     </button>
                   ) : credits.length === 0 ? (
                     <span className="project-participation-state">{roleStateLabel(lead.state)}</span>
