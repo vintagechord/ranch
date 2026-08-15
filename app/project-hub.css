@@ -4586,6 +4586,8 @@ html.location-trace-open body {
 .location-trace-shell {
   --reticle-size: 250px;
   --reticle-color: rgba(121, 230, 255, 0.44);
+  --reticle-x: 50%;
+  --reticle-y: 50%;
   position: relative;
   width: min(100%, 1180px);
   height: min(720px, calc(100dvh - 48px));
@@ -4692,6 +4694,8 @@ html.location-trace-open body {
   --orbit-opacity: 0;
   --reticle-size: 76px;
   --reticle-color: rgba(255, 90, 54, 0.96);
+  --reticle-x: 45%;
+  --reticle-y: 18%;
 }
 
 .location-trace-visual,
@@ -4773,16 +4777,21 @@ html.location-trace-open body {
   filter: saturate(0.94) contrast(1.06) brightness(0.94);
 }
 
+.location-trace-media-frame[data-trace-stage="earth"] {
+  --trace-shot-scale: 2.35;
+}
+
 .location-trace-media-frame[data-trace-stage="earth"] img {
-  object-position: 54% 50%;
+  object-position: 50% 50%;
+  transform-origin: 51.5% 59%;
 }
 
 .location-trace-media-frame[data-trace-stage="asia"] {
-  --trace-shot-scale: 1.15;
+  --trace-shot-scale: 1.06;
 }
 
 .location-trace-media-frame[data-trace-stage="asia"] img {
-  object-position: 57% 56%;
+  object-position: 52% 51%;
 }
 
 .location-trace-media-frame[data-trace-stage="korea"] img {
@@ -5280,8 +5289,8 @@ html.location-trace-open body {
 
 .location-trace-reticle {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: var(--reticle-y);
+  left: var(--reticle-x);
   z-index: 3;
   width: var(--reticle-size);
   aspect-ratio: 1;
@@ -5293,9 +5302,35 @@ html.location-trace-open body {
     inset 0 0 24px rgba(121, 230, 255, 0.08);
   transform: translate(-50%, -50%);
   transition:
+    top 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    left 900ms cubic-bezier(0.16, 1, 0.3, 1),
     width 680ms cubic-bezier(0.76, 0, 0.24, 1),
     border-color 480ms ease,
     box-shadow 480ms ease;
+}
+
+.location-trace-reticle::before,
+.location-trace-reticle::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.location-trace-reticle::before {
+  width: 7px;
+  aspect-ratio: 1;
+  background: var(--reticle-color);
+  box-shadow: 0 0 13px var(--reticle-color);
+}
+
+.location-trace-reticle::after {
+  width: 34%;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--reticle-color), transparent 35%);
 }
 
 .location-trace-reticle > i {
@@ -5344,7 +5379,9 @@ html.location-trace-open body {
     0 0 0 14px rgba(255, 90, 54, 0.04),
     0 0 38px rgba(255, 90, 54, 0.34),
     inset 0 0 24px rgba(255, 90, 54, 0.2);
-  animation: location-trace-target-lock 780ms ease-out 2;
+  animation:
+    location-trace-target-acquire 1.35s cubic-bezier(0.16, 1, 0.3, 1) both,
+    location-trace-target-pulse 520ms ease-out 1.35s 2;
 }
 
 .location-trace-header {
@@ -5394,7 +5431,6 @@ html.location-trace-open body {
   animation: location-trace-copy-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.location-trace-stage-copy > span,
 .location-trace-stage-copy > small {
   color: rgba(121, 230, 255, 0.72);
   font-size: 0.58rem;
@@ -5413,83 +5449,9 @@ html.location-trace-open body {
   word-break: keep-all;
 }
 
-.location-trace-shell[data-stage="venue"] .location-trace-stage-copy > span,
 .location-trace-shell[data-stage="venue"] .location-trace-stage-copy > small {
   color: #ff8b5f;
   text-shadow: 0 0 12px rgba(255, 90, 54, 0.48);
-}
-
-.location-trace-route {
-  position: absolute;
-  top: 86px;
-  bottom: 84px;
-  left: 26px;
-  z-index: 6;
-  display: grid;
-  grid-template-rows: repeat(8, 1fr);
-  width: 16px;
-  min-width: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  pointer-events: none;
-}
-
-.location-trace-route li {
-  display: grid;
-  grid-template-columns: 16px;
-  gap: 0;
-  align-items: center;
-  color: rgba(214, 231, 229, 0.28);
-  font-size: 0.5rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  transition: color 320ms ease;
-}
-
-.location-trace-route li > span {
-  display: none;
-}
-
-.location-trace-route li > i {
-  position: relative;
-  width: 6px;
-  aspect-ratio: 1;
-  justify-self: center;
-  border: 1px solid rgba(121, 230, 255, 0.28);
-  border-radius: 50%;
-  background: #061012;
-  transition: background-color 320ms ease, box-shadow 320ms ease, transform 320ms ease;
-}
-
-.location-trace-route li:not(:last-child) > i::after {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  width: 1px;
-  height: clamp(24px, 7vh, 60px);
-  background: rgba(121, 230, 255, 0.12);
-  content: "";
-  transform: translateX(-50%);
-}
-
-.location-trace-route li.is-complete {
-  color: rgba(121, 230, 255, 0.54);
-}
-
-.location-trace-route li.is-complete > i {
-  background: #79e6ff;
-  box-shadow: 0 0 8px rgba(121, 230, 255, 0.62);
-}
-
-.location-trace-route li.is-current {
-  color: #f1eee7;
-}
-
-.location-trace-route li.is-current > i {
-  background: #ff5a36;
-  box-shadow: 0 0 0 4px rgba(255, 90, 54, 0.12), 0 0 13px rgba(255, 90, 54, 0.82);
-  transform: scale(1.24);
 }
 
 .location-trace-controls {
@@ -5590,9 +5552,17 @@ html.location-trace-open body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes location-trace-target-lock {
-  0% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.2; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+@keyframes location-trace-target-acquire {
+  0% { top: 72%; left: 78%; }
+  54% { top: 17%; left: 40%; }
+  72% { top: 26%; left: 49%; }
+  87% { top: 19%; left: 43%; }
+  100% { top: var(--reticle-y); left: var(--reticle-x); }
+}
+
+@keyframes location-trace-target-pulse {
+  0% { opacity: 0.42; transform: translate(-50%, -50%) scale(1.28); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 @keyframes location-trace-building-lock {
@@ -5611,6 +5581,7 @@ html.location-trace-open body {
 
   .location-trace-shell {
     --reticle-size: 184px;
+    --reticle-y: 44%;
     width: 100%;
     height: 100%;
     max-height: none;
@@ -5620,9 +5591,21 @@ html.location-trace-open body {
     object-position: 50% 44%;
   }
 
-  .location-trace-media-frame[data-trace-stage="earth"] img,
+  .location-trace-media-frame[data-trace-stage="earth"] {
+    --trace-shot-scale: 2.3;
+  }
+
+  .location-trace-media-frame[data-trace-stage="earth"] img {
+    object-position: 50% 50%;
+    transform-origin: 50% 47%;
+  }
+
+  .location-trace-media-frame[data-trace-stage="asia"] {
+    --trace-shot-scale: 1.38;
+  }
+
   .location-trace-media-frame[data-trace-stage="asia"] img {
-    object-position: 62% 47%;
+    object-position: 54% 46%;
   }
 
   .location-trace-media-frame[data-trace-stage="korea"] img {
@@ -5668,6 +5651,8 @@ html.location-trace-open body {
 
   .location-trace-shell[data-stage="venue"] {
     --reticle-size: 66px;
+    --reticle-x: 34%;
+    --reticle-y: 18%;
   }
 
   .location-trace-earth {
@@ -5686,19 +5671,11 @@ html.location-trace-open body {
     width: 125vw;
   }
 
-  .location-trace-reticle {
-    top: 44%;
-  }
-
   .location-trace-header {
     top: 17px;
     right: 66px;
     left: 15px;
     font-size: 0.46rem;
-  }
-
-  .location-trace-header > span {
-    display: none;
   }
 
   .location-trace-close {
@@ -5714,7 +5691,6 @@ html.location-trace-open body {
     text-align: center;
   }
 
-  .location-trace-stage-copy > span,
   .location-trace-stage-copy > small {
     font-size: 0.5rem;
   }
@@ -5723,38 +5699,6 @@ html.location-trace-open body {
     max-width: 100%;
     font-size: clamp(1.7rem, 9vw, 2.8rem);
     white-space: nowrap;
-  }
-
-  .location-trace-route {
-    top: auto;
-    right: 15px;
-    bottom: 68px;
-    left: 15px;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: 1fr;
-    width: auto;
-    min-width: 0;
-    height: 16px;
-  }
-
-  .location-trace-route li {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-    place-items: center;
-  }
-
-  .location-trace-route li > span {
-    display: none;
-  }
-
-  .location-trace-route li:not(:last-child) > i::after {
-    top: 50%;
-    left: 8px;
-    width: calc((100vw - 44px) / 8 - 5px);
-    height: 1px;
-    transform: translateY(-50%);
   }
 
   .location-trace-controls {
@@ -5768,24 +5712,19 @@ html.location-trace-open body {
     font-size: clamp(1.62rem, 9vw, 2.25rem);
   }
 
-  .location-trace-stage-copy > span,
   .location-trace-stage-copy > small {
     letter-spacing: 0.13em;
   }
 
   .location-trace-controls button,
   .location-trace-close {
-    min-height: 42px;
+    min-height: 44px;
   }
 }
 
 @media (max-height: 520px) {
   .location-trace-header {
     top: 13px;
-  }
-
-  .location-trace-route {
-    display: none;
   }
 
   .location-trace-stage-copy {

@@ -22,7 +22,8 @@ const TRACE_STAGES = [
     label: "지구",
     system: "PLANET LOCK",
     duration: 1050,
-    media: "earth-orbit"
+    media: "solar-system",
+    mobileMedia: "solar-system-mobile"
   },
   {
     key: "asia",
@@ -62,7 +63,7 @@ const TRACE_STAGES = [
   {
     key: "venue",
     label: "시그마프라자",
-    system: "TARGET LOCKED",
+    system: "7F TARGET LOCKED",
     duration: 0,
     media: "sigma-plaza"
   }
@@ -206,7 +207,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
 
   useEffect(() => {
     if (isOpen && isComplete) {
-      setAnnouncement(`위치 확인 완료: ${venue}`);
+      setAnnouncement(`위치 확인 완료: ${venue} 7층`);
     }
   }, [isComplete, isOpen, venue]);
 
@@ -318,8 +319,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
           {venue} 위치 추적
         </h2>
         <p id="location-trace-description" className="studio-visually-hidden">
-          태양계에서 지구, 아시아, 대한민국, 김포, 사우동, 사우역 2번 출구를 거쳐{" "}
-          {venue}까지 위치를 추적합니다.
+          {venue} 7층을 향해 위치를 추적합니다.
         </p>
 
         <div className="location-trace-visual" aria-hidden="true">
@@ -378,28 +378,12 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
 
         <header className="location-trace-header" aria-hidden="true">
           <p><i /> SATELLITE TRACE</p>
-          <span>POSITIONING SYSTEM / {String(activeStage + 1).padStart(2, "0")}</span>
         </header>
 
         <div className="location-trace-stage-copy" aria-hidden="true" key={stage.key}>
-          <span>{String(activeStage + 1).padStart(2, "0")} / 08</span>
           <strong>{stage.label}</strong>
           <small>{stage.system}</small>
         </div>
-
-        <ol className="location-trace-route" aria-hidden="true">
-          {TRACE_STAGES.map((traceStage, index) => (
-            <li
-              className={
-                index === activeStage ? "is-current" : index < activeStage ? "is-complete" : ""
-              }
-              key={traceStage.key}
-            >
-              <i />
-              <span>{traceStage.label}</span>
-            </li>
-          ))}
-        </ol>
 
         <div className="location-trace-controls">
           {!motionLimited ? (
