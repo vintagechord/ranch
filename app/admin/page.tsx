@@ -421,7 +421,7 @@ export default async function AdminPage({
     releaseApplicationLoadError =
       adminError instanceof Error
         ? adminError.message
-        : "음원 참여 신청 요약을 불러오지 못했습니다.";
+        : "프로젝트 참여 신청 요약을 불러오지 못했습니다.";
   }
 
   const proposalPage = parsePositivePage(proposalPageValue);
@@ -462,14 +462,14 @@ export default async function AdminPage({
         </div>
       </header>
 
-      <nav className="admin-workspace-nav" aria-label="음원 참여 관리">
+      <nav className="admin-workspace-nav" aria-label="프로젝트 참여 관리">
         <Link href="/admin/releases" prefetch={false}>
-          <strong>발매 · 참여 파트 관리</strong>
+          <strong>프로젝트 · 참여 파트 관리</strong>
           <span aria-hidden="true">→</span>
-          <small>음원, 모집 상태, 참여 크레딧</small>
+          <small>프로젝트 항목, 모집 상태, 참여 크레딧</small>
         </Link>
         <Link href="/admin/release-applications" prefetch={false}>
-          <strong>음원 참여 신청</strong>
+          <strong>프로젝트 참여 신청</strong>
           <span>{releaseApplicationCount}건</span>
           <small>
             최근 접수 {latestReleaseApplicationCreatedAt
@@ -489,7 +489,7 @@ export default async function AdminPage({
           <strong>{projectProposalCount}</strong>
         </article>
         <article>
-          <span>음원 참여 신청</span>
+          <span>프로젝트 참여 신청</span>
           <strong>{releaseApplicationCount}</strong>
         </article>
         <article>

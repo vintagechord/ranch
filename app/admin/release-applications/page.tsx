@@ -26,6 +26,7 @@ type SearchParams = Promise<{
 
 type ReleaseRow = {
   id: string;
+  project_slug: string;
   release_number: number;
   title: string;
   artist_name: string;
@@ -58,6 +59,12 @@ type Filters = {
   releaseId: string;
   roleCode: string;
 };
+
+function projectLabel(slug: string) {
+  if (slug === "ibyeol-ui-dosu") return "이별의 도수";
+  if (slug === "vintagechord-post-production") return "PPP";
+  return slug;
+}
 
 function parsePositivePage(value?: string) {
   const page = Number(value);
@@ -98,7 +105,8 @@ async function loadCatalog() {
   const [releaseResult, roleTypeResult, roleResult] = await Promise.all([
     supabase
       .from("music_releases")
-      .select("id, release_number, title, artist_name")
+      .select("id, project_slug, release_number, title, artist_name")
+      .order("project_slug", { ascending: true })
       .order("release_number", { ascending: true }),
     supabase
       .from("release_role_types")
@@ -190,12 +198,12 @@ export default async function AdminReleaseApplicationsPage({
     <main className="admin-shell">
       <header className="admin-topbar">
         <div>
-          <p className="admin-eyebrow">RELEASE PARTICIPATION / APPLICATIONS</p>
-          <h1>음원 참여 신청</h1>
+          <p className="admin-eyebrow">PROJECT PARTICIPATION / APPLICATIONS</p>
+          <h1>프로젝트 참여 신청</h1>
         </div>
         <div className="admin-actions">
           <Link href="/admin">운영 관리</Link>
-          <Link href="/admin/releases">발매 · 파트 관리</Link>
+          <Link href="/admin/releases">프로젝트 · 파트 관리</Link>
           <form action="/api/admin/logout" method="post">
             <button type="submit">로그아웃</button>
           </form>
@@ -223,12 +231,12 @@ export default async function AdminReleaseApplicationsPage({
               </select>
             </label>
             <label className="admin-form-field">
-              <span>음원</span>
+              <span>프로젝트 항목</span>
               <select name="release" defaultValue={filters.releaseId}>
-                <option value="">전체 음원</option>
+                <option value="">전체 항목</option>
                 {releases.map((release) => (
                   <option value={release.id} key={release.id}>
-                    {release.release_number}. {release.title}
+                    {projectLabel(release.project_slug)} · {release.release_number}. {release.title}
                   </option>
                 ))}
               </select>
@@ -270,8 +278,11 @@ export default async function AdminReleaseApplicationsPage({
                       <p>크레딧 {application.credit_name}</p>
                     </div>
                     <div>
-                      <strong>{release?.title ?? "알 수 없는 음원"}</strong>
-                      <p>{roleType?.label_ko ?? role?.role_type_code ?? "알 수 없는 파트"}</p>
+                      <strong>{release?.title ?? "알 수 없는 프로젝트"}</strong>
+                      <p>
+                        {release ? `${projectLabel(release.project_slug)} · ` : ""}
+                        {roleType?.label_ko ?? role?.role_type_code ?? "알 수 없는 파트"}
+                      </p>
                     </div>
                     <Link
                       className="admin-form-button"
@@ -287,7 +298,7 @@ export default async function AdminReleaseApplicationsPage({
           )}
 
           {pageCount > 1 ? (
-            <nav className="admin-pagination" aria-label="음원 참여 신청 페이지">
+            <nav className="admin-pagination" aria-label="프로젝트 참여 신청 페이지">
               {page > 1 ? (
                 <Link href={buildListHref(filters, page - 1)} prefetch={false}>← 이전</Link>
               ) : <span aria-hidden="true" />}

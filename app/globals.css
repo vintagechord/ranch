@@ -3628,6 +3628,34 @@ img {
   line-height: 1.2;
 }
 
+.admin-release-edit {
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  background: var(--ivory);
+}
+
+.admin-release-edit > summary {
+  min-height: 42px;
+  padding: 11px 13px;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.admin-release-edit[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-release-edit > form {
+  border-top: 0;
+  padding: 14px;
+}
+
+.admin-role-edit {
+  grid-column: 1 / -1;
+}
+
 .admin-lead-list {
   display: grid;
   gap: 10px;
@@ -4530,8 +4558,16 @@ img {
     display: grid;
   }
 
+  .admin-lead-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .admin-lead-row > :last-child {
     grid-column: auto;
+  }
+
+  .admin-lead-row > .admin-role-edit {
+    grid-column: 1 / -1;
   }
 
   .admin-inline-form,

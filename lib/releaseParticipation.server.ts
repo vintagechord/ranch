@@ -246,7 +246,10 @@ export async function getPublicMusicReleases(
       youtubeVideoId: release.youtube_video_id,
       coverImageUrl: release.cover_image_url,
       summary: release.summary,
-      leads: leadsByReleaseId.get(release.id) ?? []
+      leads: (leadsByReleaseId.get(release.id) ?? []).map((lead) => ({
+        ...lead,
+        canApply: release.state === "upcoming" && lead.canApply
+      }))
     }];
   });
 }

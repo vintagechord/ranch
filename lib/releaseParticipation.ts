@@ -28,7 +28,12 @@ export const SEEDED_RELEASE_ROLE_CODES = [
   "composition",
   "lyrics",
   "arrangement",
-  "vocal"
+  "vocal",
+  "planning",
+  "a_and_r",
+  "video",
+  "mixing",
+  "mastering"
 ] as const;
 
 export type MusicReleaseState = (typeof MUSIC_RELEASE_STATES)[number];

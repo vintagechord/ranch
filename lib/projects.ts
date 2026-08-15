@@ -21,7 +21,7 @@ export const projects: Project[] = [
     title: "이별의 도수",
     shortTitle: "이별의 도수",
     status: "진행 중",
-    stage: "업데이트 예정",
+    stage: "참여 파트 모집 중",
     summary: "SunizShine의 ‘이별의 도수’",
     visual: "reel",
     accent: "#ff5a36",

@@ -16,7 +16,6 @@ const APPLICATION_STATUSES = [
   "declined",
   "withdrawn"
 ] as const;
-const PUBLIC_PROJECT_PATH = "/projects/vintagechord-post-production";
 
 type SearchParams = Promise<{
   notice?: string;
@@ -57,11 +56,18 @@ type ReleaseRoleDetail = {
 
 type ReleaseDetail = {
   id: string;
+  project_slug: string;
   release_number: number;
   title: string;
   artist_name: string;
   release_date: string | null;
 };
+
+function projectLabel(slug: string) {
+  if (slug === "ibyeol-ui-dosu") return "이별의 도수";
+  if (slug === "vintagechord-post-production") return "PPP";
+  return slug;
+}
 
 type RoleTypeDetail = {
   code: string;
@@ -178,7 +184,7 @@ async function loadApplication(id: string) {
     await Promise.all([
       supabase
         .from("music_releases")
-        .select("id, release_number, title, artist_name, release_date")
+        .select("id, project_slug, release_number, title, artist_name, release_date")
         .eq("id", typedRole.release_id)
         .maybeSingle(),
       supabase
@@ -262,7 +268,8 @@ async function reviewApplication(formData: FormData) {
   revalidatePath("/admin/releases");
   revalidatePath("/admin/release-applications");
   revalidatePath(`/admin/release-applications/${applicationId}`);
-  revalidatePath(PUBLIC_PROJECT_PATH);
+  revalidatePath("/projects/ibyeol-ui-dosu");
+  revalidatePath("/projects/vintagechord-post-production");
   redirect(`/admin/release-applications/${applicationId}?notice=updated`);
 }
 
@@ -289,12 +296,12 @@ export default async function AdminReleaseApplicationDetailPage({
     <main className="admin-shell">
       <header className="admin-topbar">
         <div>
-          <p className="admin-eyebrow">RELEASE APPLICATION / DETAIL</p>
+          <p className="admin-eyebrow">PROJECT APPLICATION / DETAIL</p>
           <h1>참여 신청 확인</h1>
         </div>
         <div className="admin-actions">
           <Link href="/admin/release-applications">신청 목록</Link>
-          <Link href="/admin/releases">발매 · 파트 관리</Link>
+          <Link href="/admin/releases">프로젝트 · 파트 관리</Link>
           <form action="/api/admin/logout" method="post">
             <button type="submit">로그아웃</button>
           </form>
@@ -315,7 +322,7 @@ export default async function AdminReleaseApplicationDetailPage({
         </header>
 
         <div className="admin-release-meta" aria-label="신청 대상">
-          <span>RELEASE {String(release.release_number).padStart(2, "0")}</span>
+          <span>{projectLabel(release.project_slug)} · {String(release.release_number).padStart(2, "0")}</span>
           <span>{release.title}</span>
           <span>{roleType.label_ko}</span>
           <span>파트 상태 {role.state}</span>

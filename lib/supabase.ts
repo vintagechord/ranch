@@ -438,6 +438,31 @@ export type Database = {
         };
         Returns: string;
       };
+      update_music_release_item: {
+        Args: {
+          p_release_id: string;
+          p_title: string;
+          p_artist_name: string;
+          p_release_date: string | null;
+          p_state: string;
+          p_youtube_video_id: string | null;
+          p_summary: string | null;
+          p_is_published: boolean;
+        };
+        Returns: string;
+      };
+      update_release_role_configuration: {
+        Args: {
+          p_role_id: string;
+          p_state: string;
+          p_is_public: boolean;
+          p_brief: string | null;
+          p_requirements: string | null;
+          p_application_deadline: string | null;
+          p_capacity: number;
+        };
+        Returns: string;
+      };
       review_release_participation_application: {
         Args: {
           p_application_id: string;
