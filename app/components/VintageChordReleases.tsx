@@ -14,6 +14,7 @@ import type {
   PublicReleaseLead,
   ReleaseParticipationApplicationPayload
 } from "@/lib/releaseParticipation";
+import { StudioSpeaker } from "@/app/components/StudioEquipment";
 
 type VintageChordReleasesProps = {
   releases: PublicMusicRelease[];
@@ -262,8 +263,10 @@ export default function VintageChordReleases({ releases }: VintageChordReleasesP
           <p>VINTAGECHORD / RELEASES</p>
           <h1 id="project-title">빈티지코드</h1>
         </div>
-        <div className="vc-release-hero-signal" aria-hidden="true">
-          {Array.from({ length: 20 }, (_, index) => <i key={index} />)}
+        <div className="vc-release-hero-equipment" aria-hidden="true">
+          <span className="project-sound-wave is-left" />
+          <span className="project-sound-wave is-right" />
+          <StudioSpeaker playing />
         </div>
       </header>
 

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
+import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 import VintageChordReleases from "@/app/components/VintageChordReleases";
 import { getProjectBySlug, projects, type Project } from "@/lib/projects";
 import { RELEASE_PROJECT_SLUG } from "@/lib/releaseParticipation";
@@ -19,46 +20,23 @@ type ProjectStyle = CSSProperties & {
 
 export const dynamic = "force-dynamic";
 
-function ReelDeckVisual() {
-  return (
-    <div className="project-reel-visual" aria-hidden="true">
-      <div className="project-reel-brand">MR / MASTER RECORDER</div>
-      <div className="project-reel-window">
-        <span className="project-reel-wheel"><i /></span>
-        <b className="project-reel-tape" />
-        <span className="project-reel-wheel is-secondary"><i /></span>
-      </div>
-      <div className="project-reel-console">
-        <span className="project-reel-knob" />
-        <span className="project-reel-knob" />
-        <span className="project-reel-meter"><i /><i /><i /><i /><i /></span>
-        <span className="project-reel-button" />
-        <span className="project-reel-button" />
-      </div>
-    </div>
-  );
-}
-
-function SpeakerVisual() {
-  return (
-    <div className="project-speaker-visual" aria-hidden="true">
-      <span className="project-sound-wave is-left" />
-      <span className="project-sound-wave is-right" />
-      <div className="project-speaker-cabinet">
-        <div className="project-speaker-brand"><i /> VC / POST</div>
-        <span className="project-speaker-driver is-tweeter"><i /></span>
-        <span className="project-speaker-driver is-woofer"><i /></span>
-        <b className="project-speaker-port" />
-      </div>
-    </div>
-  );
-}
-
 function ProjectVisual({ project }: { project: Project }) {
+  const isSpeaker = project.visual === "speaker";
+
   return (
     <div className={`project-machine project-machine-${project.visual}`}>
       <span className="project-machine-label">{project.shortTitle}</span>
-      {project.visual === "reel" ? <ReelDeckVisual /> : <SpeakerVisual />}
+      <div className={`project-equipment project-equipment-${project.visual}`}>
+        {isSpeaker ? (
+          <>
+            <span className="project-sound-wave is-left" aria-hidden="true" />
+            <span className="project-sound-wave is-right" aria-hidden="true" />
+            <StudioSpeaker playing />
+          </>
+        ) : (
+          <StudioReelDeck />
+        )}
+      </div>
       <span className="project-machine-index" aria-hidden="true">
         {project.number}
       </span>

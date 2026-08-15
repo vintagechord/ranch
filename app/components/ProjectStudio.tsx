@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
+import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 
 type StudioProject = {
   slug: string;
@@ -271,68 +272,6 @@ function AcousticDisplay() {
   return <canvas ref={canvasRef} className="studio-acoustic-canvas" />;
 }
 
-function ReelDeck() {
-  return (
-    <div className="studio-reel-deck" aria-hidden="true">
-      <div className="studio-deck-top-rail" />
-      <div className="studio-reels">
-        <span className="studio-reel">
-          <span className="studio-reel-slots"><b /><b /><b /></span>
-          <i className="studio-reel-hub"><b /></i>
-        </span>
-        <span className="studio-tape-path" />
-        <span className="studio-reel studio-reel-secondary">
-          <span className="studio-reel-slots"><b /><b /><b /></span>
-          <i className="studio-reel-hub"><b /></i>
-        </span>
-      </div>
-      <div className="studio-tape-transport">
-        <span className="studio-tape-guide is-left" />
-        <span className="studio-head-cover" />
-        <span className="studio-tape-guide is-right" />
-      </div>
-      <div className="studio-deck-control-panel">
-        <div className="studio-deck-toggle-bank">
-          {Array.from({ length: 4 }, (_, index) => <span key={index}><i /></span>)}
-        </div>
-        <div className="studio-deck-knob-bank">
-          {Array.from({ length: 4 }, (_, index) => <span key={index}><i /></span>)}
-        </div>
-        <div className="studio-deck-vu-pair">
-          <span><i /></span>
-          <span><i /></span>
-        </div>
-        <div className="studio-deck-transport-buttons">
-          {Array.from({ length: 6 }, (_, index) => (
-            <span className={index === 5 ? "is-record" : ""} key={index} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SpeakerStack() {
-  return (
-    <div className="studio-speaker-stack" aria-hidden="true">
-      <div className="studio-speaker-depth" />
-      <div className="studio-mm45-baffle">
-        <div className="studio-mm45-woofer">
-          <span><i /></span>
-          <b className="studio-driver-screws" />
-        </div>
-        <div className="studio-mm45-array">
-          <div className="studio-mm45-mid is-top"><span /></div>
-          <div className="studio-mm45-tweeter"><span /></div>
-          <div className="studio-mm45-mid is-bottom"><span /></div>
-          <b className="studio-driver-screws" />
-        </div>
-        <span className="studio-speaker-light" />
-      </div>
-    </div>
-  );
-}
-
 function MixingDesk() {
   return (
     <div className="studio-mixer" aria-hidden="true">
@@ -446,7 +385,7 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
               key={project.slug}
             >
               <span className="studio-object-index">PROJECT {project.number}</span>
-              {project.visual === "reel" ? <ReelDeck /> : <SpeakerStack />}
+              {project.visual === "reel" ? <StudioReelDeck /> : <StudioSpeaker />}
               <span className="studio-object-label">
                 <small>{project.artist}</small>
                 <strong>{project.title}</strong>
