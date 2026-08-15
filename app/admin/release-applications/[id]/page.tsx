@@ -401,7 +401,7 @@ export default async function AdminReleaseApplicationDetailPage({
           <section className="admin-detail-panel" aria-labelledby="review-title">
             <h2 id="review-title">심사 처리</h2>
             <p className="admin-review-note">
-              참여 확정으로 저장하면 공개 크레딧이 생성되고 해당 파트가 참여 확정 상태로 바뀝니다.
+              참여 확정으로 저장하면 공개 크레딧이 생성됩니다. 선정 인원이 목표에 도달하면 해당 파트 모집이 자동 마감됩니다.
             </p>
             <form className="admin-review-form" action={reviewApplication}>
               <input type="hidden" name="applicationId" value={application.id} />

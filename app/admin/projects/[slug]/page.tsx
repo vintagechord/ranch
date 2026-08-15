@@ -205,7 +205,8 @@ function noticeMessage(notice?: string, error?: string, createdNumber?: string) 
   if (error === "release-number-exhausted") return "사용할 수 있는 PPP 번호가 모두 소진되었습니다.";
   if (error === "release-invalid") return "새 PPP의 제목과 입력 내용을 확인해 주세요.";
   if (error === "release-save") return "새 PPP 초안을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.";
-  if (error === "capacity") return "정원이 모두 확정된 파트는 다시 모집할 수 없습니다.";
+  if (error === "capacity") return "선정 인원이 목표 인원에 도달해 모집 중 상태로 열 수 없습니다.";
+  if (error === "capacity-below") return "참여 희망 인원은 현재 선정 인원보다 작게 설정할 수 없습니다.";
   if (error === "release") return "사이트에 공개된 UP NEXT 항목에서만 모집을 열 수 있습니다.";
   if (error === "deadline") return "모집을 열려면 마감 시각을 비우거나 미래로 설정해 주세요.";
   if (error === "not-found") return "대상을 찾을 수 없습니다.";
@@ -836,15 +837,17 @@ async function updateRoleConfiguration(routeProjectSlug: string, formData: FormD
     redirect(projectAdminHref(projectSlug, { error: "save" }, releaseAnchor));
   }
   if (data !== "updated") {
-    const reason = data === "capacity_reached" || data === "capacity_below_credits"
+    const reason = data === "capacity_reached"
       ? "capacity"
-      : data === "release_unavailable"
-        ? "release"
-        : data === "deadline_expired"
-          ? "deadline"
-          : data === "not_found"
-            ? "not-found"
-            : "invalid";
+      : data === "capacity_below_credits"
+        ? "capacity-below"
+        : data === "release_unavailable"
+          ? "release"
+          : data === "deadline_expired"
+            ? "deadline"
+            : data === "not_found"
+              ? "not-found"
+              : "invalid";
     redirect(projectAdminHref(projectSlug, { error: reason }, releaseAnchor));
   }
 
@@ -861,6 +864,7 @@ async function addReleaseRole(routeProjectSlug: string, formData: FormData) {
   const releaseAnchor = UUID_PATTERN.test(releaseId) ? `release-${releaseId}` : undefined;
   const roleTypeCode = stringValue(formData.get("roleTypeCode"));
   const state = stringValue(formData.get("state"));
+  const capacity = Number(stringValue(formData.get("capacity")));
 
   let brief: string | null;
   let requirements: string | null;
@@ -876,7 +880,10 @@ async function addReleaseRole(routeProjectSlug: string, formData: FormData) {
   if (
     !UUID_PATTERN.test(releaseId) ||
     !/^[a-z][a-z0-9_]{1,39}$/.test(roleTypeCode) ||
-    !ADDABLE_ROLE_STATES.includes(state as never)
+    !ADDABLE_ROLE_STATES.includes(state as never) ||
+    !Number.isSafeInteger(capacity) ||
+    capacity < 1 ||
+    capacity > 100
   ) {
     redirect(projectAdminHref(projectSlug, { error: "invalid" }, releaseAnchor));
   }
@@ -915,7 +922,7 @@ async function addReleaseRole(routeProjectSlug: string, formData: FormData) {
     is_public: true,
     brief,
     requirements,
-    capacity: 1,
+    capacity,
     application_deadline: applicationDeadline,
     sort_order: roleType.sort_order
   });
@@ -1301,7 +1308,7 @@ export default async function AdminProjectPage({
                                       ? "마감일 지남"
                                       : roleStateLabel(role.state)}
                                   </span>
-                                  <span>정원 {role.capacity}명</span>
+                                  <span>선정 {roleCredits.length}명 / 목표 {role.capacity}명</span>
                                   <span>신청 {applicationCount}건</span>
                                   <span>{formatDateTime(role.application_deadline)}</span>
                                   {!role.is_public ? <span>비공개</span> : null}
@@ -1347,7 +1354,7 @@ export default async function AdminProjectPage({
                                     </select>
                                   </label>
                                   <label className="admin-form-field">
-                                    <span>정원</span>
+                                    <span>참여 희망 인원</span>
                                     <input name="capacity" type="number" min="1" max="100" defaultValue={role.capacity} required />
                                   </label>
                                   <label className="admin-form-field">
@@ -1400,6 +1407,10 @@ export default async function AdminProjectPage({
                             <option value="open">모집 중</option>
                             <option value="closed">마감</option>
                           </select>
+                        </label>
+                        <label className="admin-form-field">
+                          <span>참여 희망 인원</span>
+                          <input name="capacity" type="number" min="1" max="100" defaultValue="1" required />
                         </label>
                         <label className="admin-form-field">
                           <span>신청 마감 (KST)</span>
