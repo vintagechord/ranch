@@ -2,6 +2,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { getProjectBySlug } from "@/lib/projects";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -64,9 +65,7 @@ type ReleaseDetail = {
 };
 
 function projectLabel(slug: string) {
-  if (slug === "ibyeol-ui-dosu") return "이별의 도수";
-  if (slug === "vintagechord-post-production") return "PPP";
-  return slug;
+  return getProjectBySlug(slug)?.shortTitle ?? slug;
 }
 
 type RoleTypeDetail = {
@@ -235,6 +234,12 @@ async function reviewApplication(formData: FormData) {
     redirect(`/admin/release-applications/${applicationId}?error=invalid`);
   }
 
+  const existingApplication = await loadApplication(applicationId);
+  if (!existingApplication) {
+    redirect(`/admin/release-applications/${applicationId}?error=not-found`);
+  }
+  const projectSlug = existingApplication.release.project_slug;
+
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase.rpc("review_release_participation_application", {
     p_application_id: applicationId,
@@ -266,12 +271,10 @@ async function reviewApplication(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/releases");
-  revalidatePath("/admin/projects/ibyeol-ui-dosu");
-  revalidatePath("/admin/projects/vintagechord-post-production");
+  revalidatePath(`/admin/projects/${projectSlug}`);
   revalidatePath("/admin/release-applications");
   revalidatePath(`/admin/release-applications/${applicationId}`);
-  revalidatePath("/projects/ibyeol-ui-dosu");
-  revalidatePath("/projects/vintagechord-post-production");
+  revalidatePath(`/projects/${projectSlug}`);
   redirect(`/admin/release-applications/${applicationId}?notice=updated`);
 }
 

@@ -154,7 +154,7 @@ export default async function AdminPage({ searchParams }: { searchParams: AdminS
         <Link href="/admin/projects" className="admin-command-card is-projects">
           <span>{String(activeProjects.length).padStart(2, "0")} ACTIVE</span>
           <strong>프로젝트 관리</strong>
-          <p>이별의 도수와 PPP를 각각 열어 음원, 참여 파트, 공개 상태를 관리합니다.</p>
+          <p>프로젝트별 작업실에서 참여 파트, 신청, 공개 상태를 관리합니다.</p>
           <b aria-hidden="true">→</b>
         </Link>
       </section>

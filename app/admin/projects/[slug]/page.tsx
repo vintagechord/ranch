@@ -54,6 +54,11 @@ type RoleTypeRow = {
   sort_order: number;
 };
 
+type RoleTypeScopeRow = {
+  role_type_code: string;
+  project_slug: string;
+};
+
 type ReleaseRoleRow = {
   id: string;
   release_id: string;
@@ -150,9 +155,9 @@ function formatDateTimeInput(value: string | null) {
   }).format(new Date(value)).replace(" ", "T");
 }
 
-function releaseStateLabel(state: string) {
-  if (state === "released") return "발매됨";
-  if (state === "upcoming") return "진행 중";
+function releaseStateLabel(state: string, isPerformanceProject = false) {
+  if (state === "released") return isPerformanceProject ? "공연 완료" : "발매됨";
+  if (state === "upcoming") return isPerformanceProject ? "준비 중" : "진행 중";
   if (state === "draft") return "초안";
   if (state === "archived") return "보관됨";
   return state;
@@ -239,7 +244,7 @@ function parseDeadline(value: FormDataEntryValue | null) {
 async function loadReleaseManagementData(projectSlug: ProjectSlug) {
   const supabase = getSupabaseAdmin();
   const now = new Date().toISOString();
-  const [releaseResult, roleTypeResult] = await Promise.all([
+  const [releaseResult, roleTypeResult, roleTypeScopeResult] = await Promise.all([
     supabase
       .from("music_releases")
       .select(
@@ -250,10 +255,17 @@ async function loadReleaseManagementData(projectSlug: ProjectSlug) {
     supabase
       .from("release_role_types")
       .select("code, label_ko, category, description, is_active, sort_order")
-      .order("sort_order", { ascending: true })
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("release_role_type_project_scopes")
+      .select("role_type_code, project_slug")
   ]);
 
-  const firstError = [releaseResult.error, roleTypeResult.error].find(Boolean);
+  const firstError = [
+    releaseResult.error,
+    roleTypeResult.error,
+    roleTypeScopeResult.error
+  ].find(Boolean);
   if (firstError) throw new Error(firstError.message);
 
   const releases = (releaseResult.data ?? []) as ReleaseRow[];
@@ -300,9 +312,20 @@ async function loadReleaseManagementData(projectSlug: ProjectSlug) {
     applications = (applicationResult.data ?? []) as ApplicationCountRow[];
   }
 
+  const roleTypeScopes = (roleTypeScopeResult.data ?? []) as RoleTypeScopeRow[];
+  const scopedRoleCodes = new Set(roleTypeScopes.map((scope) => scope.role_type_code));
+  const projectRoleCodes = new Set(
+    roleTypeScopes
+      .filter((scope) => scope.project_slug === projectSlug)
+      .map((scope) => scope.role_type_code)
+  );
+  const roleTypes = ((roleTypeResult.data ?? []) as RoleTypeRow[]).filter((roleType) => (
+    !scopedRoleCodes.has(roleType.code) || projectRoleCodes.has(roleType.code)
+  ));
+
   return {
     releases,
-    roleTypes: (roleTypeResult.data ?? []) as RoleTypeRow[],
+    roleTypes,
     roles,
     credits,
     applications
@@ -922,6 +945,7 @@ export default async function AdminProjectPage({
 
   const project = await getAdminProjectBySlug(projectSlug);
   if (!project) notFound();
+  const isPerformanceProject = project.kind === "performance";
 
   try {
     await processReleaseCoverCleanupQueue(5);
@@ -1025,7 +1049,9 @@ export default async function AdminProjectPage({
           <div className="admin-table-heading">
             <div>
               <p className="admin-eyebrow">PROJECT PARTICIPATION</p>
-              <h2 id="release-list-title">음원과 참여 파트</h2>
+              <h2 id="release-list-title">
+                {isPerformanceProject ? "공연과 참여 파트" : "음원과 참여 파트"}
+              </h2>
             </div>
             <span>항목 {releases.length}개</span>
           </div>
@@ -1145,7 +1171,7 @@ export default async function AdminProjectPage({
                           className="admin-status-badge"
                           data-status={release.state}
                         >
-                          {releaseStateLabel(release.state)}
+                          {releaseStateLabel(release.state, isPerformanceProject)}
                         </span>
                         <span>{formatDate(release.release_date)}</span>
                         {!release.is_published ? <span>비공개</span> : null}
@@ -1185,14 +1211,14 @@ export default async function AdminProjectPage({
                         <label className="admin-form-field">
                           <span>상태</span>
                           <select name="state" defaultValue={release.state} required>
-                            <option value="upcoming">진행 중</option>
-                            <option value="released">발매됨</option>
+                            <option value="upcoming">{isPerformanceProject ? "준비 중" : "진행 중"}</option>
+                            <option value="released">{isPerformanceProject ? "공연 완료" : "발매됨"}</option>
                             <option value="draft">초안</option>
                             <option value="archived">보관됨</option>
                           </select>
                         </label>
                         <label className="admin-form-field">
-                          <span>공개일</span>
+                          <span>{isPerformanceProject ? "공연 예정일" : "공개일"}</span>
                           <input name="releaseDate" type="date" defaultValue={release.release_date ?? ""} />
                         </label>
                         <label className="admin-form-field is-wide">
@@ -1200,7 +1226,7 @@ export default async function AdminProjectPage({
                           <input name="title" type="text" maxLength={160} defaultValue={release.title} required />
                         </label>
                         <label className="admin-form-field is-wide">
-                          <span>아티스트</span>
+                          <span>{isPerformanceProject ? "프로젝트 팀" : "아티스트"}</span>
                           <input name="artistName" type="text" maxLength={200} defaultValue={release.artist_name} required />
                         </label>
                         <label className="admin-form-field is-wide">

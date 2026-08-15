@@ -150,6 +150,18 @@ export type ReleaseRoleTypeInsert = {
   updated_at?: string;
 };
 
+export type ReleaseRoleTypeProjectScopeRow = {
+  role_type_code: string;
+  project_slug: string;
+  created_at: string;
+};
+
+export type ReleaseRoleTypeProjectScopeInsert = {
+  role_type_code: string;
+  project_slug: string;
+  created_at?: string;
+};
+
 export type MusicReleaseRow = {
   id: string;
   project_slug: string;
@@ -432,6 +444,27 @@ export type Database = {
         Insert: ReleaseRoleTypeInsert;
         Update: Partial<ReleaseRoleTypeInsert>;
         Relationships: [];
+      };
+      release_role_type_project_scopes: {
+        Row: ReleaseRoleTypeProjectScopeRow;
+        Insert: ReleaseRoleTypeProjectScopeInsert;
+        Update: Partial<ReleaseRoleTypeProjectScopeInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "release_role_type_project_scopes_role_type_code_fkey";
+            columns: ["role_type_code"];
+            isOneToOne: false;
+            referencedRelation: "release_role_types";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "release_role_type_project_scopes_project_slug_fkey";
+            columns: ["project_slug"];
+            isOneToOne: false;
+            referencedRelation: "project_page_settings";
+            referencedColumns: ["project_slug"];
+          }
+        ];
       };
       music_releases: {
         Row: MusicReleaseRow;

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useRef, type PointerEvent } from "react";
 import LocationJourneyDialog from "@/app/components/LocationJourneyDialog";
-import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
+import { StudioMixer, StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 import { getProjectStatusLabel, type Project } from "@/lib/projects";
 
 type StudioProject = {
@@ -12,7 +12,7 @@ type StudioProject = {
   artist: string;
   title: string;
   state: Project["state"];
-  visual: "reel" | "speaker";
+  visual: Project["visual"];
 };
 
 type ProjectStudioProps = {
@@ -281,53 +281,15 @@ function AcousticDisplay() {
   return <canvas ref={canvasRef} className="studio-acoustic-canvas" aria-hidden="true" />;
 }
 
-function MixingDesk() {
-  return (
-    <div className="studio-mixer" aria-hidden="true">
-      <div className="studio-mixer-meter-bridge">
-        <div className="studio-mixer-meter-bank">
-          {Array.from({ length: 3 }, (_, index) => (
-            <span className={index === 2 ? "is-correlation" : ""} key={index}><i /></span>
-          ))}
-        </div>
-        <div className="studio-mixer-signal-lights">
-          {Array.from({ length: 4 }, (_, index) => <span key={index} />)}
-        </div>
-      </div>
-      <div className="studio-mixer-channels">
-        {Array.from({ length: 8 }, (_, index) => (
-          <div
-            className={`studio-channel${index >= 6 ? " is-master" : ""}`}
-            key={index}
-            style={{ "--channel-index": index } as CSSProperties}
-          >
-            <span className="studio-channel-cap" />
-            <div className="studio-channel-knobs">
-              <i className="studio-knob is-gain" />
-              <i className="studio-knob is-eq" />
-              <i className="studio-knob is-aux" />
-              <i className="studio-knob is-pan" />
-            </div>
-            <div className="studio-channel-switches"><i /><i /></div>
-            <span className="studio-fader-track">
-              <b
-                className={index === 6 ? "is-blue" : index === 7 ? "is-red" : ""}
-                style={{ "--fader": `${20 + ((index * 13) % 56)}%` } as CSSProperties}
-              />
-            </span>
-            <em>{String(index + 1).padStart(2, "0")}</em>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const activeProjectCount = projects.length;
   const activeProjectCountLabel = String(activeProjectCount).padStart(2, "0");
-  const hasManyProjects = projects.length > 2;
+  const hasManyProjects = projects.length > 3;
+  const visualOrder: Record<Project["visual"], number> = { reel: 1, mixer: 2, speaker: 3 };
+  const studioProjects = [...projects].sort(
+    (a, b) => visualOrder[a.visual] - visualOrder[b.visual]
+  );
 
   function moveLight(event: PointerEvent<HTMLDivElement>) {
     if (
@@ -406,7 +368,7 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
         </div>
 
         <div className="studio-equipment-row">
-          {projects.map((project, index) => (
+          {studioProjects.map((project, index) => (
             <Link
               className={`studio-project-object is-${project.visual} is-slot-${index + 1}`}
               href={`/projects/${project.slug}`}
@@ -414,7 +376,13 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
               key={project.slug}
             >
               <span className="studio-object-index">PROJECT {project.number}</span>
-              {project.visual === "reel" ? <StudioReelDeck /> : <StudioSpeaker />}
+              {project.visual === "reel" ? (
+                <StudioReelDeck />
+              ) : project.visual === "mixer" ? (
+                <StudioMixer />
+              ) : (
+                <StudioSpeaker />
+              )}
               <span className="studio-object-label">
                 <small>{project.artist}</small>
                 <strong>{project.title}</strong>
@@ -423,8 +391,6 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
               <span className="studio-object-action">OPEN SESSION ↗</span>
             </Link>
           ))}
-
-          <MixingDesk />
         </div>
 
         <div className="studio-stage-footer">

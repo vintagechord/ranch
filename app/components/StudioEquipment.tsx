@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 type EquipmentProps = {
   className?: string;
 };
@@ -70,6 +72,48 @@ export function StudioSpeaker({ className, playing = false }: StudioSpeakerProps
           <b className="studio-driver-screws" />
         </div>
         <span className="studio-speaker-light" />
+      </div>
+    </div>
+  );
+}
+
+export function StudioMixer({ className }: EquipmentProps) {
+  return (
+    <div className={classNames("studio-mixer", className)} aria-hidden="true">
+      <div className="studio-mixer-meter-bridge">
+        <div className="studio-mixer-meter-bank">
+          {Array.from({ length: 3 }, (_, index) => (
+            <span className={index === 2 ? "is-correlation" : ""} key={index}><i /></span>
+          ))}
+        </div>
+        <div className="studio-mixer-signal-lights">
+          {Array.from({ length: 4 }, (_, index) => <span key={index} />)}
+        </div>
+      </div>
+      <div className="studio-mixer-channels">
+        {Array.from({ length: 8 }, (_, index) => (
+          <div
+            className={`studio-channel${index >= 6 ? " is-master" : ""}`}
+            key={index}
+            style={{ "--channel-index": index } as CSSProperties}
+          >
+            <span className="studio-channel-cap" />
+            <div className="studio-channel-knobs">
+              <i className="studio-knob is-gain" />
+              <i className="studio-knob is-eq" />
+              <i className="studio-knob is-aux" />
+              <i className="studio-knob is-pan" />
+            </div>
+            <div className="studio-channel-switches"><i /><i /></div>
+            <span className="studio-fader-track">
+              <b
+                className={index === 6 ? "is-blue" : index === 7 ? "is-red" : ""}
+                style={{ "--fader": `${20 + ((index * 13) % 56)}%` } as CSSProperties}
+              />
+            </span>
+            <em>{String(index + 1).padStart(2, "0")}</em>
+          </div>
+        ))}
       </div>
     </div>
   );

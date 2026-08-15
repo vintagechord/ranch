@@ -111,7 +111,7 @@ export default async function AdminProjectsPage() {
           <h2 id="admin-project-directory-title">프로젝트별 작업실</h2>
         </div>
         <p>
-          각 프로젝트의 음원, 참여 파트, 신청 흐름을 독립된 작업실에서 관리합니다.
+          각 프로젝트의 항목, 참여 파트, 신청 흐름을 독립된 작업실에서 관리합니다.
           새 프로젝트가 연결되면 이 목록에 같은 구조로 추가됩니다.
         </p>
       </section>

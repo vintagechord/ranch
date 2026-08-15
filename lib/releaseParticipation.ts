@@ -33,7 +33,22 @@ export const SEEDED_RELEASE_ROLE_CODES = [
   "a_and_r",
   "video",
   "mixing",
-  "mastering"
+  "mastering",
+  "show_direction",
+  "music_director",
+  "stage_management",
+  "live_guitar",
+  "live_bass",
+  "live_drums",
+  "live_keyboard",
+  "live_percussion",
+  "foh_engineering",
+  "monitor_engineering",
+  "lighting",
+  "vj_video",
+  "photography",
+  "promotion_social",
+  "event_operations"
 ] as const;
 
 export type MusicReleaseState = (typeof MUSIC_RELEASE_STATES)[number];

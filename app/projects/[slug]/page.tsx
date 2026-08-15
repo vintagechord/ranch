@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
 import ProjectParticipationBoard from "@/app/components/ProjectParticipationBoard";
-import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
+import { StudioMixer, StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 import VintageChordReleases from "@/app/components/VintageChordReleases";
 import { getProjectBySlug, getProjectStatusLabel, projects, type Project } from "@/lib/projects";
 import {
@@ -40,6 +40,8 @@ function ProjectVisual({ project }: { project: Project }) {
             <span className="project-sound-wave is-right" aria-hidden="true" />
             <StudioSpeaker playing />
           </>
+        ) : project.visual === "mixer" ? (
+          <StudioMixer />
         ) : (
           <StudioReelDeck />
         )}
@@ -69,9 +71,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const title = isReleaseProject
     ? "PPP | 목장의 아침"
     : `${project.artist} — ${project.title} | 목장의 아침`;
-  const description = isReleaseProject
-    ? "PPP 발매 음원과 참여 가능한 파트."
-    : project.summary;
+  const description = project.subcopy;
 
   return {
     title,
@@ -122,6 +122,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     ? publicProjects[(projectIndex + 1) % publicProjects.length]
     : null;
   const isReleaseProject = project.slug === RELEASE_PROJECT_SLUG;
+  const isPerformanceProject = project.kind === "performance";
   const projectReleases = await getPublicMusicReleases(project.slug);
   const participationRelease = [...projectReleases]
     .filter((release) => release.state === "upcoming")
@@ -140,7 +141,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <>
       <Header projects={publicProjects} showApplyCta={false} />
       <main
-        className={`project-page project-page-compact${isReleaseProject ? " project-page-releases" : " project-page-participation"}`}
+        className={`project-page project-page-compact${isReleaseProject ? " project-page-releases" : " project-page-participation"}${isPerformanceProject ? " project-page-performance" : ""}`}
         id="top"
         style={projectStyle}
       >
@@ -150,7 +151,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </a>
 
           {isReleaseProject ? (
-            <VintageChordReleases releases={projectReleases} />
+            <VintageChordReleases releases={projectReleases} subcopy={project.subcopy} />
           ) : (
             <>
               <section className="project-hero" aria-labelledby="project-title">
@@ -166,6 +167,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <h1 className="project-title" id="project-title">
                     {project.title}
                   </h1>
+                  <p className="project-title-subcopy">{project.subcopy}</p>
                   <div className="project-stage-line">
                     <span>CURRENT STAGE</span>
                     <strong>{project.stage}</strong>
@@ -179,6 +181,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 <ProjectParticipationBoard
                   projectTitle={`${project.artist}의 ‘${project.title}’`}
                   release={participationRelease}
+                  variant={isPerformanceProject ? "performance" : "default"}
                 />
               ) : null}
             </>

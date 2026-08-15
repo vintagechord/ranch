@@ -64,9 +64,7 @@ type Filters = {
 };
 
 function projectLabel(slug: string) {
-  if (slug === "ibyeol-ui-dosu") return "이별의 도수";
-  if (slug === "vintagechord-post-production") return "PPP";
-  return slug;
+  return getProjectBySlug(slug)?.shortTitle ?? slug;
 }
 
 function parsePositivePage(value?: string) {

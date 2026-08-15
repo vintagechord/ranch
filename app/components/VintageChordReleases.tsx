@@ -10,6 +10,7 @@ import type {
 
 type VintageChordReleasesProps = {
   releases: PublicMusicRelease[];
+  subcopy: string;
 };
 
 type RoleRow = {
@@ -78,7 +79,7 @@ function getRoleRows(release: PublicMusicRelease) {
     });
 }
 
-export default function VintageChordReleases({ releases }: VintageChordReleasesProps) {
+export default function VintageChordReleases({ releases, subcopy }: VintageChordReleasesProps) {
   const orderedReleases = [...releases].sort((a, b) => a.releaseNumber - b.releaseNumber);
   const upcomingReleases = orderedReleases.filter((release) => release.state === "upcoming");
   const releasedReleases = orderedReleases
@@ -91,8 +92,9 @@ export default function VintageChordReleases({ releases }: VintageChordReleasesP
         <>
           <header className="vc-release-hero">
             <div className="vc-release-hero-copy">
-              <p>POST PRODUCTION PROJECT</p>
+              <p className="vc-release-eyebrow">POST PRODUCTION PROJECT</p>
               <h1 id="project-title">PPP</h1>
+              <p className="project-title-subcopy vc-release-subcopy">{subcopy}</p>
             </div>
             <div className="vc-release-hero-equipment" aria-hidden="true">
               <span className="project-sound-wave is-left" />
