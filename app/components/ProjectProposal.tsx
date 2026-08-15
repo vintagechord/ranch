@@ -229,8 +229,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
           aria-label="프로젝트 제안서 열기"
           onClick={(event) => openDialog(event.currentTarget)}
         >
-          <span aria-hidden="true">＋</span>
-          <small>OPEN</small>
+          <span aria-hidden="true" />
         </button>
       </section>
 
