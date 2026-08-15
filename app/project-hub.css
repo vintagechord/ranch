@@ -3173,33 +3173,6 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
   border-top: 1px solid rgba(255, 255, 255, 0.24);
 }
 
-.project-other-projects-header {
-  display: flex;
-  gap: 16px;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.project-other-projects-header h2,
-.project-other-projects-header p {
-  margin: 0;
-  font-family: "SFMono-Regular", Consolas, monospace;
-}
-
-.project-other-projects-header h2 {
-  color: #d9d6ce;
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.15em;
-}
-
-.project-other-projects-header p {
-  color: #999a93;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
 .project-page-compact .project-other-projects .project-next {
   min-height: 78px;
   margin-top: 14px;
@@ -3739,11 +3712,6 @@ html.site-motion-paused .vc-released-card-media img {
   .project-page-compact .project-other-projects {
     margin-top: 40px;
     padding-top: 18px;
-  }
-
-  .project-other-projects-header {
-    display: grid;
-    gap: 5px;
   }
 
   .project-page-compact .project-other-projects .project-next {
