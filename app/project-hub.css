@@ -4793,7 +4793,7 @@ html.location-trace-open body {
 }
 
 .location-trace-media-frame[data-trace-stage="gimpo"] img {
-  object-position: 50% 52%;
+  object-position: 50% 50%;
 }
 
 .location-trace-media-frame[data-trace-stage="sau"] {
@@ -5606,9 +5606,12 @@ html.location-trace-open body {
     object-position: 50% 46%;
   }
 
-  .location-trace-media-frame[data-trace-stage="gimpo"] img,
+  .location-trace-media-frame[data-trace-stage="gimpo"] img {
+    object-position: 50% 50%;
+  }
+
   .location-trace-media-frame[data-trace-stage="sau"] img {
-    object-position: 51% 50%;
+    object-position: 58% 53%;
   }
 
   .location-trace-media-frame[data-trace-stage="exit"] img {

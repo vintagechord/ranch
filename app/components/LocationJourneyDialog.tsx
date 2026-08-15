@@ -44,7 +44,8 @@ const TRACE_STAGES = [
     label: "김포",
     system: "CITY LOCK",
     duration: 900,
-    media: "gimpo-aerial"
+    media: "gimpo-region-aerial",
+    mobileMedia: "gimpo-region-aerial-mobile"
   },
   {
     key: "sau",
