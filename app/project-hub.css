@@ -3327,7 +3327,11 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 }
 
 .project-page-releases.project-page-compact .vc-release-role-label {
-  font-size: 0.58rem;
+  color: #e7e4dc;
+  font-size: 0.73rem;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
 }
 
 .project-page-releases.project-page-compact .vc-release-credit {
