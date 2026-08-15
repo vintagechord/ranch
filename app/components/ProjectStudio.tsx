@@ -14,6 +14,13 @@ type StudioProject = {
 };
 
 type ProjectStudioProps = {
+  nextMeeting: {
+    accessibleDateTime: string;
+    dateTime: string;
+    dateLabel: string;
+    timeLabel: string;
+    venue: string;
+  };
   projects: StudioProject[];
 };
 
@@ -314,7 +321,7 @@ function MixingDesk() {
   );
 }
 
-export default function ProjectStudio({ projects }: ProjectStudioProps) {
+export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const projectCount = String(projects.length).padStart(2, "0");
   const hasManyProjects = projects.length > 2;
@@ -369,7 +376,22 @@ export default function ProjectStudio({ projects }: ProjectStudioProps) {
         <div className="studio-stage-toolbar">
           <span className="studio-live-pill"><i /> LIVE INPUT</span>
           <span>{projectCount} PROJECT CHANNELS</span>
-          <span className="studio-stage-time">SIGNAL ● ACTIVE</span>
+          <span className="studio-next-session">
+            <span className="studio-visually-hidden">다음 모임: </span>
+            <span className="studio-next-session-label" aria-hidden="true">NEXT MEETING</span>
+            <time
+              aria-label={nextMeeting.accessibleDateTime}
+              dateTime={nextMeeting.dateTime}
+            >
+              <span>{nextMeeting.dateLabel}</span>
+              <b aria-hidden="true">·</b>
+              <strong>{nextMeeting.timeLabel}</strong>
+            </time>
+            <span className="studio-next-session-location">
+              <span className="studio-visually-hidden">장소: </span>
+              {nextMeeting.venue}
+            </span>
+          </span>
         </div>
 
         <div className="studio-monitor" aria-hidden="true">
