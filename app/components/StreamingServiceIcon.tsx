@@ -1,0 +1,70 @@
+export type StreamingServiceKind = "melon" | "spotify" | "apple" | "youtube";
+
+type StreamingServiceIconProps = {
+  service: StreamingServiceKind;
+};
+
+const MELON_LOGO_SRC =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI4AAABjCAYAAABNJzhUAAAGyUlEQVR42u2ca2wVRRiGW2/QClQjSA1CDBpEmngJP7xkwRoF" +
+  "I0VFIqDBW0PEqCDxlhLCD/ACijdqCIkNAvEaI4lKLCFaLwFTvK0WxURbIC2opcrlWAQFqvWb3TkCZeebmT2zPaeH90neX935" +
+  "ZnbnPbMz38y2oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5je/1IS0i" +
+  "tZI6SdtJj5F69ZQbOIs0j/Q2aSWpklTkMH5f0kzSK6S3SFWk03Lo/k8ijSPdT5ro9N7VdRaRvpGG6aqPSSfnumkuIO2MaPy3" +
+  "pNMdxB9CaoyI3xwYNvv3P4DU0KVtLaTzEq53jsI0ad2X68Z5h2n8Cgfx65j41Tlw/8sUbVuXcL0NGuN8kuvG2cc0voN0fgax" +
+  "x2gezo85cP/bFW37h3RKFupNa2Mum6avpvFCb8aMXUj6XBN7Tw48gxTTvpIE663TPJtVuWycEgPjiF9eWYzYNxjETh3HxpnI" +
+  "1Psv6eqebpzOYLVlF/eEYKiFcXR1P60wzZxcn9+YGkfczEUWcW8xjHt8GyesfzTpJdIa0lLS5T0hf2NqHKF3LXIijTBOfmcu" +
+  "bYwjRp2RBjGnWcRMxWz3qcEI6HvXkK4MVn5xE2ZJGCdM7l0s21dBGkUq7ab+vELWOyq5PJmdcYTe18TrJRN77o0Tdsa9pHqZ" +
+  "Jugaa58c7m8OVnTdbRzf602aHuRffO+gIt4W0rOxkou+VyxfaTvkUr76/wy3711CWqt4LqLOBW6Na28cocuYeDMsY6UM2zmW" +
+  "tM0i7obgF99dxvG9SaRfLdp3iLQkSIeY91VNRJw3SLPlyldXZztpcjaNs5b5RbQ6N47v3aP4Jem0P0gJJGkc3ztRTmg7Y6rR" +
+  "aPQJV6l7FdOHTsvpxiPZMo6QFxGrKkaclKZ9t2fQKUIHgnd+EsYJE5yvZdi+9I74OQn1k8o8Y5I0zgGp6N3bY+PsYuIctDZO" +
+  "OOHd6+BBbWV3u+MbZ6bDzvTZyb1b44RbPWIUS8g4Kc0wXH5EnPnMdUuZzuGMs0ozR3iV9EAw9PperWbYftipcXzvbANTix/M" +
+  "16T1hq/wRx0Y50/Sd6Qmg2srkjSOeEB/K/6+XsboT/qDmWcMsjZOeNRDNeFritwCCVdTqrnQZsfGqdZsDC84qmw4RxknRz9V" +
+  "ud+VI6OZcZ4K5pmHy4zUGLYmOeOE1yxhrhkrT7Cp/v6MpnNUxnmSeT9fytzPy0xbhjkxjnilqF/LQncy7Rsoz/qoyk6JaZz3" +
+  "FOVuZco0JG2cQXLkiN76V/+tPRiN4hnnC8X1zTK5pdIT1kOzvXE85vrVGW7+roxpHNW99WHK7ErWOOF1i2NMwOYbdE5KsVr5" +
+  "y/FkUOg2R8bhclXjDZ55IXMWZ2NM45zJ1KceHbvBOKXMyBLt5qPf8TbG6Z+AaYSucmSchcz1pYbPfbXVKMD3U4emrpbsGSe8" +
+  "9jmLTqoy7Jwo4wxJwDTbgi0BN8Z5kbm+2PC5v2756i7JIBeWdeMM1BwzTav1mAeYvRFnv9y/Gu5sVeV7jzPXDzV87h8qyrfl" +
+  "n3HC6xcZdNYMi85RzXFUBl2Y9WMV/O5/peFmrarO+nw1zgBN4qs58mMy+1VVveL6FucHyO2NU8YeMNcd7/C9h5jyi/PTOGGZ" +
+  "WUyO5TrLzlHVMY9p1wsGy90fZCJuHWmE870qPjNbE2x+Rpcr1ywyyvPZOOJVMrdLRvkXdsve3jhD5baCqm21wRHLdAeFpw49" +
+  "xTZFWzBSujXOgwbHOsYHX6uGZ5QuJD3P7P0JbVKeI8oL4xwu20+ecitT/sLiGkefBT5y8ruT2URNa5Zj4xRptg/i6PqE+inH" +
+  "jONmHsEZ5wzDzToTzU5gd3x0zHNCUVqe4A88EeP0ZhrU5tA4qs223zTlRgQf7WXWKSILfW6szKoYVfn23eXAPB9oJ/y8cfZo" +
+  "ym6NlTg06NTNiX877XsfKer4zKDsMNL3GeRxbtLE/0pRdrfhvU3IwNzLjP+lSfQ/hgj/OQRfrs76xIBhg+5QBL7RoXEqFOdl" +
+  "JhiWL5YbmO0Wp9xqjb57972pihhzLe5vsDwfdMiwfZusz8OEZ4ujYk3XlLtW8eynuejYSfI7793y8NHkAteEy+QNR9QxJUaM" +
+  "fvKowHI5Cu2Q53Y65MruU3kWZrhl3KkyByPOFf0kcy2FMdo3WB4sWyO3OdKTdjFafCnP8ZTHih3Gr5RfLYiYP5PutujfLdJA" +
+  "TVqzgTwlrvEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4Jb/ABXA17hB2vHcAAAAAElFTkSuQmCC";
+
+export default function StreamingServiceIcon({ service }: StreamingServiceIconProps) {
+  if (service === "melon") {
+    return (
+      <span className="sf-platform-icon is-melon" aria-hidden="true">
+        <img src={MELON_LOGO_SRC} alt="" width="142" height="99" loading="lazy" decoding="async" />
+      </span>
+    );
+  }
+
+  if (service === "spotify") {
+    return (
+      <span className="sf-platform-icon is-spotify" aria-hidden="true">
+        <svg viewBox="0 0 236.05 225.25" focusable="false">
+          <path d="m122.37 3.31C61.99.91 11.1 47.91 8.71 108.29c-2.4 60.38 44.61 111.26 104.98 113.66 60.38 2.4 111.26-44.6 113.66-104.98C229.74 56.59 182.74 5.7 122.37 3.31Zm46.18 160.28c-1.36 2.4-4.01 3.6-6.59 3.24-.79-.11-1.58-.37-2.32-.79-14.46-8.23-30.22-13.59-46.84-15.93-16.62-2.34-33.25-1.53-49.42 2.4-3.51.85-7.04-1.3-7.89-4.81-.85-3.51 1.3-7.04 4.81-7.89 17.78-4.32 36.06-5.21 54.32-2.64 18.26 2.57 35.58 8.46 51.49 17.51 3.13 1.79 4.23 5.77 2.45 8.91Zm14.38-28.72c-2.23 4.12-7.39 5.66-11.51 3.43-16.92-9.15-35.24-15.16-54.45-17.86-19.21-2.7-38.47-1.97-57.26 2.16-1.02.22-2.03.26-3.01.12-3.41-.48-6.33-3.02-7.11-6.59-1.01-4.58 1.89-9.11 6.47-10.12 20.77-4.57 42.06-5.38 63.28-2.4 21.21 2.98 41.46 9.62 60.16 19.74 4.13 2.23 5.66 7.38 3.43 11.51Zm15.94-32.38c-2.1 4.04-6.47 6.13-10.73 5.53-1.15-.16-2.28-.52-3.37-1.08-19.7-10.25-40.92-17.02-63.07-20.13-22.15-3.11-44.42-2.45-66.18 1.97-5.66 1.15-11.17-2.51-12.32-8.16-1.15-5.66 2.51-11.17 8.16-12.32 24.1-4.89 48.74-5.62 73.25-2.18 24.51 3.44 47.99 10.94 69.81 22.29 5.12 2.66 7.11 8.97 4.45 14.09Z" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (service === "apple") {
+    return (
+      <span className="sf-platform-icon is-apple" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M23.994 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 0 0-1.877-.726 10.496 10.496 0 0 0-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 0 0 1.57-.1c.822-.106 1.596-.35 2.295-.81a5.046 5.046 0 0 0 1.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393Zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 0 1 1.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 0 0 .02-.193c0-1.815 0-3.63-.002-5.443a.725.725 0 0 0-.026-.185c-.04-.15-.15-.243-.304-.234-.16.01-.318.035-.475.066-.76.15-1.52.303-2.28.456l-2.325.47-1.374.278c-.016.003-.032.01-.048.013-.277.077-.377.203-.39.49-.002.042 0 .086 0 .13-.002 2.602 0 5.204-.003 7.805 0 .42-.047.836-.215 1.227-.278.64-.77 1.04-1.434 1.233-.35.1-.71.16-1.075.172-.96.036-1.755-.6-1.92-1.544-.14-.812.23-1.685 1.154-2.075.357-.15.73-.232 1.108-.31.287-.06.575-.116.86-.177.383-.083.583-.323.6-.714v-.15c0-2.96 0-5.922.002-8.882 0-.123.013-.25.042-.37.07-.285.273-.448.546-.518.255-.066.515-.112.774-.165.733-.15 1.466-.296 2.2-.444l2.27-.46c.67-.134 1.34-.27 2.01-.403.22-.043.442-.088.663-.106.31-.025.523.17.554.482.008.073.012.148.012.223.002 1.91.002 3.822 0 5.732Z" />
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <span className="sf-platform-icon is-youtube" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z" />
+      </svg>
+    </span>
+  );
+}

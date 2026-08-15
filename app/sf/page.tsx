@@ -4,6 +4,9 @@ import Header from "@/app/components/Header";
 import { getPublicActiveProjects } from "@/lib/projectSiteSettings.server";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
 import SfHero from "@/app/components/SfHero";
+import StreamingServiceIcon, {
+  type StreamingServiceKind
+} from "@/app/components/StreamingServiceIcon";
 
 type Release = {
   artist: string;
@@ -16,7 +19,7 @@ type Release = {
   platformLinks?: Partial<Record<ServiceKind, string>>;
 };
 
-type ServiceKind = "melon" | "spotify" | "apple";
+type ServiceKind = Exclude<StreamingServiceKind, "youtube">;
 
 const releases: Release[] = [
   {
@@ -211,20 +214,24 @@ export default async function StrangeFactoryPage() {
                         <a
                           href={platformUrl(release, service.kind, query)}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           key={service.kind}
                           data-service={service.kind}
+                          aria-label={`${release.title} — ${service.label}에서 듣기, 새 창`}
+                          title={service.label}
                         >
-                          {service.label}
+                          <StreamingServiceIcon service={service.kind} />
                         </a>
                       ))}
                       <a
                         href={youtubeUrl(release.videoId)}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         data-service="youtube"
+                        aria-label={`${release.title} — YouTube에서 보기, 새 창`}
+                        title="YouTube"
                       >
-                        YouTube
+                        <StreamingServiceIcon service="youtube" />
                       </a>
                     </div>
                   </div>
