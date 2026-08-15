@@ -5,7 +5,7 @@ export default function Footer() {
         <strong>목장의 아침</strong>
         <span>Gimpo Edition</span>
       </div>
-      <p>Made for friends, somewhere near the west sea.</p>
+      <p>A small circle for big ideas.</p>
     </footer>
   );
 }
