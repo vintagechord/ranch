@@ -67,7 +67,7 @@ export default function Header({ projects = activeProjects }: HeaderProps) {
     { kind: "proposal" as const, label: "프로젝트 제안", href: "/#project-proposal" }
   ];
   const activeProjectCount = projects.length;
-  const activeProjectCountLabel = String(activeProjectCount).padStart(2, "0");
+  const activeProjectCountLabel = `${activeProjectCount}개`;
 
   return (
     <header className="site-header">
@@ -104,9 +104,9 @@ export default function Header({ projects = activeProjects }: HeaderProps) {
 
       <div className="header-tools">
         <span className="header-session-light">
-          <span className="sr-only">현재 활성 프로젝트 {activeProjectCount}개</span>
+          <span className="sr-only">현재 진행 중인 프로젝트 {activeProjectCount}개</span>
           <i aria-hidden="true" />
-          <span className="header-session-copy" aria-hidden="true">활성 프로젝트</span>
+          <span className="header-session-copy" aria-hidden="true">진행 중 ·</span>
           <strong aria-hidden="true">{activeProjectCountLabel}</strong>
         </span>
         <MotionToggle />

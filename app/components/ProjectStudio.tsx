@@ -284,7 +284,7 @@ function AcousticDisplay() {
 export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const activeProjectCount = projects.length;
-  const activeProjectCountLabel = String(activeProjectCount).padStart(2, "0");
+  const activeProjectCountLabel = `${activeProjectCount}개`;
   const hasManyProjects = projects.length > 3;
   const visualOrder: Record<Project["visual"], number> = { reel: 1, mixer: 2, speaker: 3 };
   const studioProjects = [...projects].sort(
@@ -341,8 +341,8 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
         <div className="studio-stage-toolbar">
           <span className="studio-live-pill" aria-hidden="true"><i /> LIVE</span>
           <span className="studio-active-count">
-            <span className="studio-visually-hidden">현재 활성 프로젝트 {activeProjectCount}개</span>
-            <span aria-hidden="true">활성 프로젝트</span>
+            <span className="studio-visually-hidden">현재 진행 중인 프로젝트 {activeProjectCount}개</span>
+            <span aria-hidden="true">진행 중 ·</span>
             <strong aria-hidden="true">{activeProjectCountLabel}</strong>
           </span>
         </div>

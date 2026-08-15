@@ -152,7 +152,7 @@ export default async function AdminPage({ searchParams }: { searchParams: AdminS
           <b aria-hidden="true">→</b>
         </Link>
         <Link href="/admin/projects" className="admin-command-card is-projects">
-          <span>{String(activeProjects.length).padStart(2, "0")} ACTIVE</span>
+          <span>진행 중 · {activeProjects.length}개</span>
           <strong>프로젝트 관리</strong>
           <p>프로젝트별 작업실에서 참여 파트, 신청, 공개 상태를 관리합니다.</p>
           <b aria-hidden="true">→</b>
@@ -162,7 +162,7 @@ export default async function AdminPage({ searchParams }: { searchParams: AdminS
       <section className="admin-summary" aria-label="접수 요약">
         <article><span>프로젝트 제안</span><strong>{overview.projectProposalCount}</strong></article>
         <article><span>참여 신청</span><strong>{overview.releaseApplicationCount}</strong></article>
-        <article><span>활성 프로젝트</span><strong>{String(activeProjects.length).padStart(2, "0")}</strong></article>
+        <article><span>진행 중</span><strong>{activeProjects.length}개</strong></article>
         <article><span>최근 접수</span><strong>{formatDate(latestCreatedAt)}</strong></article>
       </section>
 
