@@ -73,13 +73,53 @@ const TRACE_STAGES = [
 const LAST_STAGE = TRACE_STAGES.length - 1;
 
 type LocationJourneyDialogProps = {
+  accessibleDateTime: string;
+  dateLabel: string;
+  dateTime: string;
+  timeLabel: string;
   venue: string;
 };
 
-export default function LocationJourneyDialog({ venue }: LocationJourneyDialogProps) {
+type MeetingCountdown = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  started: boolean;
+};
+
+function getMeetingCountdown(targetTime: number, now: number): MeetingCountdown {
+  const remainingSeconds = Math.max(0, Math.ceil((targetTime - now) / 1000));
+
+  if (remainingSeconds === 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, started: true };
+  }
+
+  return {
+    days: Math.floor(remainingSeconds / 86_400),
+    hours: Math.floor((remainingSeconds % 86_400) / 3_600),
+    minutes: Math.floor((remainingSeconds % 3_600) / 60),
+    seconds: remainingSeconds % 60,
+    started: false
+  };
+}
+
+function padClockUnit(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+export default function LocationJourneyDialog({
+  accessibleDateTime,
+  dateLabel,
+  dateTime,
+  timeLabel,
+  venue
+}: LocationJourneyDialogProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const shellRef = useRef<HTMLElement>(null);
+  const journeyRunRef = useRef(0);
+  const countdownStartedAnnouncedRef = useRef(false);
   const stageClockRef = useRef<{ stage: number; remaining: number; startedAt: number }>({
     stage: 0,
     remaining: TRACE_STAGES[0].duration,
@@ -93,9 +133,15 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
   const [pageVisible, setPageVisible] = useState(true);
   const [announcement, setAnnouncement] = useState("");
   const [readyStages, setReadyStages] = useState<Set<number>>(() => new Set());
+  const [countdownNow, setCountdownNow] = useState<number | null>(null);
+  const [showFinalReadout, setShowFinalReadout] = useState(false);
 
   const stage = TRACE_STAGES[activeStage];
   const isComplete = activeStage === LAST_STAGE;
+  const targetTime = Date.parse(dateTime);
+  const countdown = countdownNow === null || !Number.isFinite(targetTime)
+    ? null
+    : getMeetingCountdown(targetTime, countdownNow);
 
   useEffect(() => {
     setPortalReady(true);
@@ -112,15 +158,22 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
       const limited =
         reducedMotion.matches || document.documentElement.classList.contains("site-motion-paused");
 
+      if (limited) {
+        journeyRunRef.current += 1;
+      }
       setMotionLimited(limited);
     }
 
     function handleSiteMotionChange(event: Event) {
       const paused = (event as CustomEvent<{ paused: boolean }>).detail.paused;
+      if (reducedMotion.matches || paused) {
+        journeyRunRef.current += 1;
+      }
       setMotionLimited(reducedMotion.matches || paused);
     }
 
     function handleVisibilityChange() {
+      journeyRunRef.current += 1;
       setPageVisible(!document.hidden);
     }
 
@@ -139,6 +192,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
 
   useEffect(() => {
     if (isOpen && motionLimited) {
+      journeyRunRef.current += 1;
       stageClockRef.current = { stage: LAST_STAGE, remaining: 0, startedAt: 0 };
       setActiveStage(LAST_STAGE);
       setPlaybackPaused(false);
@@ -167,8 +221,16 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
 
     const remaining = Math.max(clock.remaining, 0);
     clock.startedAt = performance.now();
+    const scheduledStage = activeStage;
+    const scheduledRun = journeyRunRef.current;
     const timeoutId = window.setTimeout(() => {
-      setActiveStage((current) => Math.min(current + 1, LAST_STAGE));
+      if (journeyRunRef.current !== scheduledRun) {
+        return;
+      }
+
+      setActiveStage((current) =>
+        current === scheduledStage ? Math.min(current + 1, LAST_STAGE) : current
+      );
     }, remaining);
 
     return () => {
@@ -208,9 +270,73 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
 
   useEffect(() => {
     if (isOpen && isComplete) {
-      setAnnouncement(`위치 확인 완료: ${venue} 7층`);
+      setAnnouncement(`위치 확인 완료: ${venue} 7층. 다음 모임 ${accessibleDateTime}.`);
     }
-  }, [isComplete, isOpen, venue]);
+  }, [accessibleDateTime, isComplete, isOpen, venue]);
+
+  useEffect(() => {
+    if (!isOpen || !isComplete) {
+      setShowFinalReadout(false);
+      return;
+    }
+
+    if (motionLimited) {
+      setShowFinalReadout(true);
+      return;
+    }
+
+    if (!pageVisible) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowFinalReadout(true);
+    }, 1650);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isComplete, isOpen, motionLimited, pageVisible]);
+
+  useEffect(() => {
+    if (!isOpen || !isComplete) {
+      setCountdownNow(null);
+      return;
+    }
+
+    if (!pageVisible || !Number.isFinite(targetTime)) {
+      return;
+    }
+
+    let timeoutId = 0;
+
+    function updateCountdown() {
+      const now = Date.now();
+      setCountdownNow(now);
+
+      if (now >= targetTime) {
+        return;
+      }
+
+      timeoutId = window.setTimeout(updateCountdown, 1000 - (now % 1000) + 20);
+    }
+
+    updateCountdown();
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isComplete, isOpen, pageVisible, targetTime]);
+
+  useEffect(() => {
+    if (
+      !isOpen ||
+      !isComplete ||
+      !countdown?.started ||
+      countdownStartedAnnouncedRef.current
+    ) {
+      return;
+    }
+
+    countdownStartedAnnouncedRef.current = true;
+    setAnnouncement(`다음 모임 ${accessibleDateTime} 한국 표준시. 모임 시작 시각이 되었습니다.`);
+  }, [accessibleDateTime, countdown?.started, isComplete, isOpen]);
 
   function openDialog() {
     const dialog = dialogRef.current;
@@ -223,6 +349,8 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
       document.documentElement.classList.contains("site-motion-paused");
 
+    journeyRunRef.current += 1;
+    countdownStartedAnnouncedRef.current = false;
     setMotionLimited(limited);
     setActiveStage(limited ? LAST_STAGE : 0);
     stageClockRef.current = {
@@ -232,6 +360,8 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
     };
     setPlaybackPaused(false);
     setAnnouncement("");
+    setCountdownNow(null);
+    setShowFinalReadout(false);
     setReadyStages(new Set());
     setIsOpen(true);
     document.documentElement.classList.add("location-trace-open");
@@ -239,6 +369,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
   }
 
   function closeDialog() {
+    journeyRunRef.current += 1;
     dialogRef.current?.close();
   }
 
@@ -249,10 +380,14 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
   }
 
   function handleClose() {
+    journeyRunRef.current += 1;
+    countdownStartedAnnouncedRef.current = false;
     setIsOpen(false);
     setActiveStage(0);
     setPlaybackPaused(false);
     setAnnouncement("");
+    setCountdownNow(null);
+    setShowFinalReadout(false);
     setReadyStages(new Set());
     stageClockRef.current = {
       stage: 0,
@@ -269,6 +404,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
   }
 
   function skipToTarget() {
+    journeyRunRef.current += 1;
     setPlaybackPaused(false);
     stageClockRef.current = { stage: LAST_STAGE, remaining: 0, startedAt: 0 };
     setActiveStage(LAST_STAGE);
@@ -279,7 +415,11 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
       return;
     }
 
+    journeyRunRef.current += 1;
+    countdownStartedAnnouncedRef.current = false;
     setAnnouncement("");
+    setCountdownNow(null);
+    setShowFinalReadout(false);
     setPlaybackPaused(false);
     stageClockRef.current = {
       stage: 0,
@@ -301,6 +441,11 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
     });
   }
 
+  function togglePlayback() {
+    journeyRunRef.current += 1;
+    setPlaybackPaused((paused) => !paused);
+  }
+
   const dialog = (
     <dialog
       ref={dialogRef}
@@ -320,7 +465,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
           {venue} 위치 추적
         </h2>
         <p id="location-trace-description" className="studio-visually-hidden">
-          {venue} 7층을 향해 위치를 추적합니다.
+          {venue} 7층을 향해 위치를 추적합니다. 다음 모임은 {accessibleDateTime} 한국 표준시입니다.
         </p>
 
         <div className="location-trace-visual" aria-hidden="true">
@@ -384,7 +529,35 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
         <div className="location-trace-stage-copy" aria-hidden="true" key={stage.key}>
           <strong>{stage.label}</strong>
           <small>{stage.system}</small>
+          {isComplete && showFinalReadout && countdown ? (
+            <div className="location-trace-session-hud">
+              <p><i /> RENDEZVOUS WINDOW</p>
+              <time dateTime={dateTime}>{dateLabel} / {timeLabel} KST</time>
+              <div className="location-trace-countdown">
+                {countdown.started ? (
+                  <strong>SESSION LIVE</strong>
+                ) : (
+                  <>
+                    <strong>{countdown.days === 0 ? "D-DAY" : `D-${countdown.days}`}</strong>
+                    <span>
+                      <b>{padClockUnit(countdown.hours)}</b><i>H</i>
+                      <b>{padClockUnit(countdown.minutes)}</b><i>M</i>
+                      <b>{padClockUnit(countdown.seconds)}</b><i>S</i>
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : null}
         </div>
+
+        {isComplete && countdown ? (
+          <p className="studio-visually-hidden">
+            다음 모임 {accessibleDateTime}. {countdown.started
+              ? "모임 시작 시각이 되었습니다."
+              : `${countdown.days}일 ${countdown.hours}시간 ${countdown.minutes}분 남았습니다.`}
+          </p>
+        ) : null}
 
         <div className="location-trace-controls">
           {!motionLimited ? (
@@ -399,7 +572,7 @@ export default function LocationJourneyDialog({ venue }: LocationJourneyDialogPr
                     : "위치 추적 일시정지"
               }
               aria-pressed={isComplete ? undefined : playbackPaused}
-              onClick={isComplete ? replayTrace : () => setPlaybackPaused((paused) => !paused)}
+              onClick={isComplete ? replayTrace : togglePlayback}
             >
               <span aria-hidden="true">{isComplete ? "↻" : playbackPaused ? "▶" : "Ⅱ"}</span>
             </button>

@@ -16,6 +16,8 @@ function formatNextMeeting(setting: NextMeetingSetting) {
   if (!setting.isVisible) return null;
 
   const date = new Date(setting.nextMeetingAt);
+  if (!Number.isFinite(date.getTime())) return null;
+
   const dateParts = new Intl.DateTimeFormat("en-CA", {
     month: "2-digit",
     day: "2-digit",

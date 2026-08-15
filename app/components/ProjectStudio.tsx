@@ -401,7 +401,7 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
                 <b aria-hidden="true">/</b>
                 <strong aria-hidden="true">{nextMeeting.timeLabel}</strong>
               </time>
-              <LocationJourneyDialog venue={nextMeeting.venue} />
+              <LocationJourneyDialog {...nextMeeting} />
             </div>
           ) : null}
         </div>
