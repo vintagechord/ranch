@@ -3556,6 +3556,145 @@ img {
   overflow: hidden;
 }
 
+.admin-release-creator {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+
+.admin-release-creator > summary {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 14px 20px;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-release-creator > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-release-creator > summary > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-release-creator > summary small {
+  color: #ff806f;
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+}
+
+.admin-release-creator > summary strong {
+  font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.admin-release-creator > summary > b {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  place-items: center;
+  font-size: 1.35rem;
+  line-height: 1;
+  transition: transform 220ms ease;
+}
+
+.admin-release-creator[open] > summary > b {
+  transform: rotate(45deg);
+}
+
+.admin-release-creator > summary:hover,
+.admin-release-creator > summary:focus-visible {
+  background: var(--surface-elevated);
+  outline: none;
+}
+
+.admin-release-creator > summary:focus-visible {
+  box-shadow: inset 0 0 0 3px rgba(28, 105, 212, 0.5);
+}
+
+.admin-release-creator-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+
+.admin-release-creator-intro {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--ivory);
+  padding: 16px;
+}
+
+.admin-release-creator-intro p,
+.admin-release-creator-exhausted {
+  margin: 0;
+  color: #b8b8b8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.admin-release-creator-intro ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-release-creator-intro li {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 7px 8px;
+  color: var(--body-strong);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.admin-release-creator-intro li span {
+  color: #73aaff;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.62rem;
+}
+
+.admin-release-creator .admin-add-release-form {
+  align-content: start;
+  align-self: stretch;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--ivory);
+  padding: 16px;
+}
+
+.admin-release-creator-exhausted {
+  border: 1px solid #ff806f;
+  border-radius: 7px;
+  color: #ff806f;
+  padding: 16px;
+}
+
 .admin-release-list {
   display: grid;
   gap: 14px;
@@ -3566,10 +3705,18 @@ img {
   display: grid;
   gap: 18px;
   min-width: 0;
+  scroll-margin-top: 24px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-soft);
   padding: 18px;
+}
+
+.admin-release-card:target,
+.admin-release-card:focus-visible {
+  border-color: #73aaff;
+  box-shadow: 0 0 0 3px rgba(28, 105, 212, 0.34);
+  outline: none;
 }
 
 .admin-release-card > header {
@@ -3610,6 +3757,60 @@ img {
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+}
+
+.admin-release-readiness {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-release-readiness li {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ivory);
+  color: #b8b8b8;
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.admin-release-readiness li[data-ready="true"] {
+  border-color: rgba(115, 170, 255, 0.56);
+  color: var(--body-strong);
+}
+
+.admin-release-readiness li[data-ready="false"] strong {
+  color: #ff806f;
+}
+
+.admin-release-readiness strong {
+  color: #73aaff;
+  font-weight: 950;
+}
+
+.admin-release-empty-help {
+  display: grid;
+  gap: 6px;
+  padding-block: 22px;
+}
+
+.admin-release-empty-help strong {
+  color: var(--body-strong);
+}
+
+.admin-release-empty-help span {
+  color: #a6a6a6;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  word-break: keep-all;
 }
 
 .admin-release-meta span,
@@ -4731,6 +4932,42 @@ img {
 
   .admin-release-card {
     padding: 14px;
+  }
+
+  .admin-release-creator > summary {
+    min-height: 68px;
+    padding: 12px 14px;
+  }
+
+  .admin-release-creator-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 0 14px 14px;
+  }
+
+  .admin-release-creator-intro,
+  .admin-release-creator .admin-add-release-form {
+    padding: 14px;
+  }
+
+  .admin-release-creator .admin-add-release-form,
+  .admin-release-creator .admin-add-release-form .admin-form-field,
+  .admin-release-creator .admin-add-release-form .admin-form-button {
+    width: 100%;
+  }
+
+  .admin-release-creator .admin-add-release-form .admin-form-field {
+    flex-basis: 100%;
+  }
+
+  .admin-release-readiness {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-release-readiness li {
+    justify-content: space-between;
+    border-radius: 6px;
   }
 
   .admin-release-card > header,

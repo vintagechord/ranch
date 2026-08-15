@@ -1,6 +1,8 @@
+import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import AdminActionButton from "@/app/components/AdminActionButton";
 import AdminReleaseCoverManager from "@/app/components/AdminReleaseCoverManager";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import {
@@ -19,6 +21,7 @@ export const dynamic = "force-dynamic";
 type SearchParams = Promise<{
   notice?: string;
   error?: string;
+  number?: string;
 }>;
 
 type ReleaseRow = {
@@ -119,7 +122,7 @@ function formatDateTimeInput(value: string | null) {
 
 function releaseStateLabel(state: string) {
   if (state === "released") return "발매됨";
-  if (state === "upcoming") return "공개 예정";
+  if (state === "upcoming") return "진행 중";
   if (state === "draft") return "초안";
   if (state === "archived") return "보관됨";
   return state;
@@ -133,17 +136,39 @@ function roleStateLabel(state: string) {
   return state;
 }
 
-function noticeMessage(notice?: string, error?: string) {
+function releaseNumberLabel(value?: string) {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number >= 1 && number <= 999
+    ? String(number).padStart(2, "0")
+    : null;
+}
+
+function noticeMessage(notice?: string, error?: string, createdNumber?: string) {
+  const number = releaseNumberLabel(createdNumber);
+
   if (notice === "role-saved") return "참여 파트 설정을 저장했습니다.";
   if (notice === "role-added") return "새 참여 파트를 추가했습니다.";
-  if (notice === "release-added") return "새 프로젝트 항목을 추가했습니다.";
+  if (notice === "release-created") {
+    return number
+      ? `PPP ${number}를 비공개 초안으로 만들었습니다. 대표 이미지와 참여 파트를 이어서 설정해 주세요.`
+      : "새 PPP 항목을 비공개 초안으로 만들었습니다.";
+  }
+  if (notice === "release-existing") {
+    return number
+      ? `이미 생성된 PPP ${number}로 이동했습니다.`
+      : "이미 생성된 PPP 항목으로 이동했습니다.";
+  }
   if (notice === "release-saved") return "프로젝트 항목을 저장했습니다.";
   if (notice === "cover-saved") return "대표 이미지를 적용했습니다.";
   if (notice === "cover-removed") return "대표 이미지를 제거했습니다.";
   if (error === "auth") return "관리자 확인이 필요합니다. 다시 로그인해 주세요.";
-  if (error === "invalid") return "입력한 참여 파트 정보를 확인해 주세요.";
+  if (error === "invalid") return "입력 내용을 확인해 주세요.";
   if (error === "duplicate") return "이미 이 항목에 등록된 참여 파트입니다.";
-  if (error === "release-duplicate") return "같은 프로젝트 번호가 이미 등록되어 있습니다.";
+  if (error === "release-stale") return "다음 PPP 번호가 변경되었습니다. 새로고침된 번호를 확인한 뒤 다시 만들어 주세요.";
+  if (error === "release-conflict") return "같은 생성 요청이 다른 내용으로 처리되었습니다. 새로고침 후 다시 시도해 주세요.";
+  if (error === "release-number-exhausted") return "사용할 수 있는 PPP 번호가 모두 소진되었습니다.";
+  if (error === "release-invalid") return "새 PPP의 제목과 입력 내용을 확인해 주세요.";
+  if (error === "release-save") return "새 PPP 초안을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.";
   if (error === "capacity") return "정원이 모두 확정된 파트는 다시 모집할 수 없습니다.";
   if (error === "release") return "사이트에 공개된 UP NEXT 항목에서만 모집을 열 수 있습니다.";
   if (error === "deadline") return "모집을 열려면 마감 시각을 비우거나 미래로 설정해 주세요.";
@@ -238,61 +263,87 @@ function revalidateReleaseAdmin() {
   PROJECTS.forEach((project) => revalidatePath(`/projects/${project.slug}`));
 }
 
-async function addMusicRelease(formData: FormData) {
+async function createNextPppRelease(formData: FormData) {
   "use server";
 
   if (!(await isAdminAuthenticated())) redirect("/admin/releases?error=auth");
 
-  const projectSlug = stringValue(formData.get("projectSlug"));
-  const releaseNumber = Number(stringValue(formData.get("releaseNumber")));
+  const creationId = stringValue(formData.get("creationId")).toLowerCase();
+  const expectedReleaseNumber = Number(stringValue(formData.get("expectedReleaseNumber")));
   const title = stringValue(formData.get("title"));
   const artistName = stringValue(formData.get("artistName"));
   const releaseDate = stringValue(formData.get("releaseDate"));
-  const state = stringValue(formData.get("state"));
   const youtubeVideoId = stringValue(formData.get("youtubeVideoId"));
   const summary = stringValue(formData.get("summary"));
-  const isPublished = formData.get("isPublished") === "on";
 
   if (
-    !PROJECTS.some((project) => project.slug === projectSlug) ||
-    !Number.isSafeInteger(releaseNumber) ||
-    releaseNumber < 1 ||
-    releaseNumber > 999 ||
+    !UUID_PATTERN.test(creationId) ||
+    !Number.isSafeInteger(expectedReleaseNumber) ||
+    expectedReleaseNumber < 1 ||
+    expectedReleaseNumber > 999 ||
     title.length < 1 ||
     title.length > 160 ||
     artistName.length < 1 ||
     artistName.length > 200 ||
     (releaseDate && !/^\d{4}-\d{2}-\d{2}$/.test(releaseDate)) ||
-    !EDITABLE_RELEASE_STATES.includes(state as never) ||
     (youtubeVideoId && !/^[A-Za-z0-9_-]{11}$/.test(youtubeVideoId)) ||
     summary.length > 1000
   ) {
-    redirect("/admin/releases?error=invalid");
+    redirect("/admin/releases?error=release-invalid#release-creator");
   }
 
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase.from("music_releases").insert({
-    project_slug: projectSlug,
-    release_number: releaseNumber,
-    title,
-    artist_name: artistName,
-    release_date: releaseDate || null,
-    state,
-    youtube_video_id: youtubeVideoId || null,
-    cover_image_url: youtubeVideoId
-      ? `https://i.ytimg.com/vi/${youtubeVideoId}/hqdefault.jpg`
-      : null,
-    summary: summary || null,
-    is_published: isPublished
+  const { data, error } = await supabase.rpc("admin_create_next_ppp_release", {
+    p_creation_id: creationId,
+    p_expected_release_number: expectedReleaseNumber,
+    p_title: title,
+    p_artist_name: artistName,
+    p_release_date: releaseDate || null,
+    p_youtube_video_id: youtubeVideoId || null,
+    p_summary: summary || null
   });
 
   if (error) {
-    console.error("Music release insert failed:", error.code);
-    redirect(`/admin/releases?error=${error.code === "23505" ? "release-duplicate" : "save"}`);
+    console.error("PPP release creation failed:", error.code);
+    redirect("/admin/releases?error=release-save#release-creator");
   }
 
-  revalidateReleaseAdmin();
-  redirect("/admin/releases?notice=release-added");
+  const result = data;
+
+  if (result?.status === "created" || result?.status === "duplicate") {
+    if (
+      !result.release_id ||
+      !UUID_PATTERN.test(result.release_id) ||
+      typeof result.release_number !== "number" ||
+      !Number.isSafeInteger(result.release_number) ||
+      result.release_number < 1 ||
+      result.release_number > 999
+    ) {
+      console.error("PPP release creation returned an invalid result");
+      redirect("/admin/releases?error=release-save#release-creator");
+    }
+
+    revalidateReleaseAdmin();
+    const notice = result.status === "created" ? "release-created" : "release-existing";
+    redirect(`/admin/releases?notice=${notice}&number=${result.release_number}#release-${result.release_id}`);
+  }
+
+  if (result?.status === "stale") {
+    revalidatePath("/admin/releases");
+    redirect("/admin/releases?error=release-stale#release-creator");
+  }
+  if (result?.status === "conflict") {
+    redirect("/admin/releases?error=release-conflict#release-creator");
+  }
+  if (result?.status === "number_exhausted") {
+    redirect("/admin/releases?error=release-number-exhausted#release-creator");
+  }
+  if (result?.status === "invalid_input") {
+    redirect("/admin/releases?error=release-invalid#release-creator");
+  }
+
+  console.error("PPP release creation returned an unknown status:", result?.status);
+  redirect("/admin/releases?error=release-invalid#release-creator");
 }
 
 async function updateMusicRelease(formData: FormData) {
@@ -648,11 +699,32 @@ export default async function AdminReleasesPage({
     console.error("Release cover cleanup queue processing failed:", cleanupError);
   }
 
-  const { notice, error } = await searchParams;
-  const message = noticeMessage(notice, error);
+  const { notice, error, number } = await searchParams;
   const { releases, roleTypes, roles, credits, applications } =
     await loadReleaseManagementData();
+  const message = noticeMessage(notice, error, number);
   const roleTypeByCode = new Map(roleTypes.map((item) => [item.code, item]));
+  const highestPppReleaseNumber = releases.reduce(
+    (highest, release) => release.project_slug === "vintagechord-post-production"
+      ? Math.max(highest, release.release_number)
+      : highest,
+    0
+  );
+  const nextPppReleaseNumber = highestPppReleaseNumber < 999
+    ? highestPppReleaseNumber + 1
+    : null;
+  const nextPppReleaseLabel = nextPppReleaseNumber
+    ? String(nextPppReleaseNumber).padStart(2, "0")
+    : "번호 소진";
+  const creationId = randomUUID();
+  const nowTimestamp = Date.now();
+  const creatorHasError = [
+    "release-stale",
+    "release-conflict",
+    "release-number-exhausted",
+    "release-invalid",
+    "release-save"
+  ].includes(error ?? "");
 
   return (
     <main className="admin-shell">
@@ -677,64 +749,6 @@ export default async function AdminReleasesPage({
           </div>
         ) : null}
 
-        <section className="admin-management-section" aria-labelledby="add-release-title">
-          <div className="admin-table-heading">
-            <div>
-              <p className="admin-eyebrow">NEW PROJECT ITEM</p>
-              <h2 id="add-release-title">새 UP NEXT 추가</h2>
-            </div>
-          </div>
-
-          <form className="admin-add-role-form admin-add-release-form" action={addMusicRelease}>
-            <label className="admin-form-field">
-              <span>프로젝트</span>
-              <select name="projectSlug" defaultValue="vintagechord-post-production" required>
-                {PROJECTS.map((project) => (
-                  <option value={project.slug} key={project.slug}>{project.label}</option>
-                ))}
-              </select>
-            </label>
-            <label className="admin-form-field">
-              <span>번호</span>
-              <input name="releaseNumber" type="number" min="1" max="999" required />
-            </label>
-            <label className="admin-form-field">
-              <span>상태</span>
-              <select name="state" defaultValue="upcoming" required>
-                <option value="upcoming">공개 예정</option>
-                <option value="released">발매됨</option>
-                <option value="draft">초안</option>
-                <option value="archived">보관됨</option>
-              </select>
-            </label>
-            <label className="admin-form-field">
-              <span>공개일</span>
-              <input name="releaseDate" type="date" />
-            </label>
-            <label className="admin-form-field is-wide">
-              <span>제목</span>
-              <input name="title" type="text" maxLength={160} required />
-            </label>
-            <label className="admin-form-field is-wide">
-              <span>아티스트</span>
-              <input name="artistName" type="text" maxLength={200} placeholder="빈티지코드 / SunizShine" required />
-            </label>
-            <label className="admin-form-field is-wide">
-              <span>YouTube 영상 ID</span>
-              <input name="youtubeVideoId" type="text" maxLength={11} placeholder="rW3Nln-nYQ8" />
-            </label>
-            <label className="admin-form-field is-wide">
-              <span>짧은 표기</span>
-              <input name="summary" type="text" maxLength={1000} placeholder="Prod. / 메모" />
-            </label>
-            <label className="admin-check-field">
-              <input name="isPublished" type="checkbox" />
-              <span>사이트에 공개</span>
-            </label>
-            <button className="admin-form-button" type="submit">항목 추가</button>
-          </form>
-        </section>
-
         <section className="admin-management-section" aria-labelledby="release-list-title">
           <div className="admin-table-heading">
             <div>
@@ -743,6 +757,75 @@ export default async function AdminReleasesPage({
             </div>
             <span>항목 {releases.length}개</span>
           </div>
+
+          <details className="admin-release-creator" id="release-creator" open={creatorHasError}>
+            <summary>
+              <span>
+                <small>NEW PPP CHANNEL</small>
+                <strong>다음 UP NEXT · {nextPppReleaseLabel}</strong>
+              </span>
+              <b aria-hidden="true">+</b>
+            </summary>
+            <div className="admin-release-creator-body">
+              <div className="admin-release-creator-intro">
+                <p id="release-creator-help">
+                  {nextPppReleaseNumber
+                    ? `PPP ${nextPppReleaseLabel}를 비공개 초안으로 만든 뒤 필요한 준비만 이어서 완료하세요.`
+                    : "PPP 번호가 모두 소진되어 새 초안을 만들 수 없습니다."}
+                </p>
+                <ol aria-label="새 PPP 공개 순서">
+                  <li><span>01</span> 기본 정보</li>
+                  <li><span>02</span> 대표 이미지</li>
+                  <li><span>03</span> 참여 파트</li>
+                  <li><span>04</span> 사이트 공개</li>
+                </ol>
+              </div>
+
+              {nextPppReleaseNumber ? (
+                <form
+                  className="admin-add-role-form admin-add-release-form"
+                  action={createNextPppRelease}
+                  aria-describedby="release-creator-help"
+                >
+                  <input type="hidden" name="creationId" value={creationId} />
+                  <input type="hidden" name="expectedReleaseNumber" value={nextPppReleaseNumber} />
+                  <label className="admin-form-field is-wide">
+                    <span>제목</span>
+                    <input name="title" type="text" maxLength={160} required />
+                  </label>
+                  <label className="admin-form-field is-wide">
+                    <span>아티스트</span>
+                    <input name="artistName" type="text" maxLength={200} defaultValue="빈티지코드" required />
+                  </label>
+                  <label className="admin-form-field">
+                    <span>공개 예정일</span>
+                    <input name="releaseDate" type="date" />
+                  </label>
+                  <label className="admin-form-field is-wide">
+                    <span>YouTube 영상 ID</span>
+                    <input
+                      name="youtubeVideoId"
+                      type="text"
+                      maxLength={11}
+                      pattern="[A-Za-z0-9_-]{11}"
+                      placeholder="11자리 영상 ID"
+                    />
+                  </label>
+                  <label className="admin-form-field is-wide">
+                    <span>짧은 표기</span>
+                    <input name="summary" type="text" maxLength={1000} placeholder="Prod. / 메모" />
+                  </label>
+                  <AdminActionButton pendingLabel={`PPP ${nextPppReleaseLabel} 만드는 중…`}>
+                    PPP {nextPppReleaseLabel} 초안 만들기
+                  </AdminActionButton>
+                </form>
+              ) : (
+                <p className="admin-release-creator-exhausted" role="status">
+                  사용할 수 있는 PPP 번호가 모두 소진되어 새 항목을 만들 수 없습니다.
+                </p>
+              )}
+            </div>
+          </details>
 
           {releases.length === 0 ? (
             <div className="admin-empty">등록된 프로젝트 항목이 없습니다.</div>
@@ -756,15 +839,32 @@ export default async function AdminReleasesPage({
                 const availableRoleTypes = roleTypes.filter(
                   (roleType) => roleType.is_active && !existingRoleCodes.has(roleType.code)
                 );
+                const publicRoles = releaseRoles.filter((role) => (
+                  role.is_public && roleTypeByCode.get(role.role_type_code)?.is_active
+                ));
+                const publicRoleCount = publicRoles.length;
+                const openPublicRoleCount = publicRoles.filter((role) => (
+                  role.state === "open" &&
+                  (!role.application_deadline || Date.parse(role.application_deadline) > nowTimestamp)
+                )).length;
+                const releaseAnchorId = `release-${release.id}`;
+                const releaseTitleId = `${releaseAnchorId}-title`;
+                const releaseLabel = `${projectLabel(release.project_slug)} ${String(release.release_number).padStart(2, "0")}`;
 
                 return (
-                  <article className="admin-release-card" key={release.id}>
+                  <article
+                    className="admin-release-card"
+                    id={releaseAnchorId}
+                    aria-labelledby={releaseTitleId}
+                    tabIndex={-1}
+                    key={release.id}
+                  >
                     <header>
                       <div className="admin-release-title">
                         <p>
                           {projectLabel(release.project_slug)} · {String(release.release_number).padStart(2, "0")} · {release.artist_name}
                         </p>
-                        <h3>{release.title}</h3>
+                        <h3 id={releaseTitleId}>{release.title}</h3>
                       </div>
                       <div className="admin-release-meta" aria-label="프로젝트 항목 상태">
                         <span
@@ -778,6 +878,21 @@ export default async function AdminReleasesPage({
                       </div>
                     </header>
 
+                    <ul className="admin-release-readiness" aria-label={`${releaseLabel} 준비 상태`}>
+                      <li data-ready={Boolean(release.cover_image_url)}>
+                        대표 이미지 <strong>{release.cover_image_url ? "완료" : "없음"}</strong>
+                      </li>
+                      <li data-ready={publicRoleCount > 0}>
+                        공개 파트 <strong>{publicRoleCount}</strong>
+                      </li>
+                      <li data-ready={openPublicRoleCount > 0}>
+                        모집 중 <strong>{openPublicRoleCount}</strong>
+                      </li>
+                      <li data-ready={release.is_published}>
+                        <strong>{release.is_published ? "사이트 공개" : "사이트 비공개"}</strong>
+                      </li>
+                    </ul>
+
                     <AdminReleaseCoverManager
                       releaseId={release.id}
                       releaseNumber={release.release_number}
@@ -790,13 +905,13 @@ export default async function AdminReleasesPage({
                     />
 
                     <details className="admin-release-edit">
-                      <summary>항목 정보 수정</summary>
+                      <summary aria-label={`${releaseLabel} 항목 정보 수정`}>항목 정보 수정</summary>
                       <form className="admin-add-role-form" action={updateMusicRelease}>
                         <input type="hidden" name="releaseId" value={release.id} />
                         <label className="admin-form-field">
                           <span>상태</span>
                           <select name="state" defaultValue={release.state} required>
-                            <option value="upcoming">공개 예정</option>
+                            <option value="upcoming">진행 중</option>
                             <option value="released">발매됨</option>
                             <option value="draft">초안</option>
                             <option value="archived">보관됨</option>
@@ -831,7 +946,10 @@ export default async function AdminReleasesPage({
                     </details>
 
                     {releaseRoles.length === 0 ? (
-                      <div className="admin-empty">아직 등록된 참여 파트가 없습니다.</div>
+                      <div className="admin-empty admin-release-empty-help">
+                        <strong>참여 파트가 없습니다.</strong>
+                        <span>아래에서 아트워크, 소개글, 뮤직비디오 등 첫 파트를 추가하세요. 공개된 ‘모집 중’ 파트만 참여 희망 버튼이 나타납니다.</span>
+                      </div>
                     ) : (
                       <div className="admin-lead-list">
                         {releaseRoles.map((role) => {
@@ -891,7 +1009,9 @@ export default async function AdminReleasesPage({
                               </div>
 
                               <details className="admin-release-edit admin-role-edit">
-                                <summary>파트 설정</summary>
+                                <summary aria-label={`${releaseLabel} ${roleType?.label_ko ?? role.role_type_code} 파트 설정`}>
+                                  파트 설정
+                                </summary>
                                 <form className="admin-add-role-form" action={updateRoleConfiguration}>
                                   <input type="hidden" name="roleId" value={role.id} />
                                   <label className="admin-form-field">

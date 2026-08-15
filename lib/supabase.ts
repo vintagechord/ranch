@@ -120,6 +120,18 @@ export type ReleaseCoverCleanupQueueInsert = {
   updated_at?: string;
 };
 
+export type AdminCreateNextPppReleaseResult = {
+  status:
+    | "created"
+    | "duplicate"
+    | "stale"
+    | "conflict"
+    | "number_exhausted"
+    | "invalid_input";
+  release_id: string | null;
+  release_number: number | null;
+};
+
 export type ReleaseRoleRow = {
   id: string;
   release_id: string;
@@ -416,6 +428,18 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      admin_create_next_ppp_release: {
+        Args: {
+          p_creation_id: string;
+          p_expected_release_number: number;
+          p_title: string;
+          p_artist_name: string;
+          p_release_date: string | null;
+          p_youtube_video_id: string | null;
+          p_summary: string | null;
+        };
+        Returns: AdminCreateNextPppReleaseResult;
+      };
       submit_project_proposal: {
         Args: {
           p_contact_name: string;
