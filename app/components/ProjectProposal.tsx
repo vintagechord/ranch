@@ -217,7 +217,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
         data-reveal-card
       >
         <div>
-          <p>PROJECT PROPOSAL / CHANNEL {channelNumber}</p>
+          <p>PROJECT PROPOSAL</p>
           <h2 id="project-proposal-title">프로젝트 제안</h2>
         </div>
         <p>What’s next?</p>
