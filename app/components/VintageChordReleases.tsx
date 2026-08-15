@@ -1,6 +1,8 @@
 "use client";
 
-import ParticipationRequest from "@/app/components/ParticipationRequest";
+import ParticipationRequest, {
+  type OpenParticipationRequest
+} from "@/app/components/ParticipationRequest";
 import { StudioSpeaker } from "@/app/components/StudioEquipment";
 import type {
   PublicMusicRelease,
@@ -30,8 +32,6 @@ const ROLE_ORDER = new Map([
   ["vocal", 70]
 ]);
 
-const RELEASE_ONE_VIDEO_ID = "rW3Nln-nYQ8";
-
 function releaseNumber(value: number) {
   return String(value).padStart(2, "0");
 }
@@ -55,11 +55,7 @@ function dateParts(value: string | null) {
 }
 
 function youtubeVideoId(release: PublicMusicRelease) {
-  if (release.youtubeVideoId) {
-    return release.youtubeVideoId;
-  }
-
-  return release.releaseNumber === 1 ? RELEASE_ONE_VIDEO_ID : null;
+  return release.youtubeVideoId;
 }
 
 function getRoleRows(release: PublicMusicRelease) {
@@ -79,12 +75,141 @@ function getRoleRows(release: PublicMusicRelease) {
     });
 }
 
+function UpcomingReleaseCard({
+  release,
+  openRequest,
+  applicationOpen
+}: {
+  release: PublicMusicRelease;
+  openRequest: OpenParticipationRequest;
+  applicationOpen: boolean;
+}) {
+  const number = releaseNumber(release.releaseNumber);
+  const date = dateParts(release.releaseDate);
+  const rows = getRoleRows(release);
+  const titleId = `vc-release-${release.id}`;
+
+  return (
+    <article
+      className={`vc-release-card${applicationOpen ? " is-application-open" : " is-application-closed"}`}
+      aria-labelledby={titleId}
+    >
+      <header>
+        <span>RELEASE {number}</span>
+        <span>{applicationOpen ? "APPLICATION OPEN" : "APPLICATION CLOSED"}</span>
+      </header>
+
+      <div className="vc-release-poster">
+        {release.coverImageUrl ? (
+          <img
+            src={release.coverImageUrl}
+            alt={`${release.title || `Release ${number}`} 아트워크`}
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <>
+            <span className="vc-release-poster-number" aria-hidden="true">{number}</span>
+            <div className="vc-release-poster-lines" aria-hidden="true">
+              {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
+            </div>
+          </>
+        )}
+        <time
+          aria-label={`공개 예정일 ${date.year ? `${date.year}.` : ""}${date.monthDay}`}
+          dateTime={date.iso ?? undefined}
+        >
+          {date.year ? <small>{date.year}</small> : null}
+          <strong>{date.monthDay}</strong>
+        </time>
+      </div>
+
+      <div className="vc-release-card-identity">
+        <h3 id={titleId}>{release.title || `Release ${number}`}</h3>
+        <span>{release.artistName}</span>
+      </div>
+
+      {rows.length > 0 ? (
+        <ul className="vc-release-roles" aria-label={`Release ${number} 참여 파트`}>
+          {rows.map((row) => (
+            <li className={row.lead.canApply ? "is-open" : "is-credited"} key={row.key}>
+              <span className="vc-release-role-label">{row.label}</span>
+              {row.credits.length > 0 ? (
+                <span className="vc-release-credit">
+                  {row.credits.map((credit) => (
+                    <span key={credit.id}>
+                      <b>{credit.displayName}</b>
+                    </span>
+                  ))}
+                </span>
+              ) : null}
+              {row.lead.canApply ? (
+                <button
+                  type="button"
+                  aria-haspopup="dialog"
+                  aria-label={`Release ${number} ${row.label} 참여 희망`}
+                  onClick={(event) => openRequest(event, {
+                    leadId: row.lead.leadId,
+                    contextLabel: `RELEASE ${number}`,
+                    roleLabel: row.label
+                  })}
+                >
+                  참여 희망 <span aria-hidden="true">↗</span>
+                </button>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {!applicationOpen ? (
+        <div className="vc-release-closed-note">
+          <strong>APPLICATION CLOSED</strong>
+          <span>참여 모집이 종료된 프로젝트입니다.</span>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function ReleaseSectionHeading({
+  number,
+  title,
+  description,
+  titleId
+}: {
+  number: string;
+  title: string;
+  description: string;
+  titleId: string;
+}) {
+  return (
+    <div className="vc-release-section-heading">
+      <span>{number}</span>
+      <div className="vc-release-section-heading-copy">
+        <h2 id={titleId}>{title}</h2>
+        <p>{description}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function VintageChordReleases({ releases, subcopy }: VintageChordReleasesProps) {
   const orderedReleases = [...releases].sort((a, b) => a.releaseNumber - b.releaseNumber);
   const upcomingReleases = orderedReleases.filter((release) => release.state === "upcoming");
+  const openReleases = upcomingReleases.filter((release) => (
+    release.leads.some((lead) => lead.canApply)
+  ));
+  const closedReleases = upcomingReleases.filter((release) => (
+    !release.leads.some((lead) => lead.canApply)
+  ));
   const releasedReleases = orderedReleases
     .filter((release) => release.state === "released")
     .sort((a, b) => b.releaseNumber - a.releaseNumber);
+  const closedSectionNumber = String(openReleases.length > 0 ? 2 : 1).padStart(2, "0");
+  const releasedSectionNumber = String(
+    (openReleases.length > 0 ? 1 : 0) + (closedReleases.length > 0 ? 1 : 0) + 1
+  ).padStart(2, "0");
 
   return (
     <ParticipationRequest>
@@ -103,99 +228,58 @@ export default function VintageChordReleases({ releases, subcopy }: VintageChord
             </div>
           </header>
 
-          {upcomingReleases.length > 0 ? (
-            <section className="vc-release-section vc-release-upcoming" aria-labelledby="upcoming-releases-title">
-              <div className="vc-release-section-heading">
-                <span>01</span>
-                <h2 id="upcoming-releases-title">UP NEXT</h2>
-              </div>
+          {openReleases.length > 0 ? (
+            <section className="vc-release-section vc-release-state-section vc-release-open" aria-labelledby="open-releases-title">
+              <ReleaseSectionHeading
+                number="01"
+                title="OPEN PROJECTS"
+                description="참여 신청 가능"
+                titleId="open-releases-title"
+              />
 
               <div className="vc-release-grid">
-                {upcomingReleases.map((release) => {
-                  const number = releaseNumber(release.releaseNumber);
-                  const date = dateParts(release.releaseDate);
-                  const rows = getRoleRows(release);
-                  const titleId = `vc-release-${release.id}`;
+                {openReleases.map((release) => (
+                  <UpcomingReleaseCard
+                    applicationOpen
+                    key={release.id}
+                    openRequest={openRequest}
+                    release={release}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
 
-                  return (
-                    <article className="vc-release-card" aria-labelledby={titleId} key={release.id}>
-                      <header>
-                        <span>RELEASE {number}</span>
-                        <span>SCHEDULED</span>
-                      </header>
+          {closedReleases.length > 0 ? (
+            <section className="vc-release-section vc-release-state-section vc-release-closed" aria-labelledby="closed-releases-title">
+              <ReleaseSectionHeading
+                number={closedSectionNumber}
+                title="CLOSED PROJECTS"
+                description="참여 모집 마감"
+                titleId="closed-releases-title"
+              />
 
-                      <div className="vc-release-poster">
-                        {release.coverImageUrl ? (
-                          <img
-                            src={release.coverImageUrl}
-                            alt={`${release.title || `Release ${number}`} 아트워크`}
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <>
-                            <span className="vc-release-poster-number" aria-hidden="true">{number}</span>
-                            <div className="vc-release-poster-lines" aria-hidden="true">
-                              {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
-                            </div>
-                          </>
-                        )}
-                        <h3 id={titleId}>
-                          <span className="studio-visually-hidden">
-                            {release.title || `Release ${number}`}. 공개 예정일
-                          </span>
-                          <time dateTime={date.iso ?? undefined}>
-                            {date.year ? <small>{date.year}</small> : null}
-                            <strong>{date.monthDay}</strong>
-                          </time>
-                        </h3>
-                      </div>
-
-                      {rows.length > 0 ? (
-                        <ul className="vc-release-roles" aria-label={`Release ${number} 참여 파트`}>
-                          {rows.map((row) => (
-                            <li className={row.lead.canApply ? "is-open" : "is-credited"} key={row.key}>
-                              <span className="vc-release-role-label">{row.label}</span>
-                              {row.credits.length > 0 ? (
-                                <span className="vc-release-credit">
-                                  {row.credits.map((credit) => (
-                                    <span key={credit.id}>
-                                      <b>{credit.displayName}</b>
-                                    </span>
-                                  ))}
-                                </span>
-                              ) : null}
-                              {row.lead.canApply ? (
-                                <button
-                                  type="button"
-                                  aria-haspopup="dialog"
-                                  aria-label={`Release ${number} ${row.label} 참여 희망`}
-                                  onClick={(event) => openRequest(event, {
-                                    leadId: row.lead.leadId,
-                                    contextLabel: `RELEASE ${number}`,
-                                    roleLabel: row.label
-                                  })}
-                                >
-                                  참여 희망 <span aria-hidden="true">↗</span>
-                                </button>
-                              ) : null}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </article>
-                  );
-                })}
+              <div className="vc-release-grid">
+                {closedReleases.map((release) => (
+                  <UpcomingReleaseCard
+                    applicationOpen={false}
+                    key={release.id}
+                    openRequest={openRequest}
+                    release={release}
+                  />
+                ))}
               </div>
             </section>
           ) : null}
 
           {releasedReleases.length > 0 ? (
-            <section className="vc-release-section vc-release-released" aria-labelledby="released-tracks-title">
-              <div className="vc-release-section-heading">
-                <span>02</span>
-                <h2 id="released-tracks-title">RELEASED</h2>
-              </div>
+            <section className="vc-release-section vc-release-state-section vc-release-released" aria-labelledby="released-tracks-title">
+              <ReleaseSectionHeading
+                number={releasedSectionNumber}
+                title="RELEASED"
+                description="YouTube · 발매 완료"
+                titleId="released-tracks-title"
+              />
 
               <div
                 className="vc-released-rail"

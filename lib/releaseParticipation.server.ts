@@ -208,6 +208,7 @@ export async function getPublicMusicReleases(
 
     const deadlineIsOpen =
       !role.application_deadline || Date.parse(role.application_deadline) > now;
+    const roleCredits = creditsByRoleId.get(role.id) ?? [];
     const releaseLeads = leadsByReleaseId.get(role.release_id) ?? [];
 
     releaseLeads.push({
@@ -221,8 +222,11 @@ export async function getPublicMusicReleases(
       capacity: role.capacity,
       applicationDeadline: role.application_deadline,
       sortOrder: role.sort_order,
-      credits: creditsByRoleId.get(role.id) ?? [],
-      canApply: role.state === "open" && deadlineIsOpen
+      credits: roleCredits,
+      canApply:
+        role.state === "open" &&
+        deadlineIsOpen &&
+        roleCredits.length < role.capacity
     });
     leadsByReleaseId.set(role.release_id, releaseLeads);
   }

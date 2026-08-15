@@ -2534,7 +2534,7 @@
 .vc-release-poster-lines i:nth-child(3n) { height: 48%; animation-delay: -630ms; }
 .vc-release-poster-lines i:nth-child(5n) { height: 92%; animation-delay: -940ms; }
 
-.vc-release-poster h3 {
+.vc-release-poster > time {
   position: absolute;
   bottom: clamp(20px, 4vw, 38px);
   left: clamp(20px, 4vw, 38px);
@@ -3256,7 +3256,7 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
   height: 30%;
 }
 
-.project-page-releases.project-page-compact .vc-release-poster h3 {
+.project-page-releases.project-page-compact .vc-release-poster > time {
   bottom: 11px;
   left: 12px;
 }
@@ -7570,5 +7570,301 @@ html.site-motion-paused .studio-project-object.is-mixer:focus-visible .studio-kn
   .studio-project-object.is-mixer:focus-visible .studio-knob {
     transform: rotate(var(--mixer-knob-rest));
     transition: none;
+  }
+}
+
+/* PPP project-state hierarchy */
+.project-page-releases.project-page-compact .vc-release-state-section {
+  position: relative;
+  margin-top: clamp(20px, 2.8vw, 34px);
+  padding-top: clamp(16px, 2vw, 24px);
+  border-top: 1px solid rgba(235, 232, 223, 0.16);
+}
+
+.project-page-releases.project-page-compact .vc-release-state-section + .vc-release-state-section {
+  margin-top: clamp(24px, 2.6vw, 36px);
+  padding-top: clamp(18px, 2vw, 26px);
+  border-top-color: rgba(235, 232, 223, 0.28);
+}
+
+.project-page-releases.project-page-compact .vc-release-state-section .vc-release-section-heading {
+  grid-template-columns: 44px minmax(0, 1fr);
+  min-height: 46px;
+  margin-bottom: 12px;
+  border: 1px solid var(--vc-line-strong);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--project-accent) 9%, transparent), transparent 44%),
+    rgba(255, 255, 255, 0.018);
+}
+
+.vc-release-section-heading-copy {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 7px 12px 7px 14px;
+}
+
+.vc-release-section-heading-copy h2,
+.vc-release-section-heading-copy p {
+  margin: 0;
+  font: inherit;
+}
+
+.vc-release-section-heading-copy h2 {
+  color: #ece9e1;
+  letter-spacing: 0.14em;
+}
+
+.vc-release-section-heading-copy p {
+  color: #92938c;
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.vc-release-open .vc-release-section-heading > span {
+  color: var(--project-accent-alt);
+}
+
+.vc-release-closed .vc-release-section-heading {
+  background:
+    linear-gradient(90deg, rgba(185, 133, 91, 0.09), transparent 44%),
+    rgba(255, 255, 255, 0.012);
+}
+
+.vc-release-closed .vc-release-section-heading > span,
+.vc-release-closed .vc-release-card > header span:last-child {
+  color: #c69a76;
+}
+
+.vc-release-released .vc-release-section-heading {
+  background:
+    linear-gradient(90deg, rgba(121, 166, 185, 0.09), transparent 44%),
+    rgba(255, 255, 255, 0.012);
+}
+
+.vc-release-released .vc-release-section-heading > span {
+  color: #9fc9d8;
+}
+
+.vc-release-card.is-application-open {
+  border-color: color-mix(in srgb, var(--project-accent-alt) 42%, var(--vc-line-strong));
+  box-shadow: inset 0 1px color-mix(in srgb, var(--project-accent-alt) 16%, transparent);
+}
+
+.vc-release-card.is-application-open > header span:last-child {
+  color: var(--project-accent-alt);
+}
+
+.vc-release-open .vc-release-card:only-child {
+  grid-column: 1 / -1;
+}
+
+.vc-release-card.is-application-closed {
+  border-color: rgba(235, 232, 223, 0.2);
+  background: #0a0b0a;
+}
+
+.vc-release-card.is-application-closed:hover,
+.vc-release-card.is-application-closed:focus-within {
+  box-shadow: none;
+  transform: none;
+}
+
+.vc-release-card.is-application-closed .vc-release-poster > img {
+  filter: saturate(0.55) brightness(0.78);
+}
+
+.vc-release-card.is-application-closed .vc-release-poster-lines i {
+  animation: none;
+  opacity: 0.42;
+}
+
+.vc-release-card-identity {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--vc-line);
+}
+
+.vc-release-card-identity h3 {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  color: #ece9e1;
+  font-size: 0.84rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vc-release-card-identity > span {
+  flex: 0 0 auto;
+  max-width: 100%;
+  color: #8f9089;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vc-release-closed-note {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+  padding: 9px 12px;
+  border-top: 1px solid var(--vc-line);
+  color: #85867f;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.56rem;
+}
+
+.vc-release-closed-note strong {
+  color: #c69a76;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+}
+
+/* A softer console-style participation control shared across project rooms. */
+.project-page-releases.project-page-compact .vc-release-roles button,
+.project-participation-grid button {
+  gap: 8px;
+  border: 1px solid color-mix(in srgb, var(--project-accent-alt) 72%, #e8e5dd 28%);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent),
+    color-mix(in srgb, var(--project-accent-alt) 10%, #111210 90%);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+  color: #f2efe7;
+  padding: 4px 5px 4px 13px;
+  letter-spacing: -0.01em;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.project-page-releases.project-page-compact .vc-release-roles button > span,
+.project-participation-grid button > span {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--project-accent-alt);
+  color: #090a09;
+  font-size: 0.7rem;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.project-page-releases.project-page-compact .vc-release-roles button:hover,
+.project-participation-grid button:hover {
+  border-color: var(--project-accent-alt);
+  background: var(--project-accent-alt);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.22),
+    0 3px 10px color-mix(in srgb, var(--project-accent-alt) 18%, transparent);
+  color: #090a09;
+  transform: translateY(-1px);
+}
+
+.project-page-releases.project-page-compact .vc-release-roles button:focus-visible,
+.project-participation-grid button:focus-visible {
+  border-color: var(--project-accent-alt);
+  background: var(--project-accent-alt);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.22),
+    0 3px 10px color-mix(in srgb, var(--project-accent-alt) 18%, transparent);
+  color: #090a09;
+  outline: 2px solid #f1eee6;
+  outline-offset: 2px;
+  transform: translateY(-1px);
+}
+
+.project-page-releases.project-page-compact .vc-release-roles button:hover > span,
+.project-page-releases.project-page-compact .vc-release-roles button:focus-visible > span,
+.project-participation-grid button:hover > span,
+.project-participation-grid button:focus-visible > span {
+  background: #090a09;
+  color: var(--project-accent-alt);
+  transform: translate(1px, -1px);
+}
+
+html.site-motion-paused .project-page-releases.project-page-compact .vc-release-roles button,
+html.site-motion-paused .project-page-releases.project-page-compact .vc-release-roles button > span,
+html.site-motion-paused .project-participation-grid button,
+html.site-motion-paused .project-participation-grid button > span {
+  transition: none;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .project-page-releases.project-page-compact .vc-release-state-section {
+    margin-top: 24px;
+    padding-top: 18px;
+  }
+
+  .project-page-releases.project-page-compact .vc-release-state-section + .vc-release-state-section {
+    margin-top: 24px;
+    padding-top: 18px;
+  }
+
+  .vc-release-section-heading-copy {
+    display: grid;
+    gap: 3px;
+    padding-block: 6px;
+  }
+
+  .vc-release-section-heading-copy p {
+    font-size: 0.5rem;
+    white-space: normal;
+  }
+
+  .vc-release-closed-note {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .vc-release-card-identity {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-page-releases.project-page-compact .vc-release-roles button,
+  .project-page-releases.project-page-compact .vc-release-roles button > span,
+  .project-participation-grid button,
+  .project-participation-grid button > span {
+    transition: none;
+  }
+
+  .project-page-releases.project-page-compact .vc-release-roles button:hover,
+  .project-page-releases.project-page-compact .vc-release-roles button:focus-visible,
+  .project-page-releases.project-page-compact .vc-release-roles button:hover > span,
+  .project-page-releases.project-page-compact .vc-release-roles button:focus-visible > span,
+  .project-participation-grid button:hover,
+  .project-participation-grid button:focus-visible,
+  .project-participation-grid button:hover > span,
+  .project-participation-grid button:focus-visible > span {
+    transform: none;
   }
 }
