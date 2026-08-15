@@ -280,64 +280,6 @@
   color: #eeebe3;
 }
 
-.studio-next-session {
-  display: inline-flex;
-  min-width: 0;
-  margin-left: auto;
-  gap: 9px;
-  align-items: center;
-  justify-content: flex-end;
-  color: #d5d2c9;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.studio-next-session-label {
-  display: inline-flex;
-  gap: 7px;
-  align-items: center;
-  color: #8e8f88;
-  font-size: 0.52rem;
-  letter-spacing: 0.14em;
-}
-
-.studio-next-session-label::before {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ee3c23;
-  box-shadow: 0 0 9px rgba(238, 60, 35, 0.72);
-  content: "";
-}
-
-.studio-next-session time {
-  display: inline-flex;
-  gap: 6px;
-  align-items: baseline;
-  color: #f4f0e7;
-  font-size: 0.66rem;
-  letter-spacing: 0.08em;
-}
-
-.studio-next-session time b {
-  color: var(--studio-orange);
-  font-weight: 900;
-}
-
-.studio-next-session time strong {
-  color: #f4f0e7;
-  font-size: 0.72rem;
-  font-weight: 900;
-}
-
-.studio-next-session-location {
-  padding-left: 10px;
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
-  color: #c2c0b9;
-  font-size: 0.62rem;
-  letter-spacing: 0.05em;
-}
-
 .studio-monitor {
   position: absolute;
   top: 10.5%;
@@ -3438,28 +3380,6 @@ html.site-motion-paused .studio-object-label {
     display: none;
   }
 
-  .studio-next-session {
-    gap: 7px;
-  }
-
-  .studio-next-session-label {
-    display: none;
-  }
-
-  .studio-next-session time {
-    gap: 4px;
-    font-size: 0.59rem;
-  }
-
-  .studio-next-session time strong {
-    font-size: 0.66rem;
-  }
-
-  .studio-next-session-location {
-    padding-left: 7px;
-    font-size: 0.58rem;
-  }
-
   .studio-monitor {
     position: relative;
     top: auto;
@@ -3680,18 +3600,6 @@ html.site-motion-paused .studio-object-label {
   }
 }
 
-@media (max-width: 430px) {
-  .studio-stage-toolbar > .studio-live-pill {
-    display: none;
-  }
-
-  .studio-next-session {
-    width: 100%;
-    margin-left: 0;
-    justify-content: center;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .studio-project-object::after,
   .studio-object-label {
@@ -3726,11 +3634,11 @@ html.site-motion-paused .studio-object-label {
 }
 
 .studio-monitor {
-  top: 8.6%;
-  width: min(62%, 760px);
+  top: 9.2%;
+  width: min(50%, 620px);
   min-height: 0;
-  aspect-ratio: 2.55;
-  padding: 11px;
+  aspect-ratio: 2.65;
+  padding: 10px;
   border: 1px solid #454846;
   border-radius: 14px;
   background:
@@ -3748,7 +3656,7 @@ html.site-motion-paused .studio-object-label {
 
 .studio-monitor::before {
   position: absolute;
-  inset: 11px;
+  inset: 10px;
   z-index: 2;
   border: 1px solid rgba(181, 238, 255, 0.14);
   border-radius: 7px;
@@ -3762,9 +3670,9 @@ html.site-motion-paused .studio-object-label {
 
 .studio-monitor::after {
   right: 50%;
-  bottom: -39px;
-  width: 104px;
-  height: 31px;
+  bottom: -35px;
+  width: 92px;
+  height: 27px;
   border-radius: 0 0 5px 5px;
   background:
     linear-gradient(90deg, #090a09, #363936 20%, #171918 52%, #3b3e3b 82%, #090a09);
@@ -3785,6 +3693,90 @@ html.site-motion-paused .studio-object-label {
   box-shadow:
     inset 0 0 26px rgba(0, 0, 0, 0.95),
     0 0 16px rgba(80, 209, 255, 0.07);
+}
+
+.studio-monitor-session {
+  position: absolute;
+  right: 24px;
+  bottom: 21px;
+  z-index: 4;
+  display: inline-flex;
+  min-height: 38px;
+  padding: 6px 11px 6px 27px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid rgba(255, 91, 50, 0.4);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(28, 9, 5, 0.88), rgba(5, 4, 3, 0.94)),
+    repeating-linear-gradient(90deg, transparent 0 4px, rgba(255, 255, 255, 0.018) 4px 5px);
+  box-shadow:
+    0 0 20px rgba(255, 72, 32, 0.13),
+    inset 0 0 18px rgba(255, 77, 35, 0.08),
+    inset 0 1px rgba(255, 224, 205, 0.12);
+  color: #ffd0b8;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.studio-monitor-session::before {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff3b22;
+  box-shadow:
+    0 0 0 3px rgba(255, 59, 34, 0.12),
+    0 0 12px rgba(255, 59, 34, 0.94);
+  content: "";
+  transform: translateY(-50%);
+  animation: studio-monitor-rec-light 1.65s ease-in-out infinite alternate;
+}
+
+.studio-monitor-session time {
+  display: inline-flex;
+  gap: 9px;
+  align-items: baseline;
+  color: #ff9a66;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 9px rgba(255, 92, 48, 0.78);
+}
+
+.studio-monitor-session time strong {
+  color: #ffd6bf;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.studio-monitor-session time b {
+  color: rgba(255, 164, 118, 0.56);
+  font-weight: 500;
+}
+
+.studio-monitor-session-location {
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 149, 103, 0.28);
+  color: #f0e5dc;
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px rgba(255, 160, 116, 0.34);
+}
+
+@keyframes studio-monitor-rec-light {
+  from {
+    opacity: 0.58;
+    filter: brightness(0.8);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1.22);
+  }
 }
 
 .studio-stage.has-many-projects .studio-equipment-row {
@@ -4579,7 +4571,7 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
 
 @media (max-width: 1100px) {
   .studio-monitor {
-    width: min(68%, 720px);
+    width: min(68%, 620px);
   }
 
   .studio-mixer {
@@ -4600,9 +4592,10 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
     position: relative;
     top: auto;
     left: auto;
-    width: 100%;
+    width: min(82%, 560px);
     min-height: 0;
-    aspect-ratio: 2.35;
+    aspect-ratio: 2.5;
+    align-self: center;
     margin-top: 16px;
     transform: none;
   }
@@ -4626,7 +4619,8 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
 
 @media (max-width: 720px) {
   .studio-monitor {
-    aspect-ratio: 2.02;
+    width: min(94%, 480px);
+    aspect-ratio: 2.15;
     min-height: 0;
     padding: 8px;
     border-radius: 10px;
@@ -4634,6 +4628,34 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
 
   .studio-monitor::before {
     inset: 8px;
+  }
+
+  .studio-monitor-session {
+    right: 15px;
+    bottom: 14px;
+    min-height: 32px;
+    padding: 5px 8px 5px 23px;
+    gap: 7px;
+  }
+
+  .studio-monitor-session::before {
+    left: 9px;
+    width: 6px;
+    height: 6px;
+  }
+
+  .studio-monitor-session time {
+    gap: 6px;
+    font-size: 0.61rem;
+  }
+
+  .studio-monitor-session time strong {
+    font-size: 0.69rem;
+  }
+
+  .studio-monitor-session-location {
+    padding-left: 7px;
+    font-size: 0.54rem;
   }
 
   .studio-equipment-row {
@@ -4698,6 +4720,12 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .studio-monitor-session::before {
+    animation: none;
+    filter: none;
+    opacity: 1;
+  }
+
   .studio-mm45-woofer > span,
   .studio-project-object:hover .studio-mm45-woofer > span,
   .studio-project-object:focus-visible .studio-mm45-woofer > span {

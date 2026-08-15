@@ -10,7 +10,7 @@ export default function Home() {
   const nextMeeting = {
     accessibleDateTime: "2026년 9월 12일 오후 5시",
     dateTime: "2026-09-12T17:00:00+09:00",
-    dateLabel: "2026.09.12",
+    dateLabel: "09.12",
     timeLabel: "17:00",
     venue: "시그마프라자"
   };

@@ -276,7 +276,7 @@ function AcousticDisplay() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="studio-acoustic-canvas" />;
+  return <canvas ref={canvasRef} className="studio-acoustic-canvas" aria-hidden="true" />;
 }
 
 function MixingDesk() {
@@ -376,26 +376,25 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
         <div className="studio-stage-toolbar">
           <span className="studio-live-pill"><i /> LIVE INPUT</span>
           <span>{projectCount} PROJECT CHANNELS</span>
-          <span className="studio-next-session">
+        </div>
+
+        <div className="studio-monitor">
+          <AcousticDisplay />
+          <div className="studio-monitor-session">
             <span className="studio-visually-hidden">다음 모임: </span>
-            <span className="studio-next-session-label" aria-hidden="true">NEXT MEETING</span>
             <time
               aria-label={nextMeeting.accessibleDateTime}
               dateTime={nextMeeting.dateTime}
             >
               <span>{nextMeeting.dateLabel}</span>
-              <b aria-hidden="true">·</b>
+              <b aria-hidden="true">/</b>
               <strong>{nextMeeting.timeLabel}</strong>
             </time>
-            <span className="studio-next-session-location">
+            <span className="studio-monitor-session-location">
               <span className="studio-visually-hidden">장소: </span>
               {nextMeeting.venue}
             </span>
-          </span>
-        </div>
-
-        <div className="studio-monitor" aria-hidden="true">
-          <AcousticDisplay />
+          </div>
         </div>
 
         <div className="studio-equipment-row">
