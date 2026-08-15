@@ -157,7 +157,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <section className="project-hero" aria-labelledby="project-title">
                 <div className="project-hero-copy">
                   <div className="project-meta-row">
-                    <span className="project-label">{project.label}</span>
                     <span className="project-status">
                       <span className="project-status-dot" aria-hidden="true" />
                       {getProjectStatusLabel(project.state)}
