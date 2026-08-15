@@ -9,18 +9,6 @@ import {
   type OpenChatSettings
 } from "@/lib/openChat";
 import {
-  getParticipantFallbackImageUrl,
-  getParticipantImageSettings,
-  normalizeParticipantDisplayName,
-  normalizeParticipantImageUrl,
-  parseParticipantSlot,
-  saveParticipantDisplayName,
-  saveParticipantImageUrl,
-  uploadParticipantImage,
-  validateParticipantImageFile,
-  type ParticipantImageSetting
-} from "@/lib/participantImages";
-import {
   addPiggyBankAmount,
   getPiggyBankBalance,
   type PiggyBankBalance
@@ -34,22 +22,10 @@ type AdminSearchParams = Promise<{
   error?: string;
   piggy?: string;
   chat?: string;
-  participant?: string;
   proposalPage?: string;
 }>;
 
 const PROJECT_PROPOSALS_PER_PAGE = 24;
-
-type PartyApplication = {
-  id: string;
-  created_at: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-  instagram: string | null;
-  attendees: number | null;
-  message: string | null;
-};
 
 type ProjectProposalSummary = Pick<
   ProjectProposalRow,
@@ -93,10 +69,6 @@ function formatCurrency(value: number) {
     currency: "KRW",
     maximumFractionDigits: 0
   }).format(value);
-}
-
-function formatNullable(value: string | null) {
-  return value?.trim() ? value : "-";
 }
 
 function getErrorMessage(error?: string) {
@@ -171,44 +143,6 @@ function getOpenChatMessage(status?: string) {
   return "";
 }
 
-function getParticipantMessage(status?: string) {
-  if (status === "name-saved") {
-    return "참가자 표시 이름을 저장했습니다.";
-  }
-
-  if (status === "url-saved") {
-    return "참가자 이미지 주소를 저장했습니다.";
-  }
-
-  if (status === "file-saved") {
-    return "참가자 이미지 파일을 업로드했습니다.";
-  }
-
-  if (status === "invalid") {
-    return "참가자 번호, 이름, 이미지 정보를 확인해 주세요.";
-  }
-
-  if (status === "auth") {
-    return "관리자 확인이 필요합니다. 다시 로그인해 주세요.";
-  }
-
-  if (status === "error") {
-    return "참가자 설정을 저장하지 못했습니다.";
-  }
-
-  return "";
-}
-
-function getDefaultParticipantImageSettings(): ParticipantImageSetting[] {
-  return Array.from({ length: 16 }, (_, index) => ({
-    slotNumber: index + 1,
-    displayName: null,
-    imageUrl: null,
-    imagePath: null,
-    updatedAt: null
-  }));
-}
-
 function parsePositiveAmount(value: FormDataEntryValue | null) {
   if (typeof value !== "string") {
     return 0;
@@ -221,22 +155,6 @@ function parsePositiveAmount(value: FormDataEntryValue | null) {
   }
 
   return amount;
-}
-
-async function getApplications() {
-  const supabase = getSupabaseAdmin();
-  const { data, error, count } = await supabase
-    .from("ranch_applications")
-    .select("id, created_at, name, phone, email, instagram, attendees, message", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .limit(200);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const items = (data ?? []) as PartyApplication[];
-  return { items, total: count ?? items.length };
 }
 
 async function getProjectProposals(page: number) {
@@ -396,111 +314,6 @@ async function saveOpenChatUrl(formData: FormData) {
   redirect("/admin?chat=saved");
 }
 
-async function saveParticipantImageUrlAction(formData: FormData) {
-  "use server";
-
-  const authenticated = await isAdminAuthenticated();
-
-  if (!authenticated) {
-    redirect("/admin?participant=auth");
-  }
-
-  const parsed = (() => {
-    try {
-      return {
-        slotNumber: parseParticipantSlot(formData.get("slotNumber")),
-        imageUrl: normalizeParticipantImageUrl(formData.get("imageUrl"))
-      };
-    } catch {
-      redirect("/admin?participant=invalid");
-    }
-  })();
-
-  try {
-    await saveParticipantImageUrl(parsed.slotNumber, parsed.imageUrl);
-  } catch (error) {
-    console.error(
-      "Participant image URL update failed:",
-      error instanceof Error ? error.message : error
-    );
-    redirect("/admin?participant=error");
-  }
-
-  revalidatePath("/admin");
-  revalidatePath("/participants");
-  redirect("/admin?participant=url-saved");
-}
-
-async function saveParticipantDisplayNameAction(formData: FormData) {
-  "use server";
-
-  const authenticated = await isAdminAuthenticated();
-
-  if (!authenticated) {
-    redirect("/admin?participant=auth");
-  }
-
-  const parsed = (() => {
-    try {
-      return {
-        slotNumber: parseParticipantSlot(formData.get("slotNumber")),
-        displayName: normalizeParticipantDisplayName(formData.get("displayName"))
-      };
-    } catch {
-      redirect("/admin?participant=invalid");
-    }
-  })();
-
-  try {
-    await saveParticipantDisplayName(parsed.slotNumber, parsed.displayName);
-  } catch (error) {
-    console.error(
-      "Participant display name update failed:",
-      error instanceof Error ? error.message : error
-    );
-    redirect("/admin?participant=error");
-  }
-
-  revalidatePath("/admin");
-  revalidatePath("/participants");
-  redirect("/admin?participant=name-saved");
-}
-
-async function uploadParticipantImageAction(formData: FormData) {
-  "use server";
-
-  const authenticated = await isAdminAuthenticated();
-
-  if (!authenticated) {
-    redirect("/admin?participant=auth");
-  }
-
-  const parsed = (() => {
-    try {
-      return {
-        slotNumber: parseParticipantSlot(formData.get("slotNumber")),
-        file: validateParticipantImageFile(formData.get("imageFile"))
-      };
-    } catch {
-      redirect("/admin?participant=invalid");
-    }
-  })();
-
-  try {
-    await uploadParticipantImage(parsed.slotNumber, parsed.file);
-  } catch (error) {
-    console.error(
-      "Participant image upload failed:",
-      error instanceof Error ? error.message : error
-    );
-    redirect("/admin?participant=error");
-  }
-
-  revalidatePath("/admin");
-  revalidatePath("/participants");
-  redirect("/admin?participant=file-saved");
-}
-
 function AdminLogin({ error }: { error?: string }) {
   const message = getErrorMessage(error);
 
@@ -543,15 +356,13 @@ export default async function AdminPage({
 }: {
   searchParams: AdminSearchParams;
 }) {
-  const { error, piggy, chat, participant, proposalPage: proposalPageValue } = await searchParams;
+  const { error, piggy, chat, proposalPage: proposalPageValue } = await searchParams;
   const authenticated = await isAdminAuthenticated();
 
   if (!authenticated) {
     return <AdminLogin error={error} />;
   }
 
-  let applications: PartyApplication[] = [];
-  let applicationCount = 0;
   let projectProposals: ProjectProposalSummary[] = [];
   let projectProposalCount = 0;
   let latestProjectProposalCreatedAt: string | null = null;
@@ -566,24 +377,10 @@ export default async function AdminPage({
     chatUrl: null,
     updatedAt: null
   };
-  let participantImages = getDefaultParticipantImageSettings();
-  let loadError = "";
   let proposalLoadError = "";
   let piggyLoadError = "";
   let openChatLoadError = "";
-  let participantImageLoadError = "";
   let releaseApplicationLoadError = "";
-
-  try {
-    const result = await getApplications();
-    applications = result.items;
-    applicationCount = result.total;
-  } catch (adminError) {
-    loadError =
-      adminError instanceof Error
-        ? adminError.message
-        : "신청 목록을 불러오지 못했습니다.";
-  }
 
   try {
     const result = await getProjectProposals(parsePositivePage(proposalPageValue));
@@ -617,15 +414,6 @@ export default async function AdminPage({
   }
 
   try {
-    participantImages = await getParticipantImageSettings();
-  } catch (adminError) {
-    participantImageLoadError =
-      adminError instanceof Error
-        ? adminError.message
-        : "참가자 이미지를 불러오지 못했습니다.";
-  }
-
-  try {
     const result = await getReleaseApplicationOverview();
     releaseApplicationCount = result.total;
     latestReleaseApplicationCreatedAt = result.latestCreatedAt;
@@ -652,14 +440,12 @@ export default async function AdminPage({
 
   const latestCreatedAt = [
     latestProjectProposalCreatedAt,
-    latestReleaseApplicationCreatedAt,
-    applications[0]?.created_at
+    latestReleaseApplicationCreatedAt
   ]
     .filter((value): value is string => Boolean(value))
     .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
   const piggyMessage = getPiggyMessage(piggy);
   const openChatMessage = getOpenChatMessage(chat);
-  const participantMessage = getParticipantMessage(participant);
 
   return (
     <main className="admin-shell">
@@ -703,12 +489,12 @@ export default async function AdminPage({
           <strong>{projectProposalCount}</strong>
         </article>
         <article>
-          <span>이전 신청 기록</span>
-          <strong>{applicationCount}</strong>
+          <span>음원 참여 신청</span>
+          <strong>{releaseApplicationCount}</strong>
         </article>
         <article>
           <span>전체 접수</span>
-          <strong>{projectProposalCount + applicationCount + releaseApplicationCount}</strong>
+          <strong>{projectProposalCount + releaseApplicationCount}</strong>
         </article>
         <article>
           <span>최근 신청</span>
@@ -716,7 +502,6 @@ export default async function AdminPage({
         </article>
       </section>
 
-      {loadError ? <div className="admin-alert">{loadError}</div> : null}
       {proposalLoadError ? <div className="admin-alert">{proposalLoadError}</div> : null}
 
       <section id="project-proposals" className="admin-proposal-section" aria-label="프로젝트 제안 목록">
@@ -865,156 +650,6 @@ export default async function AdminPage({
 
       {openChatMessage ? <div className="admin-alert">{openChatMessage}</div> : null}
       {openChatLoadError ? <div className="admin-alert">{openChatLoadError}</div> : null}
-
-      <section className="admin-participant-section" aria-label="참가자 이름과 캐릭터 이미지 관리">
-        <div className="admin-table-heading">
-          <div>
-            <p className="admin-eyebrow">PARTICIPANTS</p>
-            <h2>참가자 설정</h2>
-          </div>
-          <span>1번-16번</span>
-        </div>
-
-        {participantMessage ? <div className="admin-section-alert">{participantMessage}</div> : null}
-        {participantImageLoadError ? (
-          <div className="admin-section-alert">{participantImageLoadError}</div>
-        ) : null}
-
-        <div className="admin-participant-grid">
-          {participantImages.map((setting) => {
-            const fallbackImageUrl = getParticipantFallbackImageUrl(setting.slotNumber);
-            const currentImageUrl = setting.imageUrl ?? fallbackImageUrl;
-            const hasCustomImage = Boolean(setting.imageUrl);
-
-            return (
-              <article className="admin-participant-card" key={setting.slotNumber}>
-                <div className="admin-participant-preview">
-                  <img src={currentImageUrl} alt={`참가자 ${setting.slotNumber} 이미지`} />
-                </div>
-
-                <div className="admin-participant-copy">
-                  <p className="admin-eyebrow">
-                    PLAYER {String(setting.slotNumber).padStart(2, "0")}
-                  </p>
-                  <h3>참가자 {setting.slotNumber}</h3>
-                  <dl>
-                    <div>
-                      <dt>현재 이미지</dt>
-                      <dd>
-                        {hasCustomImage ? (
-                          <a href={currentImageUrl} target="_blank" rel="noreferrer">
-                            적용됨
-                          </a>
-                        ) : (
-                          "기본 이미지"
-                        )}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>표시 이름</dt>
-                      <dd>{setting.displayName ?? "자동 이니셜"}</dd>
-                    </div>
-                    <div>
-                      <dt>업데이트</dt>
-                      <dd>{formatDateOnly(setting.updatedAt)}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <form className="admin-participant-form" action={saveParticipantDisplayNameAction}>
-                  <input type="hidden" name="slotNumber" value={setting.slotNumber} />
-                  <label>
-                    <span>표시 이름</span>
-                    <input
-                      name="displayName"
-                      type="text"
-                      maxLength={24}
-                      placeholder="예: JY"
-                      defaultValue={setting.displayName ?? ""}
-                    />
-                  </label>
-                  <button type="submit">이름 저장</button>
-                </form>
-
-                <form className="admin-participant-form" action={saveParticipantImageUrlAction}>
-                  <input type="hidden" name="slotNumber" value={setting.slotNumber} />
-                  <label>
-                    <span>이미지 주소</span>
-                    <input
-                      name="imageUrl"
-                      type="url"
-                      inputMode="url"
-                      placeholder="https://..."
-                      defaultValue={setting.imageUrl ?? ""}
-                      required
-                    />
-                  </label>
-                  <button type="submit">주소 저장</button>
-                </form>
-
-                <form
-                  className="admin-participant-form"
-                  action={uploadParticipantImageAction}
-                >
-                  <input type="hidden" name="slotNumber" value={setting.slotNumber} />
-                  <label>
-                    <span>파일 업로드</span>
-                    <input
-                      name="imageFile"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      required
-                    />
-                  </label>
-                  <button type="submit">파일 업로드</button>
-                </form>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="admin-table-section" aria-label="이전 신청 기록">
-        <div className="admin-table-heading">
-          <h2>이전 신청 기록</h2>
-          <span>최신 {applications.length}건 / 전체 {applicationCount}건</span>
-        </div>
-
-        {applications.length === 0 && !loadError ? (
-          <div className="admin-empty">보관 중인 이전 신청 기록이 없습니다.</div>
-        ) : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>접수</th>
-                  <th>이름</th>
-                  <th>연락처</th>
-                  <th>이메일</th>
-                  <th>인스타그램</th>
-                  <th>인원</th>
-                  <th>메시지</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.map((item) => (
-                  <tr key={item.id}>
-                    <td>{formatDate(item.created_at)}</td>
-                    <td>
-                      <strong>{item.name}</strong>
-                    </td>
-                    <td>{formatNullable(item.phone)}</td>
-                    <td>{formatNullable(item.email)}</td>
-                    <td>{formatNullable(item.instagram)}</td>
-                    <td>{item.attendees ?? "-"}</td>
-                    <td>{formatNullable(item.message)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
     </main>
   );
 }

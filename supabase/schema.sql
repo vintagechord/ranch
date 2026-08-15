@@ -1,24 +1,6 @@
 create extension if not exists "pgcrypto";
 create extension if not exists pg_cron with schema pg_catalog;
 
-create table if not exists ranch_applications (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  phone text,
-  email text,
-  instagram text,
-  attendees integer,
-  message text,
-  created_at timestamptz default now()
-);
-
-alter table public.ranch_applications enable row level security;
-
-drop policy if exists "Allow public ranch application inserts" on public.ranch_applications;
-
-revoke all on table public.ranch_applications from public, anon, authenticated;
-grant select on table public.ranch_applications to service_role;
-
 create table if not exists party_applications (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),

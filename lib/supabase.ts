@@ -1,25 +1,3 @@
-export type RanchApplicationRow = {
-  id: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-  instagram: string | null;
-  attendees: number | null;
-  message: string | null;
-  created_at: string | null;
-};
-
-export type RanchApplicationInsert = {
-  id?: string;
-  name: string;
-  phone?: string | null;
-  email?: string | null;
-  instagram?: string | null;
-  attendees?: number | null;
-  message?: string | null;
-  created_at?: string | null;
-};
-
 export type ProjectProposalRow = {
   id: string;
   created_at: string;
@@ -303,12 +281,6 @@ type OpenChatSettingsInsert = {
 export type Database = {
   public: {
     Tables: {
-      ranch_applications: {
-        Row: RanchApplicationRow;
-        Insert: RanchApplicationInsert;
-        Update: Partial<RanchApplicationInsert>;
-        Relationships: [];
-      };
       project_proposals: {
         Row: ProjectProposalRow;
         Insert: ProjectProposalInsert;
