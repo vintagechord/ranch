@@ -159,7 +159,6 @@ export default function VintageChordReleases({ releases }: VintageChordReleasesP
                                   {row.credits.map((credit) => (
                                     <span key={credit.id}>
                                       <b>{credit.displayName}</b>
-                                      {credit.isRanchMember ? <small>RANCH MEMBER</small> : null}
                                     </span>
                                   ))}
                                 </span>

@@ -2,6 +2,11 @@
 const nextConfig = {
   devIndicators: false,
   reactStrictMode: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "4mb"
+    }
+  },
   async headers() {
     return [
       {

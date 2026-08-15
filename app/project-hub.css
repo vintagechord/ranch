@@ -2230,7 +2230,6 @@
 .vc-release-state,
 .vc-release-feature-copy > strong,
 .vc-release-role-label,
-.vc-release-member-mark,
 .vc-lead-dialog-header p,
 .vc-lead-success > p {
   font-family: "SFMono-Regular", Consolas, monospace;
@@ -2611,18 +2610,6 @@
   font-size: clamp(0.76rem, 1.15vw, 0.91rem);
   font-weight: 850;
   overflow-wrap: anywhere;
-}
-
-.vc-release-credit small {
-  border: 1px solid color-mix(in srgb, var(--project-accent-alt) 58%, transparent);
-  border-radius: 999px;
-  color: var(--project-accent-alt);
-  padding: 4px 6px;
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 0.45rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  white-space: nowrap;
 }
 
 .vc-release-roles button {
@@ -3302,11 +3289,6 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
   font-size: 0.72rem;
 }
 
-.project-page-releases.project-page-compact .vc-release-credit small {
-  padding: 2px 5px;
-  font-size: 0.52rem;
-}
-
 .project-page-releases.project-page-compact .vc-release-roles button {
   min-width: 102px;
   min-height: 44px;
@@ -3571,6 +3553,8 @@ a.vc-released-card-media:focus-visible {
 
 .project-participation-credit {
   display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
   min-width: 0;
 }
 
@@ -3586,18 +3570,6 @@ a.vc-released-card-media:focus-visible {
   color: #d1cec6;
   font-size: 0.68rem;
   overflow-wrap: anywhere;
-}
-
-.project-participation-credit small {
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  color: #979891;
-  padding: 2px 5px;
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 0.5rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
 }
 
 .project-participation-grid button,

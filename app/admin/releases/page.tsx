@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import AdminReleaseCoverManager from "@/app/components/AdminReleaseCoverManager";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import {
+  enqueueReleaseCoverCleanup,
+  MAX_RELEASE_COVER_FILE_BYTES,
+  normalizeReleaseCover,
+  processReleaseCoverCleanupQueue,
+  ReleaseCoverValidationError,
+  removeReleaseCoverObject,
+  uploadReleaseCoverObject
+} from "@/lib/releaseCoverStorage.server";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +31,7 @@ type ReleaseRow = {
   state: string;
   youtube_video_id: string | null;
   cover_image_url: string | null;
+  cover_image_path: string | null;
   summary: string | null;
   is_published: boolean;
 };
@@ -127,6 +138,8 @@ function noticeMessage(notice?: string, error?: string) {
   if (notice === "role-added") return "새 참여 파트를 추가했습니다.";
   if (notice === "release-added") return "새 프로젝트 항목을 추가했습니다.";
   if (notice === "release-saved") return "프로젝트 항목을 저장했습니다.";
+  if (notice === "cover-saved") return "대표 이미지를 적용했습니다.";
+  if (notice === "cover-removed") return "대표 이미지를 제거했습니다.";
   if (error === "auth") return "관리자 확인이 필요합니다. 다시 로그인해 주세요.";
   if (error === "invalid") return "입력한 참여 파트 정보를 확인해 주세요.";
   if (error === "duplicate") return "이미 이 항목에 등록된 참여 파트입니다.";
@@ -135,6 +148,11 @@ function noticeMessage(notice?: string, error?: string) {
   if (error === "release") return "사이트에 공개된 UP NEXT 항목에서만 모집을 열 수 있습니다.";
   if (error === "deadline") return "모집을 열려면 마감 시각을 비우거나 미래로 설정해 주세요.";
   if (error === "not-found") return "대상을 찾을 수 없습니다.";
+  if (error === "cover-empty") return "업로드할 이미지를 선택해 주세요.";
+  if (error === "cover-size") return "이미지는 3MB 이하만 업로드할 수 있습니다.";
+  if (error === "cover-format") return "JPG, PNG, WebP, AVIF 이미지만 업로드할 수 있습니다.";
+  if (error === "cover-image") return "올바른 이미지 파일인지 확인해 주세요.";
+  if (error === "cover-conflict") return "다른 변경이 먼저 저장되었습니다. 새로고침 후 다시 시도해 주세요.";
   if (error === "save") return "변경사항을 저장하지 못했습니다.";
   return "";
 }
@@ -168,7 +186,7 @@ async function loadReleaseManagementData() {
       supabase
         .from("music_releases")
         .select(
-          "id, project_slug, release_number, title, artist_name, release_date, state, youtube_video_id, cover_image_url, summary, is_published"
+          "id, project_slug, release_number, title, artist_name, release_date, state, youtube_video_id, cover_image_url, cover_image_path, summary, is_published"
         )
         .order("project_slug", { ascending: true })
         .order("release_number", { ascending: true }),
@@ -282,7 +300,7 @@ async function updateMusicRelease(formData: FormData) {
 
   if (!(await isAdminAuthenticated())) redirect("/admin/releases?error=auth");
 
-  const releaseId = stringValue(formData.get("releaseId"));
+  const releaseId = stringValue(formData.get("releaseId")).toLowerCase();
   const title = stringValue(formData.get("title"));
   const artistName = stringValue(formData.get("artistName"));
   const releaseDate = stringValue(formData.get("releaseDate"));
@@ -327,6 +345,167 @@ async function updateMusicRelease(formData: FormData) {
 
   revalidateReleaseAdmin();
   redirect("/admin/releases?notice=release-saved");
+}
+
+async function discardReleaseCover(path: string, context: string) {
+  try {
+    const { error } = await removeReleaseCoverObject(path);
+    if (!error) return;
+
+    console.error(`${context}: ${path}: ${error.name}`);
+    try {
+      await enqueueReleaseCoverCleanup(path, error.message);
+    } catch (queueError) {
+      console.error(`${context} queue failed: ${path}:`, queueError);
+    }
+  } catch (error) {
+    console.error(`${context}: ${path}:`, error);
+    try {
+      await enqueueReleaseCoverCleanup(path, error);
+    } catch (queueError) {
+      console.error(`${context} queue failed: ${path}:`, queueError);
+    }
+  }
+}
+
+async function uploadMusicReleaseCover(formData: FormData) {
+  "use server";
+
+  if (!(await isAdminAuthenticated())) redirect("/admin/releases?error=auth");
+
+  const releaseId = stringValue(formData.get("releaseId")).toLowerCase();
+  const file = formData.get("coverImage");
+
+  if (!UUID_PATTERN.test(releaseId)) {
+    redirect("/admin/releases?error=invalid");
+  }
+  if (!(file instanceof File) || file.size === 0) {
+    redirect("/admin/releases?error=cover-empty");
+  }
+
+  let normalizedImage: Buffer;
+
+  try {
+    normalizedImage = await normalizeReleaseCover(file);
+  } catch (error) {
+    if (error instanceof ReleaseCoverValidationError) {
+      const reason = error.code === "too_large"
+        ? "cover-size"
+        : error.code === "invalid_type"
+          ? "cover-format"
+          : error.code === "empty"
+            ? "cover-empty"
+            : "cover-image";
+      redirect(`/admin/releases?error=${reason}`);
+    }
+
+    console.error("Release cover normalization failed");
+    redirect("/admin/releases?error=cover-image");
+  }
+
+  const supabase = getSupabaseAdmin();
+  const { data: current, error: lookupError } = await supabase
+    .from("music_releases")
+    .select("id, cover_image_path, updated_at")
+    .eq("id", releaseId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error("Release cover lookup failed:", lookupError.code);
+    redirect("/admin/releases?error=save");
+  }
+  if (!current) redirect("/admin/releases?error=not-found");
+
+  let uploaded: Awaited<ReturnType<typeof uploadReleaseCoverObject>>;
+
+  try {
+    uploaded = await uploadReleaseCoverObject(current.id, normalizedImage);
+  } catch {
+    console.error("Release cover storage upload failed");
+    redirect("/admin/releases?error=save");
+  }
+
+  const updateQuery = supabase
+    .from("music_releases")
+    .update({
+      cover_image_url: uploaded.publicUrl,
+      cover_image_path: uploaded.path
+    })
+    .eq("id", releaseId);
+  const guardedUpdate = current.cover_image_path
+    ? updateQuery.eq("cover_image_path", current.cover_image_path)
+    : updateQuery.is("cover_image_path", null);
+  const { data: updated, error: updateError } = await guardedUpdate
+    .eq("updated_at", current.updated_at)
+    .select("id")
+    .maybeSingle();
+
+  if (updateError || !updated) {
+    await discardReleaseCover(uploaded.path, "Release cover rollback failed");
+    if (updateError) {
+      console.error("Release cover database update failed:", updateError.code);
+      redirect("/admin/releases?error=save");
+    }
+    redirect("/admin/releases?error=cover-conflict");
+  }
+
+  if (current.cover_image_path && current.cover_image_path !== uploaded.path) {
+    await discardReleaseCover(current.cover_image_path, "Previous release cover cleanup failed");
+  }
+
+  revalidateReleaseAdmin();
+  redirect("/admin/releases?notice=cover-saved");
+}
+
+async function removeMusicReleaseCover(formData: FormData) {
+  "use server";
+
+  if (!(await isAdminAuthenticated())) redirect("/admin/releases?error=auth");
+
+  const releaseId = stringValue(formData.get("releaseId")).toLowerCase();
+
+  if (!UUID_PATTERN.test(releaseId)) {
+    redirect("/admin/releases?error=invalid");
+  }
+
+  const supabase = getSupabaseAdmin();
+  const { data: current, error: lookupError } = await supabase
+    .from("music_releases")
+    .select("id, youtube_video_id, cover_image_path, updated_at")
+    .eq("id", releaseId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error("Release cover lookup failed:", lookupError.code);
+    redirect("/admin/releases?error=save");
+  }
+  if (!current) redirect("/admin/releases?error=not-found");
+  if (!current.cover_image_path) redirect("/admin/releases?error=cover-conflict");
+
+  const fallbackUrl = current.youtube_video_id
+    ? `https://i.ytimg.com/vi/${current.youtube_video_id}/hqdefault.jpg`
+    : null;
+  const { data: updated, error: updateError } = await supabase
+    .from("music_releases")
+    .update({
+      cover_image_url: fallbackUrl,
+      cover_image_path: null
+    })
+    .eq("id", releaseId)
+    .eq("cover_image_path", current.cover_image_path)
+    .eq("updated_at", current.updated_at)
+    .select("id")
+    .maybeSingle();
+
+  if (updateError) {
+    console.error("Release cover removal update failed:", updateError.code);
+    redirect("/admin/releases?error=save");
+  }
+  if (!updated) redirect("/admin/releases?error=cover-conflict");
+
+  await discardReleaseCover(current.cover_image_path, "Removed release cover cleanup failed");
+  revalidateReleaseAdmin();
+  redirect("/admin/releases?notice=cover-removed");
 }
 
 async function updateRoleConfiguration(formData: FormData) {
@@ -463,6 +642,12 @@ export default async function AdminReleasesPage({
 }) {
   if (!(await isAdminAuthenticated())) redirect("/admin");
 
+  try {
+    await processReleaseCoverCleanupQueue(5);
+  } catch (cleanupError) {
+    console.error("Release cover cleanup queue processing failed:", cleanupError);
+  }
+
   const { notice, error } = await searchParams;
   const message = noticeMessage(notice, error);
   const { releases, roleTypes, roles, credits, applications } =
@@ -487,7 +672,7 @@ export default async function AdminReleasesPage({
 
       <div className="admin-management-page">
         {message ? (
-          <div className="admin-alert" role="status" aria-live="polite">
+          <div className="admin-alert" role={error ? "alert" : "status"} aria-live={error ? "assertive" : "polite"}>
             {message}
           </div>
         ) : null}
@@ -554,7 +739,7 @@ export default async function AdminReleasesPage({
           <div className="admin-table-heading">
             <div>
               <p className="admin-eyebrow">PROJECT PARTICIPATION</p>
-              <h2 id="release-list-title">프로젝트와 참여 파트</h2>
+              <h2 id="release-list-title">음원과 참여 파트</h2>
             </div>
             <span>항목 {releases.length}개</span>
           </div>
@@ -592,6 +777,17 @@ export default async function AdminReleasesPage({
                         {!release.is_published ? <span>비공개</span> : null}
                       </div>
                     </header>
+
+                    <AdminReleaseCoverManager
+                      releaseId={release.id}
+                      releaseNumber={release.release_number}
+                      releaseTitle={release.title}
+                      currentImageUrl={release.cover_image_url}
+                      hasManagedCover={Boolean(release.cover_image_path)}
+                      maxFileSizeMb={Math.round(MAX_RELEASE_COVER_FILE_BYTES / 1024 / 1024)}
+                      uploadAction={uploadMusicReleaseCover}
+                      removeAction={removeMusicReleaseCover}
+                    />
 
                     <details className="admin-release-edit">
                       <summary>항목 정보 수정</summary>

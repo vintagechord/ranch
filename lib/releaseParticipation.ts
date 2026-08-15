@@ -45,8 +45,6 @@ export type ReleaseRoleCategory = "visual" | "editorial" | "video" | "music" | "
 export type PublicReleaseCredit = {
   id: string;
   displayName: string;
-  isRanchMember: boolean;
-  participantSlot: number | null;
   sortOrder: number;
 };
 

@@ -56,7 +56,7 @@ type PublicRoleTypeRow = Pick<
 
 type PublicCreditRow = Pick<
   ReleaseCreditRow,
-  "id" | "release_role_id" | "display_name" | "is_ranch_member" | "participant_slot" | "sort_order"
+  "id" | "release_role_id" | "display_name" | "sort_order"
 >;
 
 export type ReleaseApplicationQueueItem = Pick<
@@ -162,9 +162,7 @@ export async function getPublicMusicReleases(
     roleIds.length > 0
       ? supabase
           .from("release_credits")
-          .select(
-            "id, release_role_id, display_name, is_ranch_member, participant_slot, sort_order"
-          )
+          .select("id, release_role_id, display_name, sort_order")
           .in("release_role_id", roleIds)
           .order("sort_order", { ascending: true })
           .order("created_at", { ascending: true })
@@ -189,8 +187,6 @@ export async function getPublicMusicReleases(
     roleCredits.push({
       id: credit.id,
       displayName: credit.display_name,
-      isRanchMember: credit.is_ranch_member,
-      participantSlot: credit.participant_slot,
       sortOrder: credit.sort_order
     });
     creditsByRoleId.set(credit.release_role_id, roleCredits);

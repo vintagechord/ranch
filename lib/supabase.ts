@@ -78,6 +78,7 @@ export type MusicReleaseRow = {
   state: string;
   youtube_video_id: string | null;
   cover_image_url: string | null;
+  cover_image_path: string | null;
   summary: string | null;
   is_published: boolean;
   created_at: string;
@@ -94,8 +95,27 @@ export type MusicReleaseInsert = {
   state?: string;
   youtube_video_id?: string | null;
   cover_image_url?: string | null;
+  cover_image_path?: string | null;
   summary?: string | null;
   is_published?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ReleaseCoverCleanupQueueRow = {
+  path: string;
+  attempt_count: number;
+  last_error: string | null;
+  next_attempt_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReleaseCoverCleanupQueueInsert = {
+  path: string;
+  attempt_count?: number;
+  last_error?: string | null;
+  next_attempt_at?: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -297,6 +317,12 @@ export type Database = {
         Row: MusicReleaseRow;
         Insert: MusicReleaseInsert;
         Update: Partial<MusicReleaseInsert>;
+        Relationships: [];
+      };
+      release_cover_cleanup_queue: {
+        Row: ReleaseCoverCleanupQueueRow;
+        Insert: ReleaseCoverCleanupQueueInsert;
+        Update: Partial<ReleaseCoverCleanupQueueInsert>;
         Relationships: [];
       };
       release_roles: {

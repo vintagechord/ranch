@@ -73,6 +73,8 @@ supabase db push
 - `release_credits`: 공개 참여 크레딧
 - `release_participation_applications`, `release_application_status_events`: 프로젝트 참여 신청과 검토 이력
 
+`release-covers` Storage bucket에는 관리자가 등록한 음원 대표 이미지를 WebP로 정규화해 저장합니다. 업로드 이미지는 3MB 이하의 JPG, PNG, WebP, AVIF만 허용하며 공개 다운로드 외의 Storage 작업은 서버의 service role로만 처리합니다.
+
 종료된 을왕리 신청 API(`/api/apply`)는 `410 Gone`을 반환합니다. `project_proposals`는 공개 권한 없이 서버의 service role을 통해서만 저장·조회합니다. 관리자 조회, 저금통 수정, 오픈채팅방 링크 관리도 service role key를 사용하는 서버 코드에서 처리합니다.
 
 ## Vercel 배포
@@ -113,7 +115,7 @@ http://localhost:3000/admin
 https://배포도메인/admin
 ```
 
-관리자 페이지에서 프로젝트 제안, PPP 발매 목록, 이별의 도수를 포함한 참여 파트와 신청, 저금통과 채팅방 링크를 관리할 수 있습니다. 새 UP NEXT 항목을 만든 뒤 아트워크·소개글·뮤직비디오 등의 파트를 열 수 있고, 발매 완료 시 상태와 YouTube 영상 ID를 수정해 RELEASED 목록으로 이동할 수 있습니다.
+관리자 페이지에서 프로젝트 제안, PPP 발매 목록, 이별의 도수를 포함한 참여 파트와 신청, 저금통과 채팅방 링크를 관리할 수 있습니다. 새 UP NEXT 항목을 만든 뒤 대표 이미지를 업로드하고 아트워크·소개글·뮤직비디오 등의 파트를 열 수 있으며, 발매 완료 시 상태와 YouTube 영상 ID를 수정해 RELEASED 목록으로 이동할 수 있습니다.
 
 ## 프로젝트 제안 API
 
