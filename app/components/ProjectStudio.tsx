@@ -381,19 +381,21 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
         <div className="studio-monitor">
           <AcousticDisplay />
           <div className="studio-monitor-session">
-            <span className="studio-visually-hidden">다음 모임: </span>
-            <span className="studio-monitor-session-label" aria-hidden="true">NEXT SESSION</span>
+            <span className="studio-monitor-session-label">
+              <small>다음 모임:</small>
+              <strong aria-hidden="true">NEXT SESSION</strong>
+            </span>
             <time
               aria-label={nextMeeting.accessibleDateTime}
               dateTime={nextMeeting.dateTime}
             >
-              <span>{nextMeeting.dateLabel}</span>
+              <span aria-hidden="true">{nextMeeting.dateLabel}</span>
               <b aria-hidden="true">/</b>
-              <strong>{nextMeeting.timeLabel}</strong>
+              <strong aria-hidden="true">{nextMeeting.timeLabel}</strong>
             </time>
             <span className="studio-monitor-session-location">
-              <span className="studio-visually-hidden">장소: </span>
-              {nextMeeting.venue}
+              <small>장소:</small>
+              <strong>{nextMeeting.venue}</strong>
             </span>
           </div>
         </div>

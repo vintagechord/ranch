@@ -3701,35 +3701,35 @@ html.site-motion-paused .studio-object-label {
 
 .studio-monitor-session {
   position: absolute;
-  right: 24px;
-  bottom: 21px;
+  inset: 10px;
   z-index: 4;
-  display: inline-grid;
-  grid-template-columns: auto auto;
-  min-height: 52px;
-  padding: 7px 11px 7px 27px;
-  column-gap: 10px;
-  row-gap: 4px;
-  align-items: center;
-  border: 1px solid rgba(255, 91, 50, 0.4);
-  border-radius: 3px;
+  display: grid;
+  min-height: 0;
+  padding: 18px 34px;
+  gap: 8px;
+  place-content: center;
+  justify-items: center;
   background:
-    linear-gradient(180deg, rgba(28, 9, 5, 0.88), rgba(5, 4, 3, 0.94)),
-    repeating-linear-gradient(90deg, transparent 0 4px, rgba(255, 255, 255, 0.018) 4px 5px);
-  box-shadow:
-    0 0 20px rgba(255, 72, 32, 0.13),
-    inset 0 0 18px rgba(255, 77, 35, 0.08),
-    inset 0 1px rgba(255, 224, 205, 0.12);
+    radial-gradient(
+      ellipse at center,
+      rgba(2, 5, 7, 0.92) 0 21%,
+      rgba(2, 5, 7, 0.76) 42%,
+      rgba(2, 5, 7, 0.38) 64%,
+      transparent 82%
+    );
+  box-shadow: inset 0 0 42px rgba(2, 3, 3, 0.18);
   color: #ffd0b8;
   font-family: "SFMono-Regular", Consolas, monospace;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  isolation: isolate;
+  pointer-events: none;
 }
 
 .studio-monitor-session::before {
   position: absolute;
-  top: 11px;
-  left: 11px;
+  top: 18px;
+  left: 22px;
+  z-index: 2;
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -3741,30 +3741,61 @@ html.site-motion-paused .studio-object-label {
   animation: studio-monitor-rec-light 1.65s ease-in-out infinite alternate;
 }
 
-.studio-monitor-session-label {
-  grid-column: 1 / -1;
-  color: rgba(255, 169, 126, 0.72);
-  font-size: 0.47rem;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-shadow: 0 0 8px rgba(255, 92, 48, 0.5);
+.studio-monitor-session::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 116, 69, 0.42) 14%, rgba(121, 230, 255, 0.2) 50%, rgba(255, 116, 69, 0.42) 86%, transparent) 0 0 / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, rgba(121, 230, 255, 0.25) 14%, rgba(255, 116, 69, 0.28) 50%, rgba(121, 230, 255, 0.25) 86%, transparent) 0 100% / 100% 1px no-repeat;
+  content: "";
+  filter: drop-shadow(0 0 5px rgba(255, 99, 56, 0.24));
 }
 
-.studio-monitor-session time {
+.studio-monitor-session-label {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   gap: 9px;
   align-items: baseline;
-  color: #ff9a66;
-  font-size: 0.72rem;
+  justify-content: center;
+  text-shadow: 0 0 8px rgba(255, 92, 48, 0.5);
+}
+
+.studio-monitor-session-label small {
+  color: rgba(240, 229, 220, 0.72);
+  font-size: 0.55rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
-  text-shadow: 0 0 9px rgba(255, 92, 48, 0.78);
+  letter-spacing: 0.08em;
+}
+
+.studio-monitor-session-label strong {
+  color: #ff9a66;
+  font-size: 0.64rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.14em;
+}
+
+.studio-monitor-session time {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  gap: 14px;
+  align-items: baseline;
+  justify-self: center;
+  color: #ff9a66;
+  font-size: clamp(1.7rem, 3.2vw, 2.55rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 0 8px rgba(255, 92, 48, 0.88),
+    0 0 22px rgba(255, 92, 48, 0.32);
 }
 
 .studio-monitor-session time strong {
   color: #ffd6bf;
-  font-size: 0.82rem;
+  font-size: 1em;
   font-weight: 900;
 }
 
@@ -3774,13 +3805,28 @@ html.site-motion-paused .studio-object-label {
 }
 
 .studio-monitor-session-location {
-  padding-left: 10px;
-  border-left: 1px solid rgba(255, 149, 103, 0.28);
-  color: #f0e5dc;
-  font-size: 0.61rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  justify-content: center;
+  white-space: nowrap;
   text-shadow: 0 0 8px rgba(255, 160, 116, 0.34);
+}
+
+.studio-monitor-session-location small {
+  color: rgba(240, 229, 220, 0.62);
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.studio-monitor-session-location strong {
+  color: #f4eee7;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
 }
 
 @keyframes studio-monitor-rec-light {
@@ -3792,6 +3838,12 @@ html.site-motion-paused .studio-object-label {
     opacity: 1;
     filter: brightness(1.22);
   }
+}
+
+html.site-motion-paused .studio-monitor-session::before {
+  animation: none;
+  filter: none;
+  opacity: 1;
 }
 
 .studio-stage.has-many-projects .studio-equipment-row {
@@ -4646,37 +4698,47 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
   }
 
   .studio-monitor-session {
-    right: 15px;
-    bottom: 14px;
-    min-height: 45px;
-    padding: 6px 8px 6px 23px;
-    column-gap: 7px;
-    row-gap: 3px;
+    inset: 8px;
+    min-height: 0;
+    padding: 8px 10px;
+    gap: 3px;
   }
 
   .studio-monitor-session::before {
-    top: 9px;
-    left: 9px;
+    top: 10px;
+    left: 10px;
     width: 6px;
     height: 6px;
   }
 
-  .studio-monitor-session time {
-    gap: 6px;
-    font-size: 0.61rem;
-  }
-
   .studio-monitor-session-label {
-    font-size: 0.42rem;
+    gap: 6px;
   }
 
-  .studio-monitor-session time strong {
-    font-size: 0.69rem;
+  .studio-monitor-session-label small {
+    font-size: 0.54rem;
+  }
+
+  .studio-monitor-session-label strong {
+    font-size: 0.58rem;
+  }
+
+  .studio-monitor-session time {
+    gap: 8px;
+    font-size: clamp(1.28rem, 7vw, 1.75rem);
+    letter-spacing: 0.05em;
   }
 
   .studio-monitor-session-location {
-    padding-left: 7px;
+    gap: 4px;
+  }
+
+  .studio-monitor-session-location small {
     font-size: 0.54rem;
+  }
+
+  .studio-monitor-session-location strong {
+    font-size: 0.6rem;
   }
 
   .studio-equipment-row {
@@ -4709,6 +4771,16 @@ html.site-motion-paused .studio-project-object:focus-visible .studio-mm45-woofer
 }
 
 @media (max-width: 430px) {
+  .studio-monitor-session {
+    padding-inline: 6px;
+  }
+
+  .studio-monitor-session time {
+    gap: 6px;
+    font-size: clamp(1.15rem, 7vw, 1.45rem);
+    letter-spacing: 0.04em;
+  }
+
   .studio-mixer {
     min-height: 225px;
     padding-inline: 4px;
