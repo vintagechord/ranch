@@ -3,10 +3,9 @@ import Header from "@/app/components/Header";
 import ProjectProposal from "@/app/components/ProjectProposal";
 import ProjectStudio from "@/app/components/ProjectStudio";
 import ScrollAnimations from "@/app/components/ScrollAnimations";
-import { projects } from "@/lib/projects";
+import { activeProjects, projects } from "@/lib/projects";
 
 export default function Home() {
-  const projectCount = String(projects.length).padStart(2, "0");
   const nextMeeting = {
     accessibleDateTime: "2026년 9월 12일 오후 5시",
     dateTime: "2026-09-12T17:00:00+09:00",
@@ -15,8 +14,7 @@ export default function Home() {
     venue: "시그마프라자"
   };
   const tickerItems = [
-    `NOW PLAYING ${projectCount}`,
-    ...projects.map((project) => `${project.artist.toUpperCase()} — ${project.title}`),
+    ...activeProjects.map((project) => `${project.artist.toUpperCase()} — ${project.title}`),
     "NEW SIGNALS WILL BE CONNECTED"
   ];
 
@@ -24,7 +22,7 @@ export default function Home() {
     <>
       <Header showApplyCta={false} />
       <main id="top" className="studio-home">
-        <ProjectStudio nextMeeting={nextMeeting} projects={projects} />
+        <ProjectStudio nextMeeting={nextMeeting} projects={activeProjects} />
 
         <div className="studio-ticker" aria-label="프로젝트 채널 신호">
           <div>

@@ -6,7 +6,7 @@ import Header from "@/app/components/Header";
 import ProjectParticipationBoard from "@/app/components/ProjectParticipationBoard";
 import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 import VintageChordReleases from "@/app/components/VintageChordReleases";
-import { getProjectBySlug, projects, type Project } from "@/lib/projects";
+import { getProjectBySlug, getProjectStatusLabel, projects, type Project } from "@/lib/projects";
 import { RELEASE_PROJECT_SLUG } from "@/lib/releaseParticipation";
 import { getPublicMusicReleases } from "@/lib/releaseParticipation.server";
 
@@ -132,7 +132,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     <span className="project-label">{project.label}</span>
                     <span className="project-status">
                       <span className="project-status-dot" aria-hidden="true" />
-                      {project.status}
+                      {getProjectStatusLabel(project.state)}
                     </span>
                   </div>
                   <p className="project-artist">{project.artist}</p>

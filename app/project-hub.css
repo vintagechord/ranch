@@ -109,6 +109,18 @@
   white-space: nowrap;
 }
 
+.header-session-copy {
+  color: #a8a9a2;
+}
+
+.header-session-light > strong,
+.studio-active-count > strong {
+  color: #f1eee6;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
 .header-motion-toggle {
   display: inline-grid;
   width: 34px;
@@ -281,6 +293,12 @@
   gap: 8px;
   align-items: center;
   color: #eeebe3;
+}
+
+.studio-active-count {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .studio-monitor {
@@ -3869,6 +3887,11 @@ html.site-motion-paused .studio-object-label {
 /* Responsive */
 @media (max-width: 1100px) {
   .header-session-light {
+    gap: 5px;
+    padding-inline: 5px;
+  }
+
+  .header-session-copy {
     display: none;
   }
 
@@ -4060,7 +4083,6 @@ html.site-motion-paused .studio-object-label {
     gap: 10px;
   }
 
-  .studio-stage-toolbar > span:nth-child(2),
   .studio-stage-footer > span:nth-child(2) {
     display: none;
   }
@@ -5708,6 +5730,20 @@ html.location-trace-open body {
 }
 
 @media (max-width: 430px) {
+  .brand-mark {
+    width: 118px;
+  }
+
+  .header-tools {
+    gap: 4px;
+  }
+
+  .sf-factory-link,
+  .piggy-bank-button {
+    width: 34px;
+    height: 34px;
+  }
+
   .location-trace-stage-copy > strong {
     font-size: clamp(1.62rem, 9vw, 2.25rem);
   }

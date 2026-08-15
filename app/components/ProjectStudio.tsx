@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 import LocationJourneyDialog from "@/app/components/LocationJourneyDialog";
 import { StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
+import { getProjectStatusLabel, type Project } from "@/lib/projects";
 
 type StudioProject = {
   slug: string;
   number: string;
   artist: string;
   title: string;
-  status: string;
+  state: Project["state"];
   visual: "reel" | "speaker";
 };
 
@@ -324,7 +325,8 @@ function MixingDesk() {
 
 export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioProps) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const projectCount = String(projects.length).padStart(2, "0");
+  const activeProjectCount = projects.length;
+  const activeProjectCountLabel = String(activeProjectCount).padStart(2, "0");
   const hasManyProjects = projects.length > 2;
 
   function moveLight(event: PointerEvent<HTMLDivElement>) {
@@ -375,8 +377,12 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
         <div className="studio-stage-glow" aria-hidden="true" />
 
         <div className="studio-stage-toolbar">
-          <span className="studio-live-pill"><i /> LIVE INPUT</span>
-          <span>{projectCount} PROJECT CHANNELS</span>
+          <span className="studio-live-pill" aria-hidden="true"><i /> LIVE</span>
+          <span className="studio-active-count">
+            <span className="studio-visually-hidden">현재 활성 프로젝트 {activeProjectCount}개</span>
+            <span aria-hidden="true">활성 프로젝트</span>
+            <strong aria-hidden="true">{activeProjectCountLabel}</strong>
+          </span>
         </div>
 
         <div className="studio-monitor">
@@ -411,7 +417,7 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
               <span className="studio-object-label">
                 <small>{project.artist}</small>
                 <strong>{project.title}</strong>
-                <em><i /> {project.status}</em>
+                <em><i /> {getProjectStatusLabel(project.state)}</em>
               </span>
               <span className="studio-object-action">OPEN SESSION ↗</span>
             </Link>

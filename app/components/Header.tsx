@@ -4,10 +4,10 @@ import { type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import MotionToggle from "@/app/components/MotionToggle";
 import PiggyBankButton from "@/app/components/PiggyBankButton";
-import { projects } from "@/lib/projects";
+import { activeProjects } from "@/lib/projects";
 
 const navItems = [
-  ...projects.map((project) => ({
+  ...activeProjects.map((project) => ({
     kind: "project" as const,
     label: project.shortTitle,
     href: `/projects/${project.slug}`
@@ -66,7 +66,8 @@ function SfFactoryLink({ isActive }: { isActive: boolean }) {
 export default function Header(_props: HeaderProps) {
   const pathname = usePathname();
   const topHref = pathname === "/" ? "#top" : "/";
-  const projectCount = String(projects.length).padStart(2, "0");
+  const activeProjectCount = activeProjects.length;
+  const activeProjectCountLabel = String(activeProjectCount).padStart(2, "0");
 
   return (
     <header className="site-header">
@@ -102,7 +103,12 @@ export default function Header(_props: HeaderProps) {
       </nav>
 
       <div className="header-tools">
-        <span className="header-session-light" aria-hidden="true"><i /> {projectCount} LIVE</span>
+        <span className="header-session-light">
+          <span className="sr-only">현재 활성 프로젝트 {activeProjectCount}개</span>
+          <i aria-hidden="true" />
+          <span className="header-session-copy" aria-hidden="true">활성 프로젝트</span>
+          <strong aria-hidden="true">{activeProjectCountLabel}</strong>
+        </span>
         <MotionToggle />
         <SfFactoryLink isActive={pathname === "/sf"} />
         <PiggyBankButton />
