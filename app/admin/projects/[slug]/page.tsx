@@ -466,7 +466,7 @@ async function createNextPppRelease(routeProjectSlug: string, formData: FormData
     artistName.length > 200 ||
     (releaseDate && !/^\d{4}-\d{2}-\d{2}$/.test(releaseDate)) ||
     (youtubeVideoId && !/^[A-Za-z0-9_-]{11}$/.test(youtubeVideoId)) ||
-    summary.length > 1000
+    summary.length > 300
   ) {
     redirect(projectAdminHref(projectSlug, { error: "release-invalid" }, "release-creator"));
   }
@@ -557,7 +557,7 @@ async function updateMusicRelease(routeProjectSlug: string, formData: FormData) 
     (releaseDate && !/^\d{4}-\d{2}-\d{2}$/.test(releaseDate)) ||
     !EDITABLE_RELEASE_STATES.includes(state as never) ||
     (youtubeVideoId && !/^[A-Za-z0-9_-]{11}$/.test(youtubeVideoId)) ||
-    summary.length > 1000
+    summary.length > (projectSlug === PPP_PROJECT_SLUG ? 300 : 1000)
   ) {
     redirect(projectAdminHref(projectSlug, { error: "invalid" }, releaseAnchor));
   }
@@ -1121,9 +1121,9 @@ export default async function AdminProjectPage({
                     <span>프로젝트 설명</span>
                     <textarea
                       name="summary"
-                      maxLength={1000}
+                      maxLength={300}
                       rows={3}
-                      placeholder="공개 프로젝트 카드에서 왼쪽으로 흐르는 설명입니다."
+                      placeholder="대표 이미지가 없을 때 공개 카드 상단에 표시됩니다."
                     />
                   </label>
                   <AdminActionButton pendingLabel={`PPP ${nextPppReleaseLabel} 만드는 중…`}>
@@ -1255,10 +1255,10 @@ export default async function AdminProjectPage({
                           {projectSlug === PPP_PROJECT_SLUG ? (
                             <textarea
                               name="summary"
-                              maxLength={1000}
+                              maxLength={300}
                               rows={3}
                               defaultValue={release.summary ?? ""}
-                              placeholder="공개 프로젝트 카드에서 왼쪽으로 흐르는 설명입니다."
+                              placeholder="대표 이미지가 없을 때 공개 카드 상단에 표시됩니다."
                             />
                           ) : (
                             <input name="summary" type="text" maxLength={1000} defaultValue={release.summary ?? ""} />

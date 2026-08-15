@@ -7729,19 +7729,43 @@ html.site-motion-paused .studio-project-object.is-mixer:focus-visible .studio-kn
   opacity: 0.42;
 }
 
+.project-page-releases.project-page-compact .vc-release-poster.has-description {
+  height: auto;
+  min-height: clamp(118px, 9vw, 144px);
+}
+
+.vc-release-poster.has-description::after {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(5, 7, 6, 0.92), rgba(5, 7, 6, 0.74) 66%, rgba(5, 7, 6, 0.48)),
+    linear-gradient(to top, rgba(4, 4, 4, 0.94), transparent 72%);
+}
+
+.vc-release-poster-description {
+  position: relative;
+  z-index: 2;
+  width: min(78ch, 82%);
+  margin: 0;
+  padding: clamp(16px, 2vw, 24px) clamp(16px, 2.2vw, 28px) 52px;
+  color: #ebe8e0;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  font-weight: 750;
+  line-height: 1.55;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.78);
+  overflow-wrap: anywhere;
+}
+
 .vc-release-card-identity {
   display: grid;
-  grid-template-columns: minmax(96px, 0.42fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   min-width: 0;
   min-height: 38px;
   padding: 8px 10px;
   border-top: 1px solid var(--vc-line);
-}
-
-.vc-release-card-identity:not(.has-description) {
-  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .vc-release-card-identity h3 {
@@ -7765,82 +7789,6 @@ html.site-motion-paused .studio-project-object.is-mixer:focus-visible .studio-kn
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.vc-release-description {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  min-height: 24px;
-  border-inline: 1px solid var(--vc-line);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--project-accent-alt) 7%, transparent), transparent 58%),
-    rgba(255, 255, 255, 0.012);
-  overflow: hidden;
-}
-
-.vc-release-description-viewport {
-  position: relative;
-  width: 100%;
-  min-width: 0;
-  color: #c5c3bc;
-  font-size: 0.67rem;
-  font-weight: 700;
-  line-height: 1.35;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent);
-}
-
-.vc-release-description-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  white-space: nowrap;
-}
-
-.vc-release-description-track.is-ready {
-  will-change: transform;
-  animation: vc-release-description-scroll var(--vc-description-duration) linear infinite;
-}
-
-.vc-release-description-copy,
-.vc-release-description-measure {
-  display: inline-flex;
-  flex: 0 0 auto;
-  gap: 32px;
-  align-items: center;
-  padding-inline: 14px 32px;
-}
-
-.vc-release-description-copy {
-  box-sizing: border-box;
-  width: var(--vc-description-distance);
-}
-
-.vc-release-description-measure {
-  position: absolute;
-  width: max-content;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.vc-release-description-copy i,
-.vc-release-description-measure i {
-  color: var(--project-accent-alt);
-  font-size: 0.42rem;
-  font-style: normal;
-}
-
-.vc-release-description:hover .vc-release-description-track,
-.vc-release-card:focus-within .vc-release-description-track {
-  animation-play-state: paused;
-}
-
-@keyframes vc-release-description-scroll {
-  to {
-    transform: translate3d(calc(-1 * var(--vc-description-distance)), 0, 0);
-  }
 }
 
 /* A softer console-style participation control shared across project rooms. */
@@ -7921,40 +7869,6 @@ html.site-motion-paused .project-participation-grid button > span {
   transform: none;
 }
 
-html.site-motion-paused .vc-release-description {
-  display: block;
-  align-items: start;
-  overflow: visible;
-}
-
-html.site-motion-paused .vc-release-description-viewport {
-  overflow: visible;
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-html.site-motion-paused .vc-release-description-track {
-  width: 100%;
-  animation: none;
-  transform: none;
-  white-space: normal;
-  will-change: auto;
-}
-
-html.site-motion-paused .vc-release-description-copy {
-  display: block;
-  width: 100%;
-  padding-inline: 10px;
-  padding-block: 8px;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-html.site-motion-paused .vc-release-description-copy + .vc-release-description-copy,
-html.site-motion-paused .vc-release-description-copy i {
-  display: none;
-}
-
 @media (max-width: 720px) {
   .project-page-releases.project-page-compact .vc-release-state-section {
     margin-top: 24px;
@@ -7977,65 +7891,24 @@ html.site-motion-paused .vc-release-description-copy i {
     white-space: normal;
   }
 
-  .vc-release-description {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    min-height: 28px;
-  }
-
-  .vc-release-description-viewport {
-    font-size: 0.63rem;
-  }
-
   .vc-release-card-identity {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 5px 10px;
+    gap: 10px;
   }
 
-  .vc-release-card-identity.has-description .vc-release-card-artist {
-    grid-column: 2;
-    grid-row: 1;
+  .project-page-releases.project-page-compact .vc-release-poster.has-description {
+    min-height: 150px;
+  }
+
+  .vc-release-poster-description {
+    width: 100%;
+    padding: 14px 14px 54px;
+    font-size: 0.72rem;
+    line-height: 1.5;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vc-release-description {
-    display: block;
-    align-items: start;
-    overflow: visible;
-  }
-
-  .vc-release-description-viewport {
-    overflow: visible;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-
-  .vc-release-description-track {
-    width: 100%;
-    transform: none;
-    white-space: normal;
-    will-change: auto;
-  }
-
-  .vc-release-description-track.is-ready {
-    animation: none;
-  }
-
-  .vc-release-description-copy {
-    display: block;
-    width: 100%;
-    padding-inline: 10px;
-    padding-block: 8px;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-
-  .vc-release-description-copy + .vc-release-description-copy,
-  .vc-release-description-copy i {
-    display: none;
-  }
-
   .project-page-releases.project-page-compact .vc-release-roles button,
   .project-page-releases.project-page-compact .vc-release-roles button > span,
   .project-participation-grid button,

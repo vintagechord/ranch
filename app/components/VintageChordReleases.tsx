@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
 import ParticipationRequest, {
   type OpenParticipationRequest
 } from "@/app/components/ParticipationRequest";
@@ -21,17 +20,6 @@ type RoleRow = {
   label: string;
   lead: PublicReleaseLead;
   credits: PublicReleaseCredit[];
-};
-
-type DescriptionTickerStyle = CSSProperties & {
-  "--vc-description-duration": string;
-  "--vc-description-distance": string;
-};
-
-type DescriptionTickerMetrics = {
-  copyCount: number;
-  distance: number;
-  duration: number;
 };
 
 const ROLE_ORDER = new Map([
@@ -87,90 +75,14 @@ function getRoleRows(release: PublicMusicRelease) {
     });
 }
 
-function ProjectDescriptionTicker({ text }: { text: string }) {
-  const normalizedText = text.trim();
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const measureRef = useRef<HTMLSpanElement>(null);
-  const [metrics, setMetrics] = useState<DescriptionTickerMetrics | null>(null);
+function posterDescription(value: string | null) {
+  const normalized = value?.trim() ?? "";
 
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    const measure = measureRef.current;
+  if (normalized.length <= 300) {
+    return normalized || null;
+  }
 
-    if (!viewport || !measure) {
-      return;
-    }
-
-    let disposed = false;
-    let frame = 0;
-    const updateMetrics = () => {
-      if (disposed) {
-        return;
-      }
-
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        if (disposed) {
-          return;
-        }
-
-        const viewportWidth = Math.ceil(viewport.getBoundingClientRect().width);
-        const distance = Math.max(1, Math.ceil(measure.getBoundingClientRect().width));
-        const copyCount = Math.max(2, Math.ceil(viewportWidth / distance) + 1);
-        const duration = Math.max(12, Number((distance / 42).toFixed(2)));
-
-        setMetrics((current) => {
-          if (
-            current?.copyCount === copyCount &&
-            current.distance === distance &&
-            current.duration === duration
-          ) {
-            return current;
-          }
-
-          return { copyCount, distance, duration };
-        });
-      });
-    };
-
-    const observer = new ResizeObserver(updateMetrics);
-    observer.observe(viewport);
-    observer.observe(measure);
-    updateMetrics();
-    document.fonts?.ready.then(updateMetrics).catch(() => undefined);
-
-    return () => {
-      disposed = true;
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-    };
-  }, [normalizedText]);
-
-  const tickerStyle: DescriptionTickerStyle = {
-    "--vc-description-duration": `${metrics?.duration ?? 16}s`,
-    "--vc-description-distance": metrics ? `${metrics.distance}px` : "max-content"
-  };
-
-  return (
-    <div className="vc-release-description" role="note">
-      <span className="studio-visually-hidden">프로젝트 설명: {normalizedText}</span>
-      <div ref={viewportRef} className="vc-release-description-viewport" aria-hidden="true">
-        <span ref={measureRef} className="vc-release-description-measure">
-          {normalizedText}<i aria-hidden="true">◆</i>
-        </span>
-        <div
-          className={`vc-release-description-track${metrics ? " is-ready" : ""}`}
-          style={tickerStyle}
-        >
-          {Array.from({ length: metrics?.copyCount ?? 1 }, (_, index) => (
-            <span className="vc-release-description-copy" key={index}>
-              {normalizedText}<i aria-hidden="true">◆</i>
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return `${normalized.slice(0, 299).trimEnd()}…`;
 }
 
 function UpcomingReleaseCard({
@@ -186,6 +98,7 @@ function UpcomingReleaseCard({
   const date = dateParts(release.releaseDate);
   const rows = getRoleRows(release);
   const titleId = `vc-release-${release.id}`;
+  const description = release.coverImageUrl ? null : posterDescription(release.summary);
 
   return (
     <article
@@ -197,7 +110,7 @@ function UpcomingReleaseCard({
         <span>{applicationOpen ? "APPLICATION OPEN" : "APPLICATION CLOSED"}</span>
       </header>
 
-      <div className="vc-release-poster">
+      <div className={`vc-release-poster${description ? " has-description" : ""}`}>
         {release.coverImageUrl ? (
           <img
             src={release.coverImageUrl}
@@ -205,7 +118,7 @@ function UpcomingReleaseCard({
             loading="lazy"
             decoding="async"
           />
-        ) : (
+        ) : description ? null : (
           <>
             <span className="vc-release-poster-number" aria-hidden="true">{number}</span>
             <div className="vc-release-poster-lines" aria-hidden="true">
@@ -213,6 +126,9 @@ function UpcomingReleaseCard({
             </div>
           </>
         )}
+        {description ? (
+          <p className="vc-release-poster-description">{description}</p>
+        ) : null}
         <time
           aria-label={`공개 예정일 ${date.year ? `${date.year}.` : ""}${date.monthDay}`}
           dateTime={date.iso ?? undefined}
@@ -222,11 +138,8 @@ function UpcomingReleaseCard({
         </time>
       </div>
 
-      <div className={`vc-release-card-identity${release.summary?.trim() ? " has-description" : ""}`}>
+      <div className="vc-release-card-identity">
         <h3 id={titleId}>{release.title || `Release ${number}`}</h3>
-        {release.summary?.trim() ? (
-          <ProjectDescriptionTicker text={release.summary} />
-        ) : null}
         <span className="vc-release-card-artist">{release.artistName}</span>
       </div>
 
