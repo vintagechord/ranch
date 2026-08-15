@@ -139,6 +139,9 @@ export default function VintageChordReleases({ releases }: VintageChordReleasesP
                           </>
                         )}
                         <h3 id={titleId}>
+                          <span className="studio-visually-hidden">
+                            {release.title || `Release ${number}`}. 공개 예정일
+                          </span>
                           <time dateTime={date.iso ?? undefined}>
                             {date.year ? <small>{date.year}</small> : null}
                             <strong>{date.monthDay}</strong>

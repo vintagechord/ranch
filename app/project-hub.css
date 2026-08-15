@@ -3143,7 +3143,7 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
    -------------------------------------------------------------------------- */
 
 .project-page-compact {
-  padding: 102px 18px 46px;
+  padding: 80px 18px 16px;
 }
 
 .project-page-compact .project-shell {
@@ -3151,33 +3151,33 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 }
 
 .project-page-compact .project-back-link {
-  min-height: 34px;
-  padding-inline: 10px;
+  min-height: 44px;
+  padding-inline: 9px;
   font-size: 0.56rem;
 }
 
 .project-page-compact .project-next {
-  grid-template-columns: 112px minmax(0, 1fr) auto;
-  gap: 16px;
-  min-height: 72px;
-  margin-top: 24px;
-  padding: 14px 18px;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  gap: 12px;
+  min-height: 54px;
+  margin-top: 8px;
+  padding: 8px 14px;
 }
 
 .project-page-compact .project-next-title {
-  font-size: clamp(1rem, 2vw, 1.65rem);
+  font-size: clamp(0.92rem, 1.6vw, 1.28rem);
 }
 
 .project-page-compact .project-next-arrow {
-  width: 42px;
-  font-size: 1.15rem;
+  width: 34px;
+  font-size: 0.94rem;
 }
 
 .project-page-compact .project-section-heading,
 .project-page-compact .vc-release-section-heading {
-  grid-template-columns: 44px minmax(0, 1fr);
-  min-height: 44px;
-  margin-bottom: 10px;
+  grid-template-columns: 36px minmax(0, 1fr);
+  min-height: 36px;
+  margin-bottom: 6px;
 }
 
 .project-page-compact .project-section-heading h2,
@@ -3190,10 +3190,10 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 /* PPP */
 
 .project-page-releases.project-page-compact .vc-release-hero {
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
-  gap: 24px;
-  min-height: 172px;
-  padding: 10px 0 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 270px);
+  gap: 18px;
+  min-height: 132px;
+  padding: 2px 0 8px;
 }
 
 .project-page-releases.project-page-compact .vc-release-hero-copy p {
@@ -3202,23 +3202,23 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 }
 
 .project-page-releases.project-page-compact .vc-release-hero-copy h1 {
-  font-size: clamp(4.4rem, 8vw, 7.2rem);
+  font-size: clamp(3.8rem, 6.8vw, 5.9rem);
   line-height: 0.72;
 }
 
 .project-page-releases.project-page-compact .vc-release-hero-equipment {
-  width: min(100%, 290px);
+  width: min(100%, 250px);
   margin: 0;
 }
 
 .project-page-releases.project-page-compact .vc-release-hero-equipment .studio-speaker-stack {
-  width: min(78%, 250px);
+  width: min(72%, 205px);
 }
 
 .project-page-releases.project-page-compact .vc-release-section,
 .project-page-releases.project-page-compact .vc-release-upcoming,
 .project-page-releases.project-page-compact .vc-release-released {
-  padding-top: 18px;
+  padding-top: 10px;
 }
 
 .project-page-releases.project-page-compact .vc-release-grid {
@@ -3230,18 +3230,18 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 }
 
 .project-page-releases.project-page-compact .vc-release-card > header {
-  min-height: 32px;
-  padding-inline: 10px;
+  min-height: 26px;
+  padding-inline: 8px;
   font-size: 0.5rem;
 }
 
 .project-page-releases.project-page-compact .vc-release-poster {
-  height: 96px;
+  height: 68px;
   aspect-ratio: auto;
 }
 
 .project-page-releases.project-page-compact .vc-release-poster-number {
-  font-size: 5.4rem;
+  font-size: 4.2rem;
 }
 
 .project-page-releases.project-page-compact .vc-release-poster-lines {
@@ -3262,14 +3262,14 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 }
 
 .project-page-releases.project-page-compact .vc-release-poster time strong {
-  font-size: clamp(1.8rem, 3.5vw, 2.7rem);
+  font-size: clamp(1.45rem, 2.8vw, 2.15rem);
 }
 
 .project-page-releases.project-page-compact .vc-release-roles li {
   grid-template-columns: minmax(84px, 0.28fr) minmax(0, 1fr) auto;
   gap: 8px;
-  min-height: 42px;
-  padding: 6px 10px;
+  min-height: 36px;
+  padding: 3px 8px;
 }
 
 .project-page-releases.project-page-compact .vc-release-role-label {
@@ -3323,9 +3323,9 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 .vc-released-card {
   display: grid;
   grid-template-columns: 42% minmax(0, 1fr);
-  flex: 0 0 clamp(270px, 27vw, 350px);
+  flex: 0 0 clamp(250px, 25vw, 320px);
   min-width: 0;
-  min-height: 112px;
+  min-height: 88px;
   border: 1px solid var(--vc-line-strong);
   background: #0d0e0c;
   scroll-snap-align: start;
@@ -3392,7 +3392,7 @@ a.vc-released-card-media:focus-visible {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .vc-released-card-copy > div {
@@ -3406,9 +3406,9 @@ a.vc-released-card-media:focus-visible {
 }
 
 .vc-released-card-copy h3 {
-  margin: 8px 0 2px;
+  margin: 5px 0 2px;
   color: #efede5;
-  font-size: 1.45rem;
+  font-size: 1.15rem;
   line-height: 0.92;
   overflow-wrap: anywhere;
   display: -webkit-box;
@@ -3444,10 +3444,10 @@ a.vc-released-card-media:focus-visible {
 /* Ibyeol-ui-dosu */
 
 .project-page-participation .project-hero {
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
-  gap: 28px;
-  min-height: 270px;
-  padding: 14px 0 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 22px;
+  min-height: 220px;
+  padding: 8px 0 10px;
 }
 
 .project-page-participation .project-meta-row {
@@ -3461,7 +3461,7 @@ a.vc-released-card-media:focus-visible {
 
 .project-page-participation .project-title {
   max-width: 680px;
-  font-size: clamp(3.4rem, 7vw, 6.6rem);
+  font-size: clamp(3.1rem, 5.8vw, 5.4rem);
   line-height: 0.84;
 }
 
@@ -3489,12 +3489,12 @@ a.vc-released-card-media:focus-visible {
 }
 
 .project-page-participation .project-machine {
-  min-height: 260px;
-  padding: 24px;
+  min-height: 205px;
+  padding: 18px;
 }
 
 .project-page-participation .project-equipment-reel {
-  width: min(100%, 300px);
+  width: min(100%, 245px);
 }
 
 .project-page-participation .project-machine-label {
@@ -3508,7 +3508,7 @@ a.vc-released-card-media:focus-visible {
 }
 
 .project-participation {
-  padding-top: 18px;
+  padding-top: 10px;
 }
 
 .project-participation-grid {
@@ -3527,8 +3527,8 @@ a.vc-released-card-media:focus-visible {
   gap: 9px;
   align-items: center;
   min-width: 0;
-  min-height: 49px;
-  padding: 6px 8px;
+  min-height: 44px;
+  padding: 4px 7px;
   border-right: 1px solid rgba(255, 255, 255, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(13, 14, 12, 0.78);
@@ -3669,7 +3669,7 @@ html.site-motion-paused .vc-released-card-media img {
 }
 
 @media (max-width: 720px) {
-  .project-page-compact {
+  .project-page.project-page-compact {
     padding: 92px 12px 34px;
   }
 
