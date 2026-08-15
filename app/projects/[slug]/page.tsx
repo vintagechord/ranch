@@ -187,13 +187,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           )}
 
           {nextProject ? (
-            <a className="project-next" href={`/projects/${nextProject.slug}`}>
-              <span className="project-next-label">ANOTHER PROJECT</span>
-              <span className="project-next-title">
-                {nextProject.artist} — {nextProject.title}
-              </span>
-              <span className="project-next-arrow" aria-hidden="true">↗</span>
-            </a>
+            <aside className="project-other-projects" aria-labelledby="other-projects-title">
+              <header className="project-other-projects-header">
+                <h2 id="other-projects-title">ONGOING PROJECTS</h2>
+                <p>다른 프로젝트도 함께 진행 중입니다.</p>
+              </header>
+              <a className="project-next" href={`/projects/${nextProject.slug}`}>
+                <span className="project-next-label">ANOTHER PROJECT</span>
+                <span className="project-next-title">
+                  {nextProject.artist} — {nextProject.title}
+                </span>
+                <span className="project-next-arrow" aria-hidden="true">↗</span>
+              </a>
+            </aside>
           ) : null}
         </div>
       </main>
