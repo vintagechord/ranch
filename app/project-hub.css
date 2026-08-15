@@ -3200,7 +3200,7 @@ html.site-motion-paused .vc-lead-dialog-header > button:focus-visible {
 }
 
 .project-page-releases.project-page-compact .vc-release-eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 clamp(14px, 1.4vw, 20px);
   font-size: 0.53rem;
 }
 
@@ -3454,7 +3454,7 @@ a.vc-released-card-media:focus-visible {
 }
 
 .project-page-participation .project-artist {
-  margin-bottom: 6px;
+  margin-bottom: clamp(14px, 1.4vw, 20px);
   font-size: 0.7rem;
 }
 
