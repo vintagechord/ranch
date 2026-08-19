@@ -8964,6 +8964,18 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
   padding: 10px 14px 14px;
 }
 
+.project-page-participation
+  .project-participation:not(.is-performance)
+  .project-participation-grid
+  > li.is-application-open:not(:has(> .project-participation-brief)) {
+  grid-template-areas:
+    "confirmed"
+    "role"
+    "cta";
+  grid-template-rows: 32px auto 46px;
+  align-content: start;
+}
+
 .project-page-participation .project-participation-grid > li.is-application-open > .project-participation-role {
   grid-area: role;
   align-self: end;
