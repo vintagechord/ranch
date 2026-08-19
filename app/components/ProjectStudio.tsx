@@ -339,10 +339,10 @@ export default function ProjectStudio({ nextMeeting, projects }: ProjectStudioPr
         <div className="studio-stage-glow" aria-hidden="true" />
 
         <div className="studio-stage-toolbar">
-          <span className="studio-live-pill" aria-hidden="true"><i /> LIVE</span>
           <span className="studio-active-count">
             <span className="studio-visually-hidden">현재 진행 중인 프로젝트 {activeProjectCount}개</span>
-            <span aria-hidden="true">진행 중 ·</span>
+            <span className="studio-live-pill" aria-hidden="true"><i /> LIVE</span>
+            <span aria-hidden="true">·</span>
             <strong aria-hidden="true">{activeProjectCountLabel}</strong>
           </span>
         </div>
