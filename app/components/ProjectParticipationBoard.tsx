@@ -5,6 +5,7 @@ import ConfirmedParticipants from "@/app/components/ConfirmedParticipants";
 import type { PublicMusicRelease, ReleaseRoleState } from "@/lib/releaseParticipation";
 
 type ProjectParticipationBoardProps = {
+  collectPortfolio?: boolean;
   projectTitle: string;
   release: PublicMusicRelease;
   variant?: "default" | "performance";
@@ -40,6 +41,7 @@ function roleStateLabel(state: ReleaseRoleState) {
 }
 
 export default function ProjectParticipationBoard({
+  collectPortfolio = true,
   projectTitle,
   release,
   variant = "default"
@@ -56,7 +58,7 @@ export default function ProjectParticipationBoard({
   }
 
   return (
-    <ParticipationRequest>
+    <ParticipationRequest collectPortfolio={collectPortfolio}>
       {(openRequest) => (
         <section
           className={`project-participation${variant === "performance" ? " is-performance" : ""}`}

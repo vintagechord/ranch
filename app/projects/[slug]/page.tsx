@@ -274,6 +274,9 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
 
               {participationRelease ? (
                 <ProjectParticipationBoard
+                  collectPortfolio={
+                    project.slug !== "ibyeol-ui-dosu" && project.slug !== "wandurup-dudu"
+                  }
                   projectTitle={`${project.artist}의 ‘${project.title}’`}
                   release={participationRelease}
                   variant={isPerformanceProject ? "performance" : "default"}

@@ -24,6 +24,7 @@ export type OpenParticipationRequest = (
 
 type ParticipationRequestProps = {
   children: (openRequest: OpenParticipationRequest) => ReactNode;
+  collectPortfolio?: boolean;
 };
 
 type SubmitState = {
@@ -36,7 +37,10 @@ function textValue(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export default function ParticipationRequest({ children }: ParticipationRequestProps) {
+export default function ParticipationRequest({
+  children,
+  collectPortfolio = true
+}: ParticipationRequestProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -128,7 +132,9 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
         name: textValue(formData, "name"),
         credit_name: textValue(formData, "credit_name"),
         contact: textValue(formData, "contact"),
-        portfolio_url: textValue(formData, "portfolio_url"),
+        ...(collectPortfolio
+          ? { portfolio_url: textValue(formData, "portfolio_url") }
+          : {}),
         message: textValue(formData, "message"),
         privacy_agreed: true,
         credit_publication_agreed: true,
@@ -234,7 +240,7 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
                   <span>활동명 / 크레딧명 *</span>
                   <input name="credit_name" type="text" maxLength={80} required />
                 </label>
-                <label>
+                <label className={collectPortfolio ? undefined : "is-wide"}>
                   <span>이메일 또는 전화번호 *</span>
                   <input
                     name="contact"
@@ -248,17 +254,19 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
                   />
                   <small id={contactHintId}>둘 중 편한 연락 방법 하나만 입력해 주세요.</small>
                 </label>
-                <label>
-                  <span>포트폴리오 링크</span>
-                  <input
-                    name="portfolio_url"
-                    type="url"
-                    inputMode="url"
-                    maxLength={1000}
-                    placeholder="https://"
-                    pattern="https://.+"
-                  />
-                </label>
+                {collectPortfolio ? (
+                  <label>
+                    <span>포트폴리오 링크</span>
+                    <input
+                      name="portfolio_url"
+                      type="url"
+                      inputMode="url"
+                      maxLength={1000}
+                      placeholder="https://"
+                      pattern="https://.+"
+                    />
+                  </label>
+                ) : null}
                 <label className="is-wide">
                   <span>참여 메모 *</span>
                   <textarea name="message" rows={5} minLength={10} maxLength={2000} required />
@@ -268,7 +276,9 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
               <label className="vc-lead-privacy">
                 <input name="privacy_agreed" type="checkbox" required />
                 <span>
-                  참여 검토와 회신을 위해 이름·활동명·이메일 또는 전화번호·포트폴리오 및 참여 메모를 수집하고 접수일로부터 1년간 보관하는 데 동의합니다.
+                  {collectPortfolio
+                    ? "참여 검토와 회신을 위해 이름·활동명·이메일 또는 전화번호·포트폴리오 및 참여 메모를 수집하고 접수일로부터 1년간 보관하는 데 동의합니다."
+                    : "참여 검토와 회신을 위해 이름·활동명·이메일 또는 전화번호·참여 메모를 수집하고 접수일로부터 1년간 보관하는 데 동의합니다."}
                 </span>
               </label>
 
