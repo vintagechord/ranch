@@ -549,10 +549,10 @@ img {
 }
 
 .piggy-bank-button {
-  --header-tool-accent: #ff79b4;
-  --header-tool-border: rgba(255, 151, 198, 0.54);
-  --header-tool-glow: rgba(255, 105, 177, 0.17);
-  --header-tool-tint: rgba(255, 105, 177, 0.13);
+  --header-tool-accent: #bd1f32;
+  --header-tool-border: rgba(235, 232, 223, 0.3);
+  --header-tool-glow: rgba(189, 31, 50, 0.13);
+  --header-tool-tint: rgba(235, 232, 223, 0.055);
 }
 
 .sf-factory-link:hover,
@@ -631,38 +631,55 @@ img {
 .piggy-bank-button svg {
   position: relative;
   z-index: 1;
-  width: 29px;
-  height: 29px;
+  width: 30px;
+  height: 30px;
   fill: none;
-  stroke: #ffe1ef;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.6;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
 }
 
 .piggy-body {
-  fill: #ff82b9;
+  fill: #c8c5bc;
+  stroke: #080908;
+  stroke-width: 1.35;
 }
 
 .piggy-ear,
 .piggy-snout,
 .piggy-leg {
-  fill: #ffb5d5;
+  fill: #96968f;
+  stroke: #080908;
+  stroke-width: 1.35;
+}
+
+.piggy-tail {
+  fill: none;
+  stroke: #c8c5bc;
+  stroke-width: 1.8;
 }
 
 .piggy-eye,
 .piggy-nostril {
-  fill: #341522;
+  fill: #080908;
+  stroke: none;
 }
 
 .piggy-slot {
-  stroke: #341522;
-  stroke-width: 2;
+  stroke: #080908;
+  stroke-width: 2.1;
 }
 
 .piggy-coin {
-  fill: #ffd66f;
+  fill: #bd1f32;
+  stroke: #ebe8df;
+  stroke-width: 1;
+}
+
+.piggy-coin-mark {
+  fill: none;
+  stroke: #ebe8df;
+  stroke-width: 0.9;
 }
 
 .piggy-bank-popover {
@@ -4665,6 +4682,11 @@ html.site-motion-paused .sf-platforms a:active {
   }
 
   .sf-factory-link svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .piggy-bank-button svg {
     width: 28px;
     height: 28px;
   }
