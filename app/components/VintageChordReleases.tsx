@@ -265,7 +265,8 @@ function UpcomingReleaseCard({
                     roleLabel: row.label
                   })}
                 >
-                  참여 희망 <span aria-hidden="true">↗</span>
+                  <span className="participation-button-label">참여 희망</span>
+                  <span className="participation-button-icon" aria-hidden="true">↗</span>
                 </button>
               ) : null}
             </li>

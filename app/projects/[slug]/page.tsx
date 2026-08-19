@@ -166,12 +166,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <h1 className="project-title" id="project-title">
                     {project.title}
                   </h1>
-                  <p className="project-title-subcopy">{project.subcopy}</p>
                   <div className="project-stage-line">
                     <span>CURRENT STAGE</span>
                     <strong>{project.stage}</strong>
                   </div>
                 </div>
+
+                <section className="project-hero-intro" aria-labelledby="project-description-title">
+                  <h2 className="sr-only" id="project-description-title">프로젝트 소개</h2>
+                  <p>{project.subcopy}</p>
+                </section>
 
                 <ProjectVisual project={project} />
               </section>

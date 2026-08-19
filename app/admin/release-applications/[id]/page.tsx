@@ -28,11 +28,11 @@ type ApplicationDetail = {
   release_role_id: string;
   applicant_name: string;
   credit_name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   profile_url: string | null;
   portfolio_url: string | null;
-  availability: string;
+  availability: string | null;
   message: string;
   status: string;
   admin_note: string | null;
@@ -345,12 +345,13 @@ export default async function AdminReleaseApplicationDetailPage({
             <dd>{application.credit_name}</dd>
           </div>
           <div>
-            <dt>이메일</dt>
-            <dd><a href={`mailto:${application.email}`}>{application.email}</a></dd>
-          </div>
-          <div>
-            <dt>연락처</dt>
-            <dd>{application.phone ? <a href={`tel:${application.phone}`}>{application.phone}</a> : "-"}</dd>
+            <dt>연락 수단</dt>
+            <dd>
+              {application.email ? <a href={`mailto:${application.email}`}>{application.email}</a> : null}
+              {application.email && application.phone ? " · " : null}
+              {application.phone ? <a href={`tel:${application.phone}`}>{application.phone}</a> : null}
+              {!application.email && !application.phone ? "-" : null}
+            </dd>
           </div>
           <div>
             <dt>프로필</dt>
@@ -391,10 +392,12 @@ export default async function AdminReleaseApplicationDetailPage({
             <h2>참여 제안</h2>
             <p className="admin-detail-message">{application.message}</p>
           </div>
-          <div className="admin-detail-panel">
-            <h2>가능 일정</h2>
-            <p className="admin-detail-message">{application.availability}</p>
-          </div>
+          {application.availability ? (
+            <div className="admin-detail-panel">
+              <h2>기존 가능 일정</h2>
+              <p className="admin-detail-message">{application.availability}</p>
+            </div>
+          ) : null}
         </div>
 
         <div className="admin-detail-columns">

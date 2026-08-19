@@ -43,6 +43,7 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
   const successButtonRef = useRef<HTMLButtonElement>(null);
   const idempotencyKeyRef = useRef("");
   const dialogTitleId = useId();
+  const contactHintId = useId();
   const [selectedLead, setSelectedLead] = useState<ParticipationRequestTarget | null>(null);
   const [submitState, setSubmitState] = useState<SubmitState>({
     status: "idle",
@@ -126,10 +127,8 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
         lead_id: selectedLead.leadId,
         name: textValue(formData, "name"),
         credit_name: textValue(formData, "credit_name"),
-        email: textValue(formData, "email"),
-        phone: textValue(formData, "phone"),
+        contact: textValue(formData, "contact"),
         portfolio_url: textValue(formData, "portfolio_url"),
-        availability: textValue(formData, "availability"),
         message: textValue(formData, "message"),
         privacy_agreed: true,
         credit_publication_agreed: true,
@@ -236,14 +235,20 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
                   <input name="credit_name" type="text" maxLength={80} required />
                 </label>
                 <label>
-                  <span>이메일 *</span>
-                  <input name="email" type="email" autoComplete="email" maxLength={254} required />
+                  <span>이메일 또는 전화번호 *</span>
+                  <input
+                    name="contact"
+                    type="text"
+                    maxLength={254}
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    placeholder="email@example.com 또는 010-0000-0000"
+                    aria-describedby={contactHintId}
+                    required
+                  />
+                  <small id={contactHintId}>둘 중 편한 연락 방법 하나만 입력해 주세요.</small>
                 </label>
                 <label>
-                  <span>연락처</span>
-                  <input name="phone" type="tel" autoComplete="tel" minLength={7} maxLength={40} />
-                </label>
-                <label className="is-wide">
                   <span>포트폴리오 링크</span>
                   <input
                     name="portfolio_url"
@@ -255,10 +260,6 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
                   />
                 </label>
                 <label className="is-wide">
-                  <span>가능 일정 *</span>
-                  <input name="availability" type="text" maxLength={500} required />
-                </label>
-                <label className="is-wide">
                   <span>참여 메모 *</span>
                   <textarea name="message" rows={5} minLength={10} maxLength={2000} required />
                 </label>
@@ -267,7 +268,7 @@ export default function ParticipationRequest({ children }: ParticipationRequestP
               <label className="vc-lead-privacy">
                 <input name="privacy_agreed" type="checkbox" required />
                 <span>
-                  참여 검토와 회신을 위해 입력 정보를 수집하며 접수일로부터 1년간 보관하는 데 동의합니다.
+                  참여 검토와 회신을 위해 이름·활동명·이메일 또는 전화번호·포트폴리오 및 참여 메모를 수집하고 접수일로부터 1년간 보관하는 데 동의합니다.
                 </span>
               </label>
 

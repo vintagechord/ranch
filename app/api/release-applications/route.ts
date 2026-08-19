@@ -16,6 +16,8 @@ type ReleaseApplicationPayload = {
   idempotency_key?: unknown;
   name?: unknown;
   credit_name?: unknown;
+  contact?: unknown;
+  // Keep accepting the former fields for forms opened before this deployment.
   email?: unknown;
   phone?: unknown;
   profile_url?: unknown;
@@ -29,11 +31,14 @@ type ReleaseApplicationPayload = {
 
 const MAX_REQUEST_BYTES = 50_000;
 const SUCCESS_MESSAGE = "참여 요청이 접수되었습니다.";
+const LEGACY_PRIVACY_VERSION = "2026-08-15-release-participation-v1";
 const PRIVATE_RESPONSE_HEADERS = {
   "Cache-Control": "private, no-cache, no-store, max-age=0"
 };
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_PATTERN = /^\+?[0-9().\-\s]+$/;
 
 function jsonResponse(
   body: { ok: boolean; message: string },
@@ -65,6 +70,10 @@ function nullableString(value: unknown) {
 
 function codePointLength(value: string) {
   return Array.from(value).length;
+}
+
+function phoneDigits(value: string) {
+  return value.replace(/\D/g, "");
 }
 
 function safeErrorCode(error: unknown) {
@@ -190,9 +199,35 @@ export async function POST(request: Request) {
   const idempotencyKey = stringValue(body.idempotency_key).toLowerCase();
   const name = stringValue(body.name);
   const creditName = stringValue(body.credit_name);
-  const email = stringValue(body.email).toLowerCase();
-  const phone = nullableString(body.phone);
-  const availability = stringValue(body.availability);
+  const contact = stringValue(body.contact);
+  const legacyEmail = stringValue(body.email).toLowerCase();
+  const legacyPhone = nullableString(body.phone);
+  const isLegacyPayload = !contact && Boolean(legacyEmail);
+  const normalizedContact = contact.toLowerCase();
+  const contactLength = codePointLength(contact);
+  const contactIsEmail = contactLength >= 3 &&
+    contactLength <= 254 &&
+    EMAIL_PATTERN.test(normalizedContact);
+  const contactDigitCount = phoneDigits(contact).length;
+  const contactIsPhone = Boolean(contact) &&
+    codePointLength(contact) <= 40 &&
+    PHONE_PATTERN.test(contact) &&
+    contactDigitCount >= 7 &&
+    contactDigitCount <= 15;
+  const email = isLegacyPayload
+    ? legacyEmail
+    : contactIsEmail
+      ? normalizedContact
+      : null;
+  const phone = isLegacyPayload
+    ? legacyPhone
+    : contactIsPhone
+      ? contact
+      : null;
+  const availability = isLegacyPayload ? stringValue(body.availability) : null;
+  const privacyNoticeVersion = isLegacyPayload
+    ? LEGACY_PRIVACY_VERSION
+    : RELEASE_APPLICATION_PRIVACY_VERSION;
   const message = stringValue(body.message);
 
   if (!UUID_PATTERN.test(leadId) || !UUID_PATTERN.test(idempotencyKey)) {
@@ -202,10 +237,12 @@ export async function POST(request: Request) {
   const requiredFields: Array<[string, number, number]> = [
     [name, 1, 80],
     [creditName, 1, 80],
-    [email, 3, 254],
-    [availability, 1, 500],
     [message, 10, 2000]
   ];
+
+  if (isLegacyPayload) {
+    requiredFields.push([legacyEmail, 3, 254], [availability ?? "", 1, 500]);
+  }
 
   if (
     requiredFields.some(
@@ -215,24 +252,40 @@ export async function POST(request: Request) {
     return jsonError("필수 항목과 입력 길이를 확인해 주세요.", 400);
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isLegacyPayload && !contactIsEmail && !contactIsPhone) {
+    return jsonError("이메일 또는 전화번호를 확인해 주세요.", 400);
+  }
+
+  if (isLegacyPayload && !EMAIL_PATTERN.test(legacyEmail)) {
     return jsonError("이메일 주소를 확인해 주세요.", 400);
   }
 
   if (
     phone &&
-    (codePointLength(phone) < 7 ||
-      codePointLength(phone) > 40 ||
-      !/^[0-9+().\-\s]+$/.test(phone))
+    (codePointLength(phone) > 40 ||
+      !PHONE_PATTERN.test(phone) ||
+      phoneDigits(phone).length < 7 ||
+      phoneDigits(phone).length > 15)
   ) {
     return jsonError("연락처를 확인해 주세요.", 400);
   }
 
-  const profileUrl = normalizeHttpsUrl(body.profile_url);
   const portfolioUrl = normalizeHttpsUrl(body.portfolio_url);
 
-  if (profileUrl === undefined || portfolioUrl === undefined) {
-    return jsonError("프로필과 포트폴리오는 https://로 시작하는 주소를 입력해 주세요.", 400);
+  if (portfolioUrl === undefined) {
+    return jsonError("포트폴리오는 https://로 시작하는 주소를 입력해 주세요.", 400);
+  }
+
+  let profileUrl: string | null = null;
+
+  if (isLegacyPayload) {
+    const legacyProfileUrl = normalizeHttpsUrl(body.profile_url);
+
+    if (legacyProfileUrl === undefined) {
+      return jsonError("프로필은 https://로 시작하는 주소를 입력해 주세요.", 400);
+    }
+
+    profileUrl = legacyProfileUrl;
   }
 
   if (body.privacy_agreed !== true) {
@@ -245,16 +298,21 @@ export async function POST(request: Request) {
 
   let supabase: ReturnType<typeof getSupabaseAdmin>;
   let requestFingerprint = "";
-  let emailFingerprint = "";
+  let contactFingerprint = "";
   let payloadHash = "";
 
   try {
     supabase = getSupabaseAdmin();
     requestFingerprint = createRequestFingerprint(request, "release-participation");
-    emailFingerprint = createValueFingerprint(
-      "release-participation-email",
-      `${leadId}\0${email}`
-    );
+    contactFingerprint = email
+      ? createValueFingerprint(
+        "release-participation-email",
+        `${leadId}\0${email}`
+      )
+      : createValueFingerprint(
+        "release-participation-phone",
+        `${leadId}\0${phoneDigits(phone ?? "")}`
+      );
     payloadHash = createScopedPayloadHash("release-participation", {
       release_role_id: leadId,
       applicant_name: name,
@@ -265,7 +323,7 @@ export async function POST(request: Request) {
       portfolio_url: portfolioUrl,
       availability,
       message,
-      privacy_notice_version: RELEASE_APPLICATION_PRIVACY_VERSION,
+      privacy_notice_version: privacyNoticeVersion,
       credit_publication_notice_version: RELEASE_CREDIT_PUBLICATION_VERSION
     });
   } catch (error) {
@@ -286,12 +344,12 @@ export async function POST(request: Request) {
         p_portfolio_url: portfolioUrl,
         p_availability: availability,
         p_message: message,
-        p_privacy_notice_version: RELEASE_APPLICATION_PRIVACY_VERSION,
+        p_privacy_notice_version: privacyNoticeVersion,
         p_credit_publication_notice_version: RELEASE_CREDIT_PUBLICATION_VERSION,
         p_idempotency_key: idempotencyKey,
         p_payload_hash: payloadHash,
         p_request_fingerprint: requestFingerprint,
-        p_email_fingerprint: emailFingerprint
+        p_email_fingerprint: contactFingerprint
       }
     );
 

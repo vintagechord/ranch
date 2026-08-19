@@ -46,6 +46,9 @@ export default function ProjectParticipationBoard({
   const leads = [...release.leads].sort(
     (a, b) => a.sortOrder - b.sortOrder || a.roleLabel.localeCompare(b.roleLabel, "ko")
   );
+  const sectionDescription = variant === "performance"
+    ? "공연을 함께 만들 역할을 선택해 참여를 신청하세요."
+    : "앨범 제작에 함께할 역할을 선택해 참여를 신청하세요.";
 
   if (leads.length === 0) {
     return null;
@@ -60,7 +63,10 @@ export default function ProjectParticipationBoard({
         >
           <div className="project-section-heading project-participation-heading">
             <span className="project-section-number">01</span>
-            <h2 id="project-participation-title">PARTICIPATION</h2>
+            <div className="project-section-heading-copy">
+              <h2 id="project-participation-title">PARTICIPATION</h2>
+              <p>{sectionDescription}</p>
+            </div>
           </div>
 
           {(() => {
@@ -68,11 +74,19 @@ export default function ProjectParticipationBoard({
               const credits = [...lead.credits].sort((a, b) => a.sortOrder - b.sortOrder);
 
               return (
-                <li data-state={lead.state} key={lead.leadId}>
+                <li
+                  className={lead.canApply ? "is-application-open" : undefined}
+                  data-state={lead.state}
+                  key={lead.leadId}
+                >
                   <span className="project-participation-index" aria-hidden="true">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <strong className="project-participation-role">{lead.roleLabel}</strong>
+
+                  {lead.brief ? (
+                    <p className="project-participation-brief">{lead.brief}</p>
+                  ) : null}
 
                   <span className="project-participation-credit">
                     {credits.map((credit) => (
@@ -93,7 +107,8 @@ export default function ProjectParticipationBoard({
                         roleLabel: lead.roleLabel
                       })}
                     >
-                      참여 희망 <span aria-hidden="true">↗</span>
+                      <span className="participation-button-label">참여 희망</span>
+                      <span className="participation-button-icon" aria-hidden="true">↗</span>
                     </button>
                   ) : credits.length === 0 ? (
                     <span className="project-participation-state">{roleStateLabel(lead.state)}</span>

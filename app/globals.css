@@ -507,7 +507,10 @@ img {
 
 .piggy-bank-button,
 .sf-factory-link {
-  --header-tool-accent: #b86e4b;
+  --header-tool-accent: #ff4545;
+  --header-tool-border: rgba(255, 94, 86, 0.48);
+  --header-tool-glow: rgba(255, 55, 55, 0.14);
+  --header-tool-tint: rgba(255, 55, 55, 0.11);
   position: relative;
   isolation: isolate;
   display: inline-flex;
@@ -518,17 +521,19 @@ img {
   height: 42px;
   padding: 0;
   overflow: hidden;
-  border: 1px solid rgba(235, 232, 223, 0.3);
+  border: 1px solid var(--header-tool-border);
   border-radius: 5px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.11), transparent 42%),
+    linear-gradient(145deg, var(--header-tool-tint), transparent 62%),
     #141512;
   color: #dedbd2;
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.56),
     inset 0 -3px 0 var(--header-tool-accent),
     0 3px 0 #030403,
-    0 8px 18px rgba(0, 0, 0, 0.34);
+    0 8px 18px rgba(0, 0, 0, 0.34),
+    0 0 16px var(--header-tool-glow);
   transition:
     border-color 160ms ease,
     background 160ms ease,
@@ -537,27 +542,35 @@ img {
 }
 
 .sf-factory-link {
-  --header-tool-accent: #c77749;
+  --header-tool-accent: #ff4141;
+  --header-tool-border: rgba(255, 92, 82, 0.5);
+  --header-tool-glow: rgba(255, 48, 48, 0.16);
+  --header-tool-tint: rgba(255, 48, 48, 0.12);
 }
 
 .piggy-bank-button {
-  --header-tool-accent: #ae7d86;
+  --header-tool-accent: #ff79b4;
+  --header-tool-border: rgba(255, 151, 198, 0.54);
+  --header-tool-glow: rgba(255, 105, 177, 0.17);
+  --header-tool-tint: rgba(255, 105, 177, 0.13);
 }
 
 .sf-factory-link:hover,
 .sf-factory-link.is-active,
 .piggy-bank-button:hover,
 .piggy-bank-button[aria-expanded="true"] {
-  border-color: rgba(235, 232, 223, 0.58);
+  border-color: color-mix(in srgb, var(--header-tool-accent) 68%, #fff 32%);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent 48%),
+    linear-gradient(145deg, color-mix(in srgb, var(--header-tool-tint) 78%, transparent), transparent 66%),
     #1b1c18;
   transform: translateY(-1px);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.46),
     inset 0 -3px 0 var(--header-tool-accent),
     0 4px 0 #030403,
-    0 11px 22px rgba(0, 0, 0, 0.42);
+    0 11px 22px rgba(0, 0, 0, 0.42),
+    0 0 22px var(--header-tool-glow);
 }
 
 .sf-factory-link:focus-visible,
@@ -582,7 +595,7 @@ img {
   width: 30px;
   height: 30px;
   fill: none;
-  stroke: #dedbd2;
+  stroke: #ffd8d4;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.55;
@@ -590,11 +603,11 @@ img {
 }
 
 .sf-factory-body {
-  fill: #bdb9ad;
+  fill: #f43f45;
 }
 
 .sf-factory-stack {
-  fill: #9f583d;
+  fill: #bd1f32;
 }
 
 .sf-factory-smoke,
@@ -604,11 +617,11 @@ img {
 }
 
 .sf-factory-sun {
-  fill: #bca563;
+  fill: #ff7770;
 }
 
 .sf-factory-text {
-  fill: #dedbd2;
+  fill: #fff2f0;
   stroke: none;
   font-size: 7.4px;
   font-weight: 950;
@@ -621,7 +634,7 @@ img {
   width: 29px;
   height: 29px;
   fill: none;
-  stroke: #dedbd2;
+  stroke: #ffe1ef;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6;
@@ -629,27 +642,27 @@ img {
 }
 
 .piggy-body {
-  fill: #ad7f87;
+  fill: #ff82b9;
 }
 
 .piggy-ear,
 .piggy-snout,
 .piggy-leg {
-  fill: #c09ca0;
+  fill: #ffb5d5;
 }
 
 .piggy-eye,
 .piggy-nostril {
-  fill: #171815;
+  fill: #341522;
 }
 
 .piggy-slot {
-  stroke: #171815;
+  stroke: #341522;
   stroke-width: 2;
 }
 
 .piggy-coin {
-  fill: #bca563;
+  fill: #ffd66f;
 }
 
 .piggy-bank-popover {
@@ -4361,6 +4374,10 @@ html.site-motion-paused .sf-platforms a:active {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
   gap: 18px;
+}
+
+.admin-detail-columns > .admin-detail-panel:only-child {
+  grid-column: 1 / -1;
 }
 
 .admin-detail-panel {

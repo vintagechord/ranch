@@ -1,5 +1,5 @@
 export const RELEASE_PROJECT_SLUG = "vintagechord-post-production";
-export const RELEASE_APPLICATION_PRIVACY_VERSION = "2026-08-15-release-participation-v1";
+export const RELEASE_APPLICATION_PRIVACY_VERSION = "2026-08-19-release-participation-v2";
 export const RELEASE_CREDIT_PUBLICATION_VERSION = "2026-08-15-release-credit-publication-v1";
 
 export const MUSIC_RELEASE_STATES = [
@@ -97,11 +97,9 @@ export type ReleaseParticipationApplicationPayload = {
   idempotency_key: string;
   name: string;
   credit_name: string;
-  email: string;
-  phone?: string;
+  contact: string;
   profile_url?: string;
   portfolio_url?: string;
-  availability: string;
   message: string;
   privacy_agreed: true;
   credit_publication_agreed: true;

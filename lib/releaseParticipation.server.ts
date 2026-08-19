@@ -66,6 +66,7 @@ export type ReleaseApplicationQueueItem = Pick<
   | "applicant_name"
   | "credit_name"
   | "email"
+  | "phone"
   | "status"
   | "retention_until"
 > & {
@@ -274,7 +275,7 @@ export async function getReleaseParticipationApplicationQueue({
   let query = supabase
     .from("release_participation_applications")
     .select(
-      "id, release_role_id, created_at, applicant_name, credit_name, email, status, retention_until",
+      "id, release_role_id, created_at, applicant_name, credit_name, email, phone, status, retention_until",
       { count: "exact" }
     )
     .gt("retention_until", now);
@@ -300,6 +301,7 @@ export async function getReleaseParticipationApplicationQueue({
       | "applicant_name"
       | "credit_name"
       | "email"
+      | "phone"
       | "status"
       | "retention_until"
     >
@@ -365,6 +367,7 @@ export async function getReleaseParticipationApplicationQueue({
       applicant_name: application.applicant_name,
       credit_name: application.credit_name,
       email: application.email,
+      phone: application.phone,
       status: application.status,
       retention_until: application.retention_until,
       releaseNumber: release.release_number,
