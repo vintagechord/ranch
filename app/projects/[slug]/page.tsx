@@ -112,17 +112,27 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params, searchParams }: ProjectPageProps) {
   const { slug } = await params;
-  const projectResult = await Promise.allSettled([getPublicProjectBySlug(slug)]);
-  const projectLoadResult = projectResult[0];
+  const [projectResult, publicProjectsResult] = await Promise.allSettled([
+    getPublicProjectBySlug(slug),
+    getPublicActiveProjects()
+  ]);
 
-  if (projectLoadResult.status === "rejected") {
-    console.error("Public project setting load failed:", projectLoadResult.reason);
+  if (projectResult.status === "rejected") {
+    console.error("Public project setting load failed:", projectResult.reason);
     notFound();
   }
 
-  const project = projectLoadResult.value;
+  const project = projectResult.value;
   if (!project) {
     notFound();
+  }
+
+  const publicProjects = publicProjectsResult.status === "fulfilled"
+    ? publicProjectsResult.value
+    : [];
+
+  if (publicProjectsResult.status === "rejected") {
+    console.error("Public project navigation settings load failed:", publicProjectsResult.reason);
   }
 
   const projectStyle: ProjectStyle = {
@@ -145,7 +155,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
 
     return (
       <>
-        <Header projects={[]} showApplyCta={false} />
+        <Header projects={publicProjects} showApplyCta={false} />
         <main className="project-page project-access-page" id="top" style={projectStyle}>
           <div className="project-shell project-access-shell">
             <a className="project-back-link" href="/#project-room">
@@ -202,17 +212,6 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
         <Footer />
       </>
     );
-  }
-
-  const publicProjectsResult = await Promise.allSettled([getPublicActiveProjects()]);
-  const publicProjectsLoadResult = publicProjectsResult[0];
-
-  const publicProjects = publicProjectsLoadResult.status === "fulfilled"
-    ? publicProjectsLoadResult.value
-    : [];
-
-  if (publicProjectsLoadResult.status === "rejected") {
-    console.error("Public project navigation settings load failed:", publicProjectsLoadResult.reason);
   }
 
   const projectIndex = publicProjects.findIndex((item) => item.slug === project.slug);
