@@ -1,6 +1,7 @@
 "use client";
 
 import ParticipationRequest from "@/app/components/ParticipationRequest";
+import ConfirmedParticipants from "@/app/components/ConfirmedParticipants";
 import type { PublicMusicRelease, ReleaseRoleState } from "@/lib/releaseParticipation";
 
 type ProjectParticipationBoardProps = {
@@ -92,23 +93,13 @@ export default function ProjectParticipationBoard({
                     className={`project-participation-actions${credits.length > 0 && lead.canApply ? " has-mixed-actions" : ""}`}
                   >
                     {credits.length > 0 ? (
-                      <span
+                      <ConfirmedParticipants
                         className="project-participation-credit"
-                        role="list"
-                        aria-label="확정 인원"
-                      >
-                        {credits.map((credit) => (
-                          <span
-                            className="confirmed-participant-chip"
-                            role="listitem"
-                            aria-label={`${credit.displayName} 참여 확정`}
-                            key={credit.id}
-                          >
-                            <span className="confirmed-participant-mark" aria-hidden="true">✓</span>
-                            <span className="confirmed-participant-name">{credit.displayName}</span>
-                          </span>
-                        ))}
-                      </span>
+                        credits={credits}
+                        collapsible={lead.canApply}
+                        contextLabel={projectTitle}
+                        roleLabel={lead.roleLabel}
+                      />
                     ) : null}
 
                     {lead.canApply ? (

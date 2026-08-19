@@ -3,6 +3,7 @@
 import ParticipationRequest, {
   type OpenParticipationRequest
 } from "@/app/components/ParticipationRequest";
+import ConfirmedParticipants from "@/app/components/ConfirmedParticipants";
 import { StudioSpeaker } from "@/app/components/StudioEquipment";
 import type {
   PublicMusicRelease,
@@ -249,19 +250,13 @@ function UpcomingReleaseCard({
                 className={`vc-release-role-actions${row.credits.length > 0 && row.lead.canApply ? " has-mixed-actions" : ""}`}
               >
                 {row.credits.length > 0 ? (
-                  <span className="vc-release-credit" role="list" aria-label="확정 인원">
-                    {row.credits.map((credit) => (
-                      <span
-                        className="confirmed-participant-chip"
-                        role="listitem"
-                        aria-label={`${credit.displayName} 참여 확정`}
-                        key={credit.id}
-                      >
-                        <span className="confirmed-participant-mark" aria-hidden="true">✓</span>
-                        <span className="confirmed-participant-name">{credit.displayName}</span>
-                      </span>
-                    ))}
-                  </span>
+                  <ConfirmedParticipants
+                    className="vc-release-credit"
+                    credits={row.credits}
+                    collapsible={row.lead.canApply}
+                    contextLabel={`PROJECT ${number}`}
+                    roleLabel={row.label}
+                  />
                 ) : null}
                 {row.lead.canApply ? (
                   <button

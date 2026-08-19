@@ -9096,3 +9096,275 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
     grid-template-columns: 1fr;
   }
 }
+
+/* Open credit rails collapse by measured width and reveal the full roster in a dialog. */
+.confirmed-participants > .confirmed-participants-visible {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.project-page-participation
+  .project-participation-grid
+  > li.is-application-open
+  > .project-participation-actions.has-mixed-actions
+  > .confirmed-participants.is-collapsible {
+  position: relative;
+  width: calc(100% - 40px);
+  max-width: none;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  justify-self: end;
+  overflow: visible;
+}
+
+.project-page-releases.project-page-compact
+  .vc-release-roles
+  > li.is-open
+  > .vc-release-role-actions.has-mixed-actions
+  > .confirmed-participants.is-collapsible {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  justify-self: stretch;
+  overflow: visible;
+}
+
+.confirmed-participants.is-collapsible > .confirmed-participants-visible {
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.confirmed-participants.is-collapsible:focus-visible {
+  outline: 2px solid #f1eee6;
+  outline-offset: 3px;
+}
+
+.confirmed-participants > .confirmed-participants-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: max-content;
+  gap: 6px;
+  align-items: center;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.project-page-participation
+  .project-participation-actions
+  button.confirmed-participant-more,
+.project-page-releases.project-page-compact
+  .vc-release-role-actions
+  button.confirmed-participant-more,
+.confirmed-participants > .confirmed-participants-measure > .confirmed-participant-more {
+  display: inline-flex;
+  width: auto;
+  min-width: 64px;
+  min-height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1px dashed color-mix(in srgb, var(--project-accent, #8db9c4) 58%, rgba(235, 232, 223, 0.32));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--project-accent, #8db9c4) 8%, #10110f 92%);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.07);
+  color: #d9ded9;
+  padding: 0 10px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  transform: none;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.project-page-participation
+  .project-participation-actions
+  button.confirmed-participant-more:hover,
+.project-page-releases.project-page-compact
+  .vc-release-role-actions
+  button.confirmed-participant-more:hover {
+  border-color: var(--project-accent, #8db9c4);
+  background: color-mix(in srgb, var(--project-accent, #8db9c4) 16%, #10110f 84%);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.project-page-participation
+  .project-participation-actions
+  button.confirmed-participant-more:focus-visible,
+.project-page-releases.project-page-compact
+  .vc-release-role-actions
+  button.confirmed-participant-more:focus-visible {
+  border-color: var(--project-accent, #8db9c4);
+  background: color-mix(in srgb, var(--project-accent, #8db9c4) 16%, #10110f 84%);
+  color: #fff;
+  outline: 2px solid #f1eee6;
+  outline-offset: 3px;
+  transform: translateY(-1px);
+}
+
+.confirmed-participants-dialog {
+  width: min(calc(100vw - 32px), 520px);
+  max-width: none;
+  max-height: min(78dvh, 620px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--project-accent, #8db9c4) 62%, rgba(235, 232, 223, 0.28));
+  border-radius: 3px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--project-accent, #8db9c4) 9%, transparent), transparent 48%),
+    #0c0d0c;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.72), inset 0 1px rgba(255, 255, 255, 0.08);
+  color: #efede6;
+}
+
+.confirmed-participants-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+.confirmed-participants-dialog-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  max-height: min(78dvh, 620px);
+}
+
+.confirmed-participants-dialog header {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid rgba(235, 232, 223, 0.16);
+}
+
+.confirmed-participants-dialog header > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.confirmed-participants-dialog header p,
+.confirmed-participants-dialog header h2 {
+  margin: 0;
+}
+
+.confirmed-participants-dialog header p {
+  color: #979891;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.confirmed-participants-dialog header h2 {
+  color: #f2efe8;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.confirmed-participants-dialog header h2 span {
+  color: var(--project-accent, #8db9c4);
+  font-size: 0.76em;
+}
+
+.confirmed-participants-dialog button.confirmed-participants-dialog-close {
+  display: grid;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin: 0;
+  border: 1px solid rgba(235, 232, 223, 0.28);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.035);
+  color: #d9d7d0;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.confirmed-participants-dialog button.confirmed-participants-dialog-close:hover,
+.confirmed-participants-dialog button.confirmed-participants-dialog-close:focus-visible {
+  border-color: var(--project-accent, #8db9c4);
+  background: color-mix(in srgb, var(--project-accent, #8db9c4) 14%, #10110f 86%);
+  color: #fff;
+  outline: none;
+}
+
+.confirmed-participants-dialog button.confirmed-participants-dialog-close:focus-visible {
+  outline: 2px solid #f1eee6;
+  outline-offset: 3px;
+}
+
+.confirmed-participants-dialog ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-content: flex-start;
+  margin: 0;
+  padding: 20px;
+  overflow: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+}
+
+.confirmed-participants-dialog ul:focus-visible {
+  outline: 2px solid #f1eee6;
+  outline-offset: -4px;
+}
+
+.confirmed-participants-dialog li {
+  display: flex;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .confirmed-participants-dialog {
+    width: calc(100vw - 20px);
+    max-height: min(82dvh, 620px);
+  }
+
+  .confirmed-participants-dialog-panel {
+    max-height: min(82dvh, 620px);
+  }
+
+  .confirmed-participants-dialog header {
+    padding: 15px 14px 13px;
+  }
+
+  .confirmed-participants-dialog ul {
+    gap: 7px;
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-page-participation
+    .project-participation-actions
+    button.confirmed-participant-more,
+  .project-page-releases.project-page-compact
+    .vc-release-role-actions
+    button.confirmed-participant-more,
+  .confirmed-participants-dialog button.confirmed-participants-dialog-close {
+    transition: none;
+  }
+}
