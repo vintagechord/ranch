@@ -8948,8 +8948,8 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
   margin: 0;
 }
 
-/* Performance cards reserve fixed rows so confirmed names never move copy or CTAs. */
-.project-page-participation .project-participation.is-performance .project-participation-grid > li {
+/* Open roles reserve fixed status and CTA rows; closed roles keep their centered balance. */
+.project-page-participation .project-participation-grid > li.is-application-open {
   grid-template-areas:
     "confirmed"
     "role"
@@ -8964,27 +8964,65 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
   padding: 10px 14px 14px;
 }
 
-.project-page-participation .project-participation.is-performance .project-participation-role {
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-role {
   grid-area: role;
   align-self: end;
   padding-inline: 0;
 }
 
-.project-page-participation .project-participation.is-performance .project-participation-brief {
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-brief {
   grid-area: brief;
   align-self: start;
 }
 
-.project-page-participation .project-participation.is-performance .project-participation-actions {
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-actions {
+  grid-area: cta;
+  align-self: end;
+  justify-self: center;
+  margin: 0;
+}
+
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-actions.has-mixed-actions {
   display: contents;
 }
 
-.project-page-participation .project-participation.is-performance .project-participation-actions > .project-participation-credit {
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open {
+  grid-template-areas:
+    "confirmed"
+    "role"
+    "cta";
+  grid-template-rows: 32px minmax(32px, 1fr) 46px;
+  gap: 8px;
+  min-height: 154px;
+  align-content: stretch;
+  align-items: stretch;
+  justify-items: center;
+  padding: 10px 14px 14px;
+}
+
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open > .vc-release-role-label {
+  grid-area: role;
+  align-self: center;
+}
+
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open > .vc-release-role-actions {
+  grid-area: cta;
+  align-self: end;
+  justify-self: center;
+  margin: 0;
+}
+
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open > .vc-release-role-actions.has-mixed-actions {
+  display: contents;
+}
+
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-actions.has-mixed-actions > .project-participation-credit,
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open > .vc-release-role-actions.has-mixed-actions > .vc-release-credit {
   grid-area: confirmed;
   align-self: center;
   justify-self: end;
   width: auto;
-  max-width: calc(100% - 40px);
+  max-width: 100%;
   flex-wrap: nowrap;
   justify-content: flex-start;
   gap: 6px;
@@ -8992,29 +9030,37 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
   scrollbar-width: none;
 }
 
-.project-page-participation .project-participation.is-performance .project-participation-actions > .project-participation-credit::-webkit-scrollbar {
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-actions.has-mixed-actions > .project-participation-credit {
+  max-width: calc(100% - 40px);
+}
+
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-actions.has-mixed-actions > .project-participation-credit::-webkit-scrollbar,
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open > .vc-release-role-actions.has-mixed-actions > .vc-release-credit::-webkit-scrollbar {
   display: none;
 }
 
-.project-page-participation .project-participation.is-performance .confirmed-participant-chip {
+.project-page-participation .project-participation-actions.has-mixed-actions .confirmed-participant-chip,
+.project-page-releases.project-page-compact .vc-release-role-actions.has-mixed-actions .confirmed-participant-chip {
   min-height: 32px;
   flex: 0 0 auto;
   gap: 6px;
   padding: 4px 10px 4px 4px;
 }
 
-.project-page-participation .project-participation.is-performance .confirmed-participant-mark {
+.project-page-participation .project-participation-actions.has-mixed-actions .confirmed-participant-mark,
+.project-page-releases.project-page-compact .vc-release-role-actions.has-mixed-actions .confirmed-participant-mark {
   width: 22px;
   height: 22px;
   font-size: 0.62rem;
 }
 
-.project-page-participation .project-participation.is-performance .confirmed-participant-name {
+.project-page-participation .project-participation-actions.has-mixed-actions .confirmed-participant-name,
+.project-page-releases.project-page-compact .vc-release-role-actions.has-mixed-actions .confirmed-participant-name {
   font-size: 0.72rem;
 }
 
-.project-page-participation .project-participation.is-performance .project-participation-actions > button,
-.project-page-participation .project-participation.is-performance .project-participation-actions > .project-participation-state {
+.project-page-participation .project-participation-grid > li.is-application-open > .project-participation-actions.has-mixed-actions > button,
+.project-page-releases.project-page-compact .vc-release-roles > li.is-open > .vc-release-role-actions.has-mixed-actions > button {
   grid-area: cta;
   align-self: end;
   justify-self: center;
