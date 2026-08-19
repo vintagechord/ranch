@@ -9195,7 +9195,6 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
 .confirmed-participant-chip {
   --confirmed-accent: var(--project-accent, #8db9c4);
   display: inline-flex;
-  gap: 8px;
   align-items: center;
   min-height: 40px;
   border: 1px solid color-mix(in srgb, var(--confirmed-accent) 62%, rgba(235, 232, 223, 0.28));
@@ -9207,22 +9206,8 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
     inset 0 1px rgba(255, 255, 255, 0.11),
     0 2px 8px rgba(0, 0, 0, 0.24);
   color: #edf2ed;
-  padding: 5px 12px 5px 5px;
+  padding: 5px 12px;
   white-space: nowrap;
-}
-
-.confirmed-participant-mark {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--confirmed-accent);
-  color: #090a09;
-  font-size: 0.7rem;
-  font-weight: 950;
-  line-height: 1;
 }
 
 .confirmed-participant-name {
@@ -9349,15 +9334,7 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
 .project-page-releases.project-page-compact .vc-release-role-actions.has-mixed-actions .confirmed-participant-chip {
   min-height: 32px;
   flex: 0 0 auto;
-  gap: 6px;
-  padding: 4px 10px 4px 4px;
-}
-
-.project-page-participation .project-participation-actions.has-mixed-actions .confirmed-participant-mark,
-.project-page-releases.project-page-compact .vc-release-role-actions.has-mixed-actions .confirmed-participant-mark {
-  width: 22px;
-  height: 22px;
-  font-size: 0.62rem;
+  padding: 4px 10px;
 }
 
 .project-page-participation .project-participation-actions.has-mixed-actions .confirmed-participant-name,

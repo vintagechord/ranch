@@ -32,7 +32,6 @@ function ParticipantChip({
       className="confirmed-participant-chip"
       role={listItem ? "listitem" : undefined}
     >
-      <span className="confirmed-participant-mark" aria-hidden="true">✓</span>
       <span className="confirmed-participant-name">{credit.displayName}</span>
       <span className="sr-only"> 참여 확정</span>
     </span>
@@ -42,7 +41,6 @@ function ParticipantChip({
 function MeasureParticipantChip({ credit }: { credit: PublicReleaseCredit }) {
   return (
     <span className="confirmed-participant-chip" data-confirmed-participant-measure>
-      <span className="confirmed-participant-mark">✓</span>
       <span className="confirmed-participant-name">{credit.displayName}</span>
     </span>
   );
