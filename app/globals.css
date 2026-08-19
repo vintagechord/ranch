@@ -542,10 +542,10 @@ img {
 }
 
 .sf-factory-link {
-  --header-tool-accent: #ff4141;
-  --header-tool-border: rgba(255, 92, 82, 0.5);
-  --header-tool-glow: rgba(255, 48, 48, 0.16);
-  --header-tool-tint: rgba(255, 48, 48, 0.12);
+  --header-tool-accent: #dedbd2;
+  --header-tool-border: rgba(235, 232, 223, 0.3);
+  --header-tool-glow: rgba(235, 232, 223, 0.08);
+  --header-tool-tint: rgba(235, 232, 223, 0.055);
 }
 
 .piggy-bank-button {
@@ -595,7 +595,7 @@ img {
   width: 30px;
   height: 30px;
   fill: none;
-  stroke: #ffd8d4;
+  stroke: #dedbd2;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.55;
@@ -603,7 +603,7 @@ img {
 }
 
 .sf-factory-body {
-  fill: #f43f45;
+  fill: #bdb9ad;
 }
 
 .sf-factory-stack {
@@ -617,11 +617,11 @@ img {
 }
 
 .sf-factory-sun {
-  fill: #ff7770;
+  fill: #8f9089;
 }
 
 .sf-factory-text {
-  fill: #fff2f0;
+  fill: #dedbd2;
   stroke: none;
   font-size: 7.4px;
   font-weight: 950;
