@@ -148,7 +148,11 @@ export default function ProjectParticipationBoard({
                   codes: [] as string[],
                   leads: uncategorized
                 }] : [])].map((group) => (
-                  <section className="project-participation-group" key={group.key}>
+                  <section
+                    className="project-participation-group"
+                    data-performance-group={group.key}
+                    key={group.key}
+                  >
                     <h3>{group.label}</h3>
                     <ol
                       className="project-participation-grid"

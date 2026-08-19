@@ -9016,6 +9016,22 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
   align-items: start;
 }
 
+.project-page-performance .project-participation-group[data-performance-group="direction"] {
+  --project-accent-alt: #ff7b4d;
+}
+
+.project-page-performance .project-participation-group[data-performance-group="performers"] {
+  --project-accent-alt: #d68cff;
+}
+
+.project-page-performance .project-participation-group[data-performance-group="technical"] {
+  --project-accent-alt: #63c7df;
+}
+
+.project-page-performance .project-participation-group[data-performance-group="creative-operations"] {
+  --project-accent-alt: #e7bd57;
+}
+
 .project-page-participation .project-participation-group {
   border-color: rgba(235, 232, 223, 0.2);
   background:
@@ -9045,6 +9061,14 @@ html.site-motion-paused .project-participation-grid button > .participation-butt
 .project-page-participation .project-participation-group .project-participation-grid > li:last-child {
   min-height: 160px;
   border: 1px solid rgba(235, 232, 223, 0.17);
+}
+
+.project-page-performance .project-participation-group .project-participation-grid > li.is-application-open {
+  border-color: color-mix(in srgb, var(--project-accent-alt) 30%, rgba(235, 232, 223, 0.17));
+}
+
+.project-page-performance .project-participation-group .project-participation-grid > li:focus-within {
+  border-color: color-mix(in srgb, var(--project-accent-alt) 72%, #e8e5dd 28%);
 }
 
 @media (max-width: 980px) {
