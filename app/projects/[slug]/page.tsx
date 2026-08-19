@@ -161,8 +161,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       <span className="project-status-dot" aria-hidden="true" />
                       {getProjectStatusLabel(project.state)}
                     </span>
+                    <p className="project-artist">{project.artist}</p>
                   </div>
-                  <p className="project-artist">{project.artist}</p>
                   <h1 className="project-title" id="project-title">
                     {project.title}
                   </h1>

@@ -1,10 +1,17 @@
-export const PROJECT_PROPOSAL_PRIVACY_VERSION = "2026-08-15-v1";
+export const PROJECT_PROPOSAL_PRIVACY_VERSION = "2026-08-19-v2";
 
 export const PROJECT_TYPES = [
   "싱글",
   "EP / 앨범",
+  "컴필레이션 / 협업 음원",
+  "리믹스 / 리이슈",
   "라이브 / 공연",
+  "파티 / 페스티벌",
   "영상 / 콘텐츠",
+  "방송 / 팟캐스트",
+  "전시 / 팝업",
+  "브랜드 / 캠페인",
+  "워크숍 / 커뮤니티",
   "기타"
 ] as const;
 

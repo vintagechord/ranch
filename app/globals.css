@@ -505,61 +505,96 @@ img {
   }
 }
 
-.piggy-bank-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid #15191d;
-  border-radius: 6px;
-  background: #fdfefe;
-  color: #15191d;
-  box-shadow: 4px 4px 0 #88bdf2;
-}
-
+.piggy-bank-button,
 .sf-factory-link {
+  --header-tool-accent: #b86e4b;
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   width: 42px;
   height: 42px;
-  border: 1px solid #15191d;
-  border-radius: 6px;
-  background: #ff9a3d;
-  color: #15191d;
-  box-shadow: 4px 4px 0 #e22718;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(235, 232, 223, 0.3);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), transparent 42%),
+    #141512;
+  color: #dedbd2;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.56),
+    inset 0 -3px 0 var(--header-tool-accent),
+    0 3px 0 #030403,
+    0 8px 18px rgba(0, 0, 0, 0.34);
   transition:
+    border-color 160ms ease,
     background 160ms ease,
     box-shadow 160ms ease,
     transform 160ms ease;
 }
 
+.sf-factory-link {
+  --header-tool-accent: #c77749;
+}
+
+.piggy-bank-button {
+  --header-tool-accent: #ae7d86;
+}
+
 .sf-factory-link:hover,
+.sf-factory-link.is-active,
+.piggy-bank-button:hover,
+.piggy-bank-button[aria-expanded="true"] {
+  border-color: rgba(235, 232, 223, 0.58);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent 48%),
+    #1b1c18;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.46),
+    inset 0 -3px 0 var(--header-tool-accent),
+    0 4px 0 #030403,
+    0 11px 22px rgba(0, 0, 0, 0.42);
+}
+
 .sf-factory-link:focus-visible,
-.sf-factory-link.is-active {
-  background: #ffbf68;
-  outline: none;
-  transform: translate(1px, 1px);
-  box-shadow: 3px 3px 0 #15191d;
+.piggy-bank-button:focus-visible {
+  border-color: #ebe8df;
+  outline: 2px solid #ebe8df;
+  outline-offset: 3px;
+}
+
+.sf-factory-link:active,
+.piggy-bank-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.62),
+    inset 0 -2px 0 var(--header-tool-accent),
+    0 1px 0 #030403;
 }
 
 .sf-factory-link svg {
+  position: relative;
+  z-index: 1;
   width: 30px;
   height: 30px;
   fill: none;
-  stroke: #15191d;
+  stroke: #dedbd2;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.55;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
 }
 
 .sf-factory-body {
-  fill: #fff1cf;
+  fill: #bdb9ad;
 }
 
 .sf-factory-stack {
-  fill: #b32818;
+  fill: #9f583d;
 }
 
 .sf-factory-smoke,
@@ -569,57 +604,52 @@ img {
 }
 
 .sf-factory-sun {
-  fill: #ffd95a;
+  fill: #bca563;
 }
 
 .sf-factory-text {
-  fill: #15191d;
+  fill: #dedbd2;
   stroke: none;
   font-size: 7.4px;
   font-weight: 950;
   letter-spacing: 0;
 }
 
-.piggy-bank-button:hover,
-.piggy-bank-button:focus-visible,
-.piggy-bank-button[aria-expanded="true"] {
-  background: #bdddfc;
-  outline: none;
-  transform: translate(1px, 1px);
-  box-shadow: 3px 3px 0 #15191d;
-}
-
 .piggy-bank-button svg {
+  position: relative;
+  z-index: 1;
   width: 29px;
   height: 29px;
   fill: none;
-  stroke: #15191d;
+  stroke: #dedbd2;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
 }
 
 .piggy-body {
-  fill: #f4b8ca;
+  fill: #ad7f87;
 }
 
 .piggy-ear,
 .piggy-snout,
 .piggy-leg {
-  fill: #ffd0dc;
+  fill: #c09ca0;
 }
 
 .piggy-eye,
 .piggy-nostril {
-  fill: #15191d;
+  fill: #171815;
 }
 
 .piggy-slot {
+  stroke: #171815;
   stroke-width: 2;
 }
 
 .piggy-coin {
-  fill: #ffd95a;
+  fill: #bca563;
 }
 
 .piggy-bank-popover {

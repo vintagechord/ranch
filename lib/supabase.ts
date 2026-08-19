@@ -3,8 +3,8 @@ export type ProjectProposalRow = {
   created_at: string;
   contact_name: string;
   phone: string | null;
-  email: string;
-  artist_name: string;
+  email: string | null;
+  artist_name: string | null;
   project_title: string;
   project_type: string;
   current_stage: string;
@@ -27,8 +27,8 @@ export type ProjectProposalInsert = {
   created_at?: string;
   contact_name: string;
   phone?: string | null;
-  email: string;
-  artist_name: string;
+  email?: string | null;
+  artist_name?: string | null;
   project_title: string;
   project_type: string;
   current_stage: string;
@@ -604,8 +604,8 @@ export type Database = {
         Args: {
           p_contact_name: string;
           p_phone: string | null;
-          p_email: string;
-          p_artist_name: string;
+          p_email: string | null;
+          p_artist_name: string | null;
           p_project_title: string;
           p_project_type: string;
           p_current_stage: string;

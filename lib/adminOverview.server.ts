@@ -10,7 +10,6 @@ export type ProjectProposalSummary = Pick<
   ProjectProposalRow,
   | "id"
   | "created_at"
-  | "artist_name"
   | "project_title"
   | "project_type"
   | "current_stage"
@@ -69,7 +68,7 @@ export async function getProjectProposals(page: number) {
     supabase
       .from("project_proposals")
       .select(
-        "id, created_at, artist_name, project_title, project_type, current_stage, support_needed, status"
+        "id, created_at, project_title, project_type, current_stage, support_needed, status"
       )
       .gt("retention_until", now)
       .order("created_at", { ascending: false })

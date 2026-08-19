@@ -32,26 +32,92 @@ const ROLE_ORDER = new Map([
   ["vocal", 70]
 ]);
 
+const KOREAN_DATE_FORMATTER = new Intl.DateTimeFormat("ko-KR", {
+  timeZone: "Asia/Seoul",
+  year: "numeric",
+  month: "numeric",
+  day: "numeric"
+});
+
 function releaseNumber(value: number) {
   return String(value).padStart(2, "0");
 }
 
-function dateParts(value: string | null) {
+function dateParts(
+  value: string | null,
+  { endExclusive = false }: { endExclusive?: boolean } = {}
+) {
   if (!value) {
-    return { iso: null, year: "", monthDay: "TBA" };
+    return {
+      iso: null,
+      korean: "일정 확인 중",
+      accessible: "일정 확인 중"
+    };
   }
 
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
-  if (!match) {
-    return { iso: value, year: "", monthDay: value };
+  if (match) {
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    return {
+      iso: value,
+      korean: `${month}월 ${day}일`,
+      accessible: `${match[1]}년 ${month}월 ${day}일`
+    };
   }
+
+  const timestamp = Date.parse(value);
+
+  if (Number.isNaN(timestamp)) {
+    return {
+      iso: value,
+      korean: value,
+      accessible: value
+    };
+  }
+
+  const displayDate = new Date(timestamp - (endExclusive ? 1 : 0));
+  const formattedParts = KOREAN_DATE_FORMATTER.formatToParts(displayDate);
+  const year = formattedParts.find((part) => part.type === "year")?.value ?? "";
+  const month = Number(formattedParts.find((part) => part.type === "month")?.value);
+  const day = Number(formattedParts.find((part) => part.type === "day")?.value);
 
   return {
-    iso: `${match[1]}-${match[2]}-${match[3]}`,
-    year: match[1],
-    monthDay: `${match[2]}.${match[3]}`
+    iso: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+    korean: `${month}월 ${day}일`,
+    accessible: `${year}년 ${month}월 ${day}일`
   };
+}
+
+function releaseDeadline(release: PublicMusicRelease, applicationOpen: boolean) {
+  const relevantLeads = applicationOpen
+    ? release.leads.filter((lead) => lead.canApply)
+    : release.leads;
+
+  if (
+    relevantLeads.length === 0 ||
+    relevantLeads.some((lead) => !lead.applicationDeadline)
+  ) {
+    return null;
+  }
+
+  const deadlines = relevantLeads
+    .map((lead) => lead.applicationDeadline)
+    .filter((deadline): deadline is string => Boolean(deadline))
+    .sort((a, b) => {
+      const timestampA = Date.parse(a);
+      const timestampB = Date.parse(b);
+
+      if (Number.isNaN(timestampA) || Number.isNaN(timestampB)) {
+        return b.localeCompare(a);
+      }
+
+      return timestampB - timestampA;
+    });
+
+  return deadlines[0] ?? null;
 }
 
 function youtubeVideoId(release: PublicMusicRelease) {
@@ -85,6 +151,30 @@ function posterDescription(value: string | null) {
   return `${normalized.slice(0, 299).trimEnd()}…`;
 }
 
+function posterDescriptionLines(value: string | null) {
+  const description = posterDescription(value);
+
+  if (!description) {
+    return [];
+  }
+
+  const lines: string[] = [];
+  let lineStart = 0;
+
+  for (let index = 0; index < description.length; index += 1) {
+    const character = description[index];
+    const nextCharacter = description[index + 1];
+
+    if (".!?".includes(character) && nextCharacter && /\s/u.test(nextCharacter)) {
+      lines.push(description.slice(lineStart, index + 1).trim());
+      lineStart = index + 1;
+    }
+  }
+
+  lines.push(description.slice(lineStart).trim());
+  return lines.filter(Boolean);
+}
+
 function UpcomingReleaseCard({
   release,
   openRequest,
@@ -95,10 +185,11 @@ function UpcomingReleaseCard({
   applicationOpen: boolean;
 }) {
   const number = releaseNumber(release.releaseNumber);
-  const date = dateParts(release.releaseDate);
+  const deadline = dateParts(releaseDeadline(release, applicationOpen), { endExclusive: true });
   const rows = getRoleRows(release);
   const titleId = `vc-release-${release.id}`;
-  const description = release.coverImageUrl ? null : posterDescription(release.summary);
+  const descriptionLines = posterDescriptionLines(release.summary);
+  const hasDescription = descriptionLines.length > 0;
 
   return (
     <article
@@ -106,19 +197,19 @@ function UpcomingReleaseCard({
       aria-labelledby={titleId}
     >
       <header>
-        <span>RELEASE {number}</span>
-        <span>{applicationOpen ? "APPLICATION OPEN" : "APPLICATION CLOSED"}</span>
+        <span>PROJECT {number}</span>
+        <span>{applicationOpen ? "신청 접수 중" : "접수 마감"}</span>
       </header>
 
-      <div className={`vc-release-poster${description ? " has-description" : ""}`}>
+      <div className={`vc-release-poster${hasDescription ? " has-description" : ""}`}>
         {release.coverImageUrl ? (
           <img
             src={release.coverImageUrl}
-            alt={`${release.title || `Release ${number}`} 아트워크`}
+            alt={`${release.title || `Project ${number}`} 아트워크`}
             loading="lazy"
             decoding="async"
           />
-        ) : description ? null : (
+        ) : hasDescription ? null : (
           <>
             <span className="vc-release-poster-number" aria-hidden="true">{number}</span>
             <div className="vc-release-poster-lines" aria-hidden="true">
@@ -126,25 +217,31 @@ function UpcomingReleaseCard({
             </div>
           </>
         )}
-        {description ? (
-          <p className="vc-release-poster-description">{description}</p>
+        {hasDescription ? (
+          <p className="vc-release-poster-description">
+            {descriptionLines.map((line, index) => (
+              <span key={`${line}-${index}`}>{line}</span>
+            ))}
+          </p>
         ) : null}
-        <time
-          aria-label={`공개 예정일 ${date.year ? `${date.year}.` : ""}${date.monthDay}`}
-          dateTime={date.iso ?? undefined}
-        >
-          {date.year ? <small>{date.year}</small> : null}
-          <strong>{date.monthDay}</strong>
-        </time>
+        <div className="vc-release-deadline">
+          <span aria-hidden="true">접수 마감</span>
+          <time
+            aria-label={`접수 마감일 ${deadline.accessible}`}
+            dateTime={deadline.iso ?? undefined}
+          >
+            <strong>{deadline.korean}</strong>
+            {applicationOpen && deadline.iso ? <small>까지</small> : null}
+          </time>
+        </div>
       </div>
 
       <div className="vc-release-card-identity">
-        <h3 id={titleId}>{release.title || `Release ${number}`}</h3>
-        <span className="vc-release-card-artist">{release.artistName}</span>
+        <h3 id={titleId}>{release.title || `Project ${number}`}</h3>
       </div>
 
       {rows.length > 0 ? (
-        <ul className="vc-release-roles" aria-label={`Release ${number} 참여 파트`}>
+        <ul className="vc-release-roles" aria-label={`Project ${number} 참여 파트`}>
           {rows.map((row) => (
             <li className={row.lead.canApply ? "is-open" : "is-credited"} key={row.key}>
               <span className="vc-release-role-label">{row.label}</span>
@@ -161,10 +258,10 @@ function UpcomingReleaseCard({
                 <button
                   type="button"
                   aria-haspopup="dialog"
-                  aria-label={`Release ${number} ${row.label} 참여 희망`}
+                  aria-label={`Project ${number} ${row.label} 참여 희망`}
                   onClick={(event) => openRequest(event, {
                     leadId: row.lead.leadId,
-                    contextLabel: `RELEASE ${number}`,
+                    contextLabel: `PROJECT ${number}`,
                     roleLabel: row.label
                   })}
                 >
@@ -296,6 +393,7 @@ export default function VintageChordReleases({ releases, subcopy }: VintageChord
               >
                 {releasedReleases.map((release) => {
                   const number = releaseNumber(release.releaseNumber);
+                  const releasedDate = dateParts(release.releaseDate);
                   const videoId = youtubeVideoId(release);
                   const youtubeUrl = videoId
                     ? `https://www.youtube.com/watch?v=${videoId}`
@@ -328,7 +426,12 @@ export default function VintageChordReleases({ releases, subcopy }: VintageChord
                       <div className="vc-released-card-copy">
                         <div>
                           <span>RELEASE {number}</span>
-                          <span>OUT NOW</span>
+                          <time
+                            aria-label={`발매일 ${releasedDate.accessible}`}
+                            dateTime={releasedDate.iso ?? undefined}
+                          >
+                            발매 {releasedDate.korean}
+                          </time>
                         </div>
                         <h3 id={titleId}>{release.title}</h3>
                         <p>{release.artistName}</p>

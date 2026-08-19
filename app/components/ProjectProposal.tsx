@@ -162,8 +162,6 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
           idempotency_key: idempotencyKey,
           name: textValue(formData, "name"),
           phone: textValue(formData, "phone"),
-          email: textValue(formData, "email"),
-          artist_name: textValue(formData, "artist_name"),
           project_title: textValue(formData, "project_title"),
           project_type: textValue(formData, "project_type"),
           current_stage: textValue(formData, "current_stage"),
@@ -302,16 +300,15 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
                   <input name="name" type="text" autoComplete="name" maxLength={80} autoFocus required />
                 </label>
                 <label>
-                  <span>연락처</span>
-                  <input name="phone" type="tel" autoComplete="tel" minLength={7} maxLength={40} />
-                </label>
-                <label>
-                  <span>이메일 *</span>
-                  <input name="email" type="email" autoComplete="email" maxLength={254} required />
-                </label>
-                <label>
-                  <span>아티스트 / 팀명 *</span>
-                  <input name="artist_name" type="text" maxLength={100} required />
+                  <span>연락처 *</span>
+                  <input
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    minLength={7}
+                    maxLength={40}
+                    required
+                  />
                 </label>
                 <label>
                   <span>프로젝트명 *</span>
@@ -320,7 +317,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
                 <label>
                   <span>프로젝트 유형 *</span>
                   <select name="project_type" defaultValue="" required>
-                    <option value="" disabled>선택</option>
+                    <option value="" disabled>유형 선택</option>
                     {PROJECT_TYPES.map((type) => <option value={type} key={type}>{type}</option>)}
                   </select>
                 </label>
@@ -374,7 +371,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
                   rows={6}
                   minLength={20}
                   maxLength={3000}
-                  placeholder="만들고 싶은 프로젝트와 현재 준비된 내용을 알려주세요."
+                  placeholder="만들고 싶은 프로젝트의 형식과 현재 준비된 내용을 알려주세요."
                   required
                 />
               </label>
@@ -382,7 +379,7 @@ export default function ProjectProposal({ channelNumber }: ProjectProposalProps)
               <label className="proposal-privacy">
                 <input name="privacy_agreed" type="checkbox" required />
                 <span>
-                  제안 검토와 회신을 위해 이름, 이메일, 선택 입력 연락처와 제안 내용을 수집하며,
+                  제안 검토와 회신을 위해 이름, 연락처와 제안 내용을 수집하며,
                   접수일로부터 1년간 보관하는 데 동의합니다.
                 </span>
               </label>

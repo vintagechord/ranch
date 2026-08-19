@@ -95,7 +95,6 @@ export default async function AdminProjectProposalsPage({
                   <time dateTime={proposal.created_at}>{formatDate(proposal.created_at)}</time>
                 </header>
                 <div className="admin-proposal-title">
-                  <p>{proposal.artist_name}</p>
                   <h3>{proposal.project_title}</h3>
                 </div>
                 <div className="admin-proposal-tags" aria-label="제안 분류">

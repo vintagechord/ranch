@@ -14,8 +14,6 @@ type ProposalPayload = {
   idempotency_key?: unknown;
   name?: unknown;
   phone?: unknown;
-  email?: unknown;
-  artist_name?: unknown;
   project_title?: unknown;
   project_type?: unknown;
   current_stage?: unknown;
@@ -186,9 +184,7 @@ export async function POST(request: Request) {
 
   const idempotencyKey = stringValue(body.idempotency_key).toLowerCase();
   const name = stringValue(body.name);
-  const phone = nullableString(body.phone);
-  const email = stringValue(body.email).toLowerCase();
-  const artistName = stringValue(body.artist_name);
+  const phone = stringValue(body.phone);
   const projectTitle = stringValue(body.project_title);
   const projectType = stringValue(body.project_type);
   const currentStage = stringValue(body.current_stage);
@@ -201,8 +197,7 @@ export async function POST(request: Request) {
 
   const requiredFields: Array<[string, number, number]> = [
     [name, 1, 80],
-    [email, 3, 254],
-    [artistName, 1, 100],
+    [phone, 7, 40],
     [projectTitle, 1, 140],
     [details, 20, 3000]
   ];
@@ -215,11 +210,7 @@ export async function POST(request: Request) {
     return jsonError("필수 항목과 입력 길이를 확인해 주세요.", 400);
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return jsonError("이메일 주소를 확인해 주세요.", 400);
-  }
-
-  if (phone && (phone.length < 7 || phone.length > 40 || !/^[0-9+().\-\s]+$/.test(phone))) {
+  if (!/^[0-9+().\-\s]+$/.test(phone)) {
     return jsonError("연락처를 확인해 주세요.", 400);
   }
 
@@ -266,8 +257,8 @@ export async function POST(request: Request) {
     payloadHash = createPayloadHash({
       contact_name: name,
       phone,
-      email,
-      artist_name: artistName,
+      email: null,
+      artist_name: null,
       project_title: projectTitle,
       project_type: projectType,
       current_stage: currentStage,
@@ -287,8 +278,8 @@ export async function POST(request: Request) {
     const { data: result, error } = await supabase.rpc("submit_project_proposal", {
       p_contact_name: name,
       p_phone: phone,
-      p_email: email,
-      p_artist_name: artistName,
+      p_email: null,
+      p_artist_name: null,
       p_project_title: projectTitle,
       p_project_type: projectType,
       p_current_stage: currentStage,

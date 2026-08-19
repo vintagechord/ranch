@@ -6,7 +6,10 @@ import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
 
-type ProposalDetail = Omit<ProjectProposalRow, "idempotency_key" | "payload_hash">;
+type ProposalDetail = Omit<
+  ProjectProposalRow,
+  "idempotency_key" | "payload_hash" | "email" | "artist_name"
+>;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
@@ -42,7 +45,7 @@ async function getProposal(id: string) {
   const { data, error } = await supabase
     .from("project_proposals")
     .select(
-      "id, created_at, contact_name, phone, email, artist_name, project_title, project_type, current_stage, support_needed, desired_schedule, budget_range, reference_url, details, status, privacy_agreed, consented_at, privacy_notice_version, retention_until"
+      "id, created_at, contact_name, phone, project_title, project_type, current_stage, support_needed, desired_schedule, budget_range, reference_url, details, status, privacy_agreed, consented_at, privacy_notice_version, retention_until"
     )
     .eq("id", id)
     .gt("retention_until", new Date().toISOString())
@@ -86,7 +89,6 @@ export default async function ProjectProposalDetailPage({
       <article className="admin-proposal-detail-page">
         <header>
           <div>
-            <p>{proposal.artist_name}</p>
             <h2>{proposal.project_title}</h2>
           </div>
           <span className="admin-status-badge">{statusLabel(proposal.status)}</span>
@@ -106,10 +108,6 @@ export default async function ProjectProposalDetailPage({
           <div>
             <dt>담당자</dt>
             <dd>{proposal.contact_name}</dd>
-          </div>
-          <div>
-            <dt>이메일</dt>
-            <dd><a href={`mailto:${proposal.email}`}>{proposal.email}</a></dd>
           </div>
           <div>
             <dt>연락처</dt>

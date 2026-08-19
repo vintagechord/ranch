@@ -10,6 +10,14 @@ import { createPortal } from "react-dom";
 
 const TRACE_STAGES = [
   {
+    key: "galaxy",
+    label: "우리 은하",
+    system: "MILKY WAY / ORION SPUR",
+    duration: 1250,
+    media: "milky-way",
+    mobileMedia: "milky-way-mobile"
+  },
+  {
     key: "solar",
     label: "태양계",
     system: "SOLAR SYSTEM LOCK",
