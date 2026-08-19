@@ -6,7 +6,7 @@
 
 ## 프로젝트 페이지
 
-프로젝트의 제목·비주얼 템플릿은 `lib/projects.ts`에서 관리하고, 공개 여부·수명주기·정렬 순서는 관리자 페이지와 `project_page_settings`에서 관리합니다. `진행 중`인 공개 프로젝트만 메인, 헤더, `/projects/[slug]`에 노출되며 완료·보관된 프로젝트의 운영 기록은 삭제하지 않습니다.
+프로젝트의 제목·비주얼 템플릿은 `lib/projects.ts`에서 관리하고, 공개 여부·수명주기·정렬 순서·입장 비밀번호는 관리자 페이지와 `project_page_settings`에서 관리합니다. `진행 중`인 공개 프로젝트만 메인, 헤더, `/projects/[slug]`에 노출되며 완료·보관된 프로젝트의 운영 기록은 삭제하지 않습니다. 입장 비밀번호가 설정된 프로젝트는 서버에서 인증된 방문자에게만 상세 내용과 참여 정보를 제공합니다.
 
 현재 공개 중인 프로젝트:
 
@@ -35,6 +35,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 PROPOSAL_RATE_LIMIT_SECRET=
 DATABASE_URL=
 ADMIN_PASSWORD=
+PROJECT_ACCESS_SESSION_SECRET=
 ```
 
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase Project URL
@@ -42,6 +43,7 @@ ADMIN_PASSWORD=
 - `PROPOSAL_RATE_LIMIT_SECRET`: IP를 저장하지 않고 요청 제한용 HMAC을 만드는 선택 키. 없으면 service role key를 사용합니다.
 - `DATABASE_URL`: 직접 DB 연결 또는 마이그레이션용, 현재 런타임 필수는 아님
 - `ADMIN_PASSWORD`: `/admin` 관리자 페이지 로그인 비밀번호
+- `PROJECT_ACCESS_SESSION_SECRET`: 프로젝트별 입장 인증 쿠키용 전용 서명 키(권장). 32바이트 이상의 임의 값을 `openssl rand -base64 48`처럼 생성합니다. 비워 두면 기존 `SUPABASE_SERVICE_ROLE_KEY`에서 용도가 분리된 서명 키를 파생합니다.
 
 `.env`, `.env.local`, `.env.production`, Supabase service role key, DB 비밀번호는 Git에 올리지 않습니다.
 
@@ -97,10 +99,13 @@ SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_PASSWORD=
 ```
 
+`PROJECT_ACCESS_SESSION_SECRET`를 별도로 두는 것을 권장하며, 미설정 시에는 위 service role key에서 프로젝트 입장 인증 전용 키를 안전하게 파생합니다.
+
 보관 권장 값:
 
 ```bash
 DATABASE_URL=
+PROJECT_ACCESS_SESSION_SECRET=
 ```
 
 ## 관리자 페이지

@@ -15,6 +15,8 @@ export type ProjectPageSetting = {
   lifecycle: ProjectPageLifecycle;
   isPublic: boolean;
   sortOrder: number;
+  isPasswordProtected: boolean;
+  accessVersion: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -31,6 +33,8 @@ export type ConfiguredProject = Project & {
   lifecycle: ProjectPageLifecycle;
   isPublic: boolean;
   sortOrder: number;
+  isPasswordProtected: boolean;
+  accessVersion: number;
   settingUpdatedAt: string;
 };
 
@@ -40,6 +44,8 @@ function normalizeProjectPageSetting(row: ProjectPageSettingsRow): ProjectPageSe
     lifecycle: row.lifecycle,
     isPublic: row.is_public,
     sortOrder: row.sort_order,
+    isPasswordProtected: Boolean(row.access_password_hash),
+    accessVersion: row.access_version,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
@@ -65,6 +71,8 @@ function mergeProjectSetting(
     lifecycle: setting.lifecycle,
     isPublic: setting.isPublic,
     sortOrder: setting.sortOrder,
+    isPasswordProtected: setting.isPasswordProtected,
+    accessVersion: setting.accessVersion,
     settingUpdatedAt: setting.updatedAt
   };
 }
@@ -73,7 +81,9 @@ export async function getProjectPageSettings(): Promise<ProjectPageSetting[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("project_page_settings")
-    .select("project_slug, lifecycle, is_public, sort_order, created_at, updated_at")
+    .select(
+      "project_slug, lifecycle, is_public, sort_order, access_password_hash, access_version, created_at, updated_at"
+    )
     .order("sort_order", { ascending: true })
     .order("project_slug", { ascending: true });
 

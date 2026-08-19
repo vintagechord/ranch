@@ -6,16 +6,18 @@ import Header from "@/app/components/Header";
 import ProjectParticipationBoard from "@/app/components/ProjectParticipationBoard";
 import { StudioMixer, StudioReelDeck, StudioSpeaker } from "@/app/components/StudioEquipment";
 import VintageChordReleases from "@/app/components/VintageChordReleases";
-import { getProjectBySlug, getProjectStatusLabel, projects, type Project } from "@/lib/projects";
+import { getProjectStatusLabel, projects, type Project } from "@/lib/projects";
 import {
   getPublicActiveProjects,
   getPublicProjectBySlug
 } from "@/lib/projectSiteSettings.server";
+import { isProjectAccessAuthorized } from "@/lib/projectAccess.server";
 import { RELEASE_PROJECT_SLUG } from "@/lib/releaseParticipation";
 import { getPublicMusicReleases } from "@/lib/releaseParticipation.server";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ access?: string }>;
 };
 
 type ProjectStyle = CSSProperties & {
@@ -61,10 +63,26 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getPublicProjectBySlug(slug);
 
   if (!project) {
     return {};
+  }
+
+  if (project.isPasswordProtected) {
+    const title = "보호된 프로젝트 | 목장의 아침";
+    const description = "입장 비밀번호가 필요한 목장의 아침 프로젝트 페이지입니다.";
+
+    return {
+      title,
+      description,
+      robots: {
+        index: false,
+        follow: false,
+        noarchive: true,
+        nocache: true
+      }
+    };
   }
 
   const isReleaseProject = project.slug === RELEASE_PROJECT_SLUG;
@@ -92,29 +110,109 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   };
 }
 
-export default async function ProjectPage({ params }: ProjectPageProps) {
+export default async function ProjectPage({ params, searchParams }: ProjectPageProps) {
   const { slug } = await params;
-  const [projectResult, publicProjectsResult] = await Promise.allSettled([
-    getPublicProjectBySlug(slug),
-    getPublicActiveProjects()
-  ]);
+  const projectResult = await Promise.allSettled([getPublicProjectBySlug(slug)]);
+  const projectLoadResult = projectResult[0];
 
-  if (projectResult.status === "rejected") {
-    console.error("Public project setting load failed:", projectResult.reason);
+  if (projectLoadResult.status === "rejected") {
+    console.error("Public project setting load failed:", projectLoadResult.reason);
     notFound();
   }
 
-  const project = projectResult.value;
+  const project = projectLoadResult.value;
   if (!project) {
     notFound();
   }
 
-  const publicProjects = publicProjectsResult.status === "fulfilled"
-    ? publicProjectsResult.value
+  const projectStyle: ProjectStyle = {
+    "--project-accent": project.accent,
+    "--project-accent-alt": project.accentAlt
+  };
+
+  if (
+    project.isPasswordProtected &&
+    !(await isProjectAccessAuthorized(project.slug, project.accessVersion))
+  ) {
+    const { access } = await searchParams;
+    const accessMessage = access === "invalid"
+      ? "비밀번호가 맞지 않습니다. 다시 확인해 주세요."
+      : access === "rate"
+        ? "입력 시도가 많습니다. 잠시 후 다시 시도해 주세요."
+        : access === "unavailable"
+          ? "지금은 입장 확인을 처리할 수 없습니다. 잠시 후 다시 시도해 주세요."
+          : "";
+
+    return (
+      <>
+        <Header projects={[]} showApplyCta={false} />
+        <main className="project-page project-access-page" id="top" style={projectStyle}>
+          <div className="project-shell project-access-shell">
+            <a className="project-back-link" href="/#project-room">
+              <span aria-hidden="true">←</span> ALL PROJECTS
+            </a>
+
+            <section className="project-access-panel" aria-labelledby="project-access-title">
+              <div className="project-access-mark" aria-hidden="true">
+                <span />
+              </div>
+              <div className="project-access-copy">
+                <p className="project-access-eyebrow">PRIVATE PROJECT · {project.number}</p>
+                <h1 id="project-access-title">입장 비밀번호를 입력해 주세요.</h1>
+                <p>
+                  <strong>{project.shortTitle}</strong> 프로젝트는 입장 비밀번호로 보호되어 있습니다.
+                </p>
+              </div>
+
+              <form
+                className="project-access-form"
+                action={`/api/projects/${project.slug}/access`}
+                method="post"
+              >
+                <label htmlFor="project-access-password">입장 비밀번호</label>
+                <div className="project-access-input-row">
+                  <input
+                    id="project-access-password"
+                    name="password"
+                    type="password"
+                    minLength={6}
+                    maxLength={128}
+                    autoComplete="current-password"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    aria-invalid={access === "invalid" || undefined}
+                    aria-describedby={accessMessage ? "project-access-message" : "project-access-help"}
+                    required
+                  />
+                  <button type="submit">입장하기 <span aria-hidden="true">↗</span></button>
+                </div>
+                {accessMessage ? (
+                  <p className="project-access-message" id="project-access-message" role="alert">
+                    {accessMessage}
+                  </p>
+                ) : (
+                  <p className="project-access-help" id="project-access-help">
+                    전달받은 비밀번호를 그대로 입력해 주세요.
+                  </p>
+                )}
+              </form>
+            </section>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const publicProjectsResult = await Promise.allSettled([getPublicActiveProjects()]);
+  const publicProjectsLoadResult = publicProjectsResult[0];
+
+  const publicProjects = publicProjectsLoadResult.status === "fulfilled"
+    ? publicProjectsLoadResult.value
     : [];
 
-  if (publicProjectsResult.status === "rejected") {
-    console.error("Public project navigation settings load failed:", publicProjectsResult.reason);
+  if (publicProjectsLoadResult.status === "rejected") {
+    console.error("Public project navigation settings load failed:", publicProjectsLoadResult.reason);
   }
 
   const projectIndex = publicProjects.findIndex((item) => item.slug === project.slug);
@@ -132,11 +230,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       .filter((release) => release.state === "upcoming")
       .sort((a, b) => b.releaseNumber - a.releaseNumber)[0]
     ?? null;
-  const projectStyle: ProjectStyle = {
-    "--project-accent": project.accent,
-    "--project-accent-alt": project.accentAlt
-  };
-
   return (
     <>
       <Header projects={publicProjects} showApplyCta={false} />

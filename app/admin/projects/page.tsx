@@ -111,7 +111,7 @@ export default async function AdminProjectsPage() {
           <h2 id="admin-project-directory-title">프로젝트별 작업실</h2>
         </div>
         <p>
-          각 프로젝트의 항목, 참여 파트, 신청 흐름을 독립된 작업실에서 관리합니다.
+          각 프로젝트의 입장 설정, 항목, 참여 파트, 신청 흐름을 독립된 작업실에서 관리합니다.
           새 프로젝트가 연결되면 이 목록에 같은 구조로 추가됩니다.
         </p>
       </section>
@@ -146,6 +146,10 @@ export default async function AdminProjectsPage() {
                 <div>
                   <dt>공개 상태</dt>
                   <dd>{project.isPublic ? "사이트 공개" : "사이트 숨김"}</dd>
+                </div>
+                <div>
+                  <dt>입장 설정</dt>
+                  <dd>{project.isPasswordProtected ? "비밀번호 보호" : "비밀번호 없음"}</dd>
                 </div>
                 <div>
                   <dt>운영 지표</dt>

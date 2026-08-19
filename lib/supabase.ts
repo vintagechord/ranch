@@ -53,6 +53,8 @@ export type ProjectPageSettingsRow = {
   lifecycle: ProjectPageLifecycle;
   is_public: boolean;
   sort_order: number;
+  access_password_hash: string | null;
+  access_version: number;
   created_at: string;
   updated_at: string;
 };
@@ -62,6 +64,8 @@ export type ProjectPageSettingsInsert = {
   lifecycle?: ProjectPageLifecycle;
   is_public?: boolean;
   sort_order?: number;
+  access_password_hash?: string | null;
+  access_version?: number;
   created_at?: string;
   updated_at?: string;
 };
@@ -121,6 +125,13 @@ export type AdminUpdateProjectPageSettingsResult = {
   status: "updated" | "not_found" | "conflict" | "invalid_input";
   project_slug: string | null;
   updated_at: string | null;
+};
+
+export type AdminUpdateProjectAccessPasswordResult = {
+  status: "updated" | "not_found" | "conflict" | "invalid_input";
+  project_slug: string | null;
+  updated_at: string | null;
+  access_version: number | null;
 };
 
 export type AdminUpdateNextMeetingSettingResult = {
@@ -578,6 +589,14 @@ export type Database = {
           p_sort_order: number;
         };
         Returns: AdminUpdateProjectPageSettingsResult;
+      };
+      admin_update_project_access_password: {
+        Args: {
+          p_project_slug: string;
+          p_expected_updated_at: string;
+          p_password_hash: string | null;
+        };
+        Returns: AdminUpdateProjectAccessPasswordResult;
       };
       admin_update_next_meeting_setting: {
         Args: {

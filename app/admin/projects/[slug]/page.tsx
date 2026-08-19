@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import AdminActionButton from "@/app/components/AdminActionButton";
 import AdminReleaseCoverManager from "@/app/components/AdminReleaseCoverManager";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { hashProjectAccessPassword } from "@/lib/projectAccess.server";
 import { getProjectBySlug } from "@/lib/projects";
 import { getAdminProjectBySlug } from "@/lib/projectSiteSettings.server";
 import {
@@ -184,6 +185,8 @@ function noticeMessage(notice?: string, error?: string, createdNumber?: string) 
   if (notice === "role-saved") return "참여 파트 설정을 저장했습니다.";
   if (notice === "role-added") return "새 참여 파트를 추가했습니다.";
   if (notice === "project-saved") return "프로젝트 운영 상태를 저장했습니다.";
+  if (notice === "access-saved") return "프로젝트 입장 비밀번호를 설정했습니다. 기존 입장 인증은 만료되었습니다.";
+  if (notice === "access-cleared") return "프로젝트 입장 비밀번호를 해제했습니다. 이제 누구나 페이지를 볼 수 있습니다.";
   if (notice === "release-created") {
     return number
       ? `PPP ${number}를 비공개 초안으로 만들었습니다. 대표 이미지와 참여 파트를 이어서 설정해 주세요.`
@@ -218,6 +221,11 @@ function noticeMessage(notice?: string, error?: string, createdNumber?: string) 
   if (error === "save") return "변경사항을 저장하지 못했습니다.";
   if (error === "project-conflict") return "다른 프로젝트 상태 변경이 먼저 저장되었습니다. 최신 내용을 확인해 주세요.";
   if (error === "project-confirm") return "프로젝트를 숨기거나 종료하려면 영향 범위를 확인해 주세요.";
+  if (error === "access-invalid") return "입장 비밀번호는 공백을 포함해 6자 이상 128자 이하로 입력해 주세요.";
+  if (error === "access-mismatch") return "새 입장 비밀번호와 확인 값이 일치하지 않습니다.";
+  if (error === "access-confirm") return "비밀번호 변경 또는 해제의 영향 범위를 확인해 주세요.";
+  if (error === "access-conflict") return "다른 프로젝트 설정 변경이 먼저 저장되었습니다. 최신 내용을 확인해 주세요.";
+  if (error === "access-save") return "입장 비밀번호를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.";
   return "";
 }
 
@@ -437,6 +445,79 @@ async function updateProjectSettings(routeProjectSlug: string, formData: FormDat
   revalidateReleaseAdmin(projectSlug);
   revalidatePath("/");
   redirect(projectAdminHref(projectSlug, { notice: "project-saved" }, "project-settings"));
+}
+
+async function updateProjectAccessPassword(routeProjectSlug: string, formData: FormData) {
+  "use server";
+
+  const projectSlug = await requireMutationProject(routeProjectSlug);
+  const expectedUpdatedAt = stringValue(formData.get("expectedUpdatedAt"));
+  const passwordValue = formData.get("accessPassword");
+  const confirmationValue = formData.get("accessPasswordConfirmation");
+  const password = typeof passwordValue === "string" ? passwordValue : "";
+  const passwordConfirmation = typeof confirmationValue === "string" ? confirmationValue : "";
+  const clearPassword = formData.get("clearAccessPassword") === "on";
+  const changeConfirmed = formData.get("confirmAccessChange") === "on";
+
+  if (!expectedUpdatedAt) {
+    redirect(projectAdminHref(projectSlug, { error: "access-invalid" }, "project-access"));
+  }
+
+  if (!changeConfirmed) {
+    redirect(projectAdminHref(projectSlug, { error: "access-confirm" }, "project-access"));
+  }
+
+  let passwordHash: string | null = null;
+
+  if (clearPassword) {
+    if (password || passwordConfirmation) {
+      redirect(projectAdminHref(projectSlug, { error: "access-invalid" }, "project-access"));
+    }
+  } else {
+    if (password.length < 6 || password.length > 128) {
+      redirect(projectAdminHref(projectSlug, { error: "access-invalid" }, "project-access"));
+    }
+
+    if (password !== passwordConfirmation) {
+      redirect(projectAdminHref(projectSlug, { error: "access-mismatch" }, "project-access"));
+    }
+
+    try {
+      passwordHash = await hashProjectAccessPassword(password);
+    } catch (hashError) {
+      console.error("Project access password hashing failed:", hashError);
+      redirect(projectAdminHref(projectSlug, { error: "access-save" }, "project-access"));
+    }
+  }
+
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase.rpc("admin_update_project_access_password", {
+    p_project_slug: projectSlug,
+    p_expected_updated_at: expectedUpdatedAt,
+    p_password_hash: passwordHash
+  });
+
+  if (error) {
+    console.error("Project access password update failed:", error.code);
+    redirect(projectAdminHref(projectSlug, { error: "access-save" }, "project-access"));
+  }
+
+  if (data?.status !== "updated") {
+    const reason = data?.status === "conflict"
+      ? "access-conflict"
+      : data?.status === "not_found"
+        ? "access-save"
+        : "access-invalid";
+    redirect(projectAdminHref(projectSlug, { error: reason }, "project-access"));
+  }
+
+  revalidateReleaseAdmin(projectSlug);
+  revalidatePath("/");
+  redirect(projectAdminHref(
+    projectSlug,
+    { notice: clearPassword ? "access-cleared" : "access-saved" },
+    "project-access"
+  ));
 }
 
 async function createNextPppRelease(routeProjectSlug: string, formData: FormData) {
@@ -963,6 +1044,10 @@ export default async function AdminProjectPage({
   const { releases, roleTypes, roles, credits, applications } =
     await loadReleaseManagementData(projectSlug);
   const message = noticeMessage(notice, error, number);
+  const isProjectAccessFeedback =
+    notice === "access-saved" ||
+    notice === "access-cleared" ||
+    error?.startsWith("access-") === true;
   const roleTypeByCode = new Map(roleTypes.map((item) => [item.code, item]));
   const highestPppReleaseNumber = releases.reduce(
     (highest, release) => release.project_slug === "vintagechord-post-production"
@@ -985,6 +1070,7 @@ export default async function AdminProjectPage({
   const updateRoleAction = updateRoleConfiguration.bind(null, projectSlug);
   const addRoleAction = addReleaseRole.bind(null, projectSlug);
   const updateProjectSettingsAction = updateProjectSettings.bind(null, projectSlug);
+  const updateProjectAccessPasswordAction = updateProjectAccessPassword.bind(null, projectSlug);
   const creatorHasError = [
     "release-stale",
     "release-conflict",
@@ -1007,7 +1093,7 @@ export default async function AdminProjectPage({
       </header>
 
       <div className="admin-management-page">
-        {message ? (
+        {message && !isProjectAccessFeedback ? (
           <div className="admin-alert" role={error ? "alert" : "status"} aria-live={error ? "assertive" : "polite"}>
             {message}
           </div>
@@ -1049,6 +1135,80 @@ export default async function AdminProjectPage({
               <span>완료·보관·숨김 전환 시 공개 페이지와 모집이 종료되는 것을 확인했습니다.</span>
             </label>
             <button type="submit">운영 상태 저장</button>
+          </form>
+        </section>
+
+        <section
+          className="admin-project-settings-panel admin-project-access-panel"
+          id="project-access"
+          aria-labelledby="project-access-settings-title"
+        >
+          {message && isProjectAccessFeedback ? (
+            <div
+              className="admin-alert admin-project-access-alert"
+              role={error ? "alert" : "status"}
+              aria-live={error ? "assertive" : "polite"}
+            >
+              {message}
+            </div>
+          ) : null}
+          <div className="admin-project-settings-copy">
+            <p className="admin-eyebrow">PROJECT ACCESS</p>
+            <h2 id="project-access-settings-title">입장 비밀번호</h2>
+            <p>
+              비밀번호를 설정하면 방문자는 프로젝트 페이지에 들어가기 전에 입장 확인을
+              거칩니다. 비밀번호를 바꾸거나 해제하면 기존 입장 인증은 즉시 만료됩니다.
+            </p>
+            <p
+              className="admin-project-access-status"
+              data-protected={project.isPasswordProtected}
+            >
+              <span aria-hidden="true" />
+              현재 {project.isPasswordProtected ? "비밀번호 보호 중" : "누구나 입장 가능"}
+            </p>
+          </div>
+          <form
+            className="admin-project-settings-form admin-project-access-form"
+            action={updateProjectAccessPasswordAction}
+          >
+            <input type="hidden" name="expectedUpdatedAt" value={project.settingUpdatedAt} />
+            <label>
+              <span>새 입장 비밀번호</span>
+              <input
+                name="accessPassword"
+                type="password"
+                minLength={6}
+                maxLength={128}
+                autoComplete="new-password"
+                aria-describedby="project-access-password-help"
+              />
+            </label>
+            <label>
+              <span>새 비밀번호 확인</span>
+              <input
+                name="accessPasswordConfirmation"
+                type="password"
+                minLength={6}
+                maxLength={128}
+                autoComplete="new-password"
+              />
+            </label>
+            <p className="admin-project-access-help" id="project-access-password-help">
+              6–128자. 앞뒤 공백도 비밀번호에 포함되므로 입력한 그대로 확인합니다.
+            </p>
+            {project.isPasswordProtected ? (
+              <label className="admin-check-field admin-project-access-clear">
+                <input name="clearAccessPassword" type="checkbox" />
+                <span>입장 비밀번호를 해제하고 누구나 페이지를 볼 수 있게 합니다.</span>
+              </label>
+            ) : null}
+            <label className="admin-check-field admin-project-access-confirm">
+              <input name="confirmAccessChange" type="checkbox" required />
+              <span>변경 또는 해제 시 기존 입장 인증이 만료되는 것을 확인했습니다.</span>
+            </label>
+            <button type="submit">
+              {project.isPasswordProtected ? "입장 설정 변경" : "입장 비밀번호 설정"}
+            </button>
           </form>
         </section>
 

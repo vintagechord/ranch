@@ -8,6 +8,10 @@ import {
   createScopedPayloadHash,
   createValueFingerprint
 } from "@/lib/requestFingerprint";
+import {
+  getProjectAccessSetting,
+  isProjectAccessAuthorizedFromRequest
+} from "@/lib/projectAccess.server";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 type ReleaseApplicationPayload = {
@@ -31,6 +35,7 @@ type ReleaseApplicationPayload = {
 
 const MAX_REQUEST_BYTES = 50_000;
 const SUCCESS_MESSAGE = "참여 요청이 접수되었습니다.";
+const ACCESS_DENIED_MESSAGE = "이 프로젝트에 접근할 수 없습니다.";
 const LEGACY_PRIVACY_VERSION = "2026-08-15-release-participation-v1";
 const PRIVATE_RESPONSE_HEADERS = {
   "Cache-Control": "private, no-cache, no-store, max-age=0"
@@ -150,6 +155,52 @@ async function readRequestBody(request: Request) {
   return new TextDecoder("utf-8", { fatal: true }).decode(body);
 }
 
+async function canAccessReleaseApplicationProject(
+  request: Request,
+  leadId: string,
+  supabase: ReturnType<typeof getSupabaseAdmin>
+) {
+  const { data: role, error: roleError } = await supabase
+    .from("release_roles")
+    .select("release_id")
+    .eq("id", leadId)
+    .maybeSingle();
+
+  if (roleError) {
+    throw roleError;
+  }
+
+  if (!role) {
+    return false;
+  }
+
+  const { data: release, error: releaseError } = await supabase
+    .from("music_releases")
+    .select("project_slug")
+    .eq("id", role.release_id)
+    .maybeSingle();
+
+  if (releaseError) {
+    throw releaseError;
+  }
+
+  if (!release) {
+    return false;
+  }
+
+  const setting = await getProjectAccessSetting(release.project_slug);
+
+  if (!setting) {
+    return false;
+  }
+
+  return !setting.passwordHash || isProjectAccessAuthorizedFromRequest(
+    request,
+    release.project_slug,
+    setting.accessVersion
+  );
+}
+
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
 
@@ -234,6 +285,19 @@ export async function POST(request: Request) {
     return jsonError("참여 요청을 새로 열어 다시 시도해 주세요.", 400);
   }
 
+  let supabase: ReturnType<typeof getSupabaseAdmin>;
+
+  try {
+    supabase = getSupabaseAdmin();
+
+    if (!(await canAccessReleaseApplicationProject(request, leadId, supabase))) {
+      return jsonError(ACCESS_DENIED_MESSAGE, 403);
+    }
+  } catch (error) {
+    console.error("Release application access check failed:", safeErrorCode(error));
+    return jsonError(ACCESS_DENIED_MESSAGE, 403);
+  }
+
   const requiredFields: Array<[string, number, number]> = [
     [name, 1, 80],
     [creditName, 1, 80],
@@ -296,13 +360,11 @@ export async function POST(request: Request) {
     return jsonError("선정 후 크레딧 공개 및 보관 동의가 필요합니다.", 400);
   }
 
-  let supabase: ReturnType<typeof getSupabaseAdmin>;
   let requestFingerprint = "";
   let contactFingerprint = "";
   let payloadHash = "";
 
   try {
-    supabase = getSupabaseAdmin();
     requestFingerprint = createRequestFingerprint(request, "release-participation");
     contactFingerprint = email
       ? createValueFingerprint(
