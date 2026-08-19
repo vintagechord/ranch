@@ -88,31 +88,47 @@ export default function ProjectParticipationBoard({
                     <p className="project-participation-brief">{lead.brief}</p>
                   ) : null}
 
-                  <span className="project-participation-credit">
-                    {credits.map((credit) => (
-                      <span key={credit.id}>
-                        <b>{credit.displayName}</b>
+                  <div
+                    className={`project-participation-actions${credits.length > 0 && lead.canApply ? " has-mixed-actions" : ""}`}
+                  >
+                    {credits.length > 0 ? (
+                      <span
+                        className="project-participation-credit"
+                        role="list"
+                        aria-label="확정 인원"
+                      >
+                        {credits.map((credit) => (
+                          <span
+                            className="confirmed-participant-chip"
+                            role="listitem"
+                            aria-label={`${credit.displayName} 참여 확정`}
+                            key={credit.id}
+                          >
+                            <span className="confirmed-participant-mark" aria-hidden="true">✓</span>
+                            <span className="confirmed-participant-name">{credit.displayName}</span>
+                          </span>
+                        ))}
                       </span>
-                    ))}
-                  </span>
+                    ) : null}
 
-                  {lead.canApply ? (
-                    <button
-                      type="button"
-                      aria-haspopup="dialog"
-                      aria-label={`${projectTitle} ${lead.roleLabel} 참여 희망`}
-                      onClick={(event) => openRequest(event, {
-                        leadId: lead.leadId,
-                        contextLabel: projectTitle,
-                        roleLabel: lead.roleLabel
-                      })}
-                    >
-                      <span className="participation-button-label">참여 희망</span>
-                      <span className="participation-button-icon" aria-hidden="true">↗</span>
-                    </button>
-                  ) : credits.length === 0 ? (
-                    <span className="project-participation-state">{roleStateLabel(lead.state)}</span>
-                  ) : null}
+                    {lead.canApply ? (
+                      <button
+                        type="button"
+                        aria-haspopup="dialog"
+                        aria-label={`${projectTitle} ${lead.roleLabel} 참여 희망`}
+                        onClick={(event) => openRequest(event, {
+                          leadId: lead.leadId,
+                          contextLabel: projectTitle,
+                          roleLabel: lead.roleLabel
+                        })}
+                      >
+                        <span className="participation-button-label">참여 희망</span>
+                        <span className="participation-button-icon" aria-hidden="true">↗</span>
+                      </button>
+                    ) : credits.length === 0 ? (
+                      <span className="project-participation-state">{roleStateLabel(lead.state)}</span>
+                    ) : null}
+                  </div>
                 </li>
               );
             };

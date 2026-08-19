@@ -56,7 +56,7 @@ export const projects: Project[] = [
     shortTitle: "완두룹두두",
     stage: "공연 참여 모집 중",
     summary: "스트레인지 팩토리 친구들이 함께 만드는 완두룹두두 공연",
-    subcopy: "스트레인지 팩토리 친구들이 함께 공연하는 신박한 공연 프로젝트",
+    subcopy: "스트레인지 팩토리 친구들이 함께하는 신박한 공연 프로젝트",
     kind: "performance",
     visual: "mixer",
     accent: "#a6ef5f",

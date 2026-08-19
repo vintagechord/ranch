@@ -245,30 +245,40 @@ function UpcomingReleaseCard({
           {rows.map((row) => (
             <li className={row.lead.canApply ? "is-open" : "is-credited"} key={row.key}>
               <span className="vc-release-role-label">{row.label}</span>
-              {row.credits.length > 0 ? (
-                <span className="vc-release-credit">
-                  {row.credits.map((credit) => (
-                    <span key={credit.id}>
-                      <b>{credit.displayName}</b>
-                    </span>
-                  ))}
-                </span>
-              ) : null}
-              {row.lead.canApply ? (
-                <button
-                  type="button"
-                  aria-haspopup="dialog"
-                  aria-label={`Project ${number} ${row.label} 참여 희망`}
-                  onClick={(event) => openRequest(event, {
-                    leadId: row.lead.leadId,
-                    contextLabel: `PROJECT ${number}`,
-                    roleLabel: row.label
-                  })}
-                >
-                  <span className="participation-button-label">참여 희망</span>
-                  <span className="participation-button-icon" aria-hidden="true">↗</span>
-                </button>
-              ) : null}
+              <div
+                className={`vc-release-role-actions${row.credits.length > 0 && row.lead.canApply ? " has-mixed-actions" : ""}`}
+              >
+                {row.credits.length > 0 ? (
+                  <span className="vc-release-credit" role="list" aria-label="확정 인원">
+                    {row.credits.map((credit) => (
+                      <span
+                        className="confirmed-participant-chip"
+                        role="listitem"
+                        aria-label={`${credit.displayName} 참여 확정`}
+                        key={credit.id}
+                      >
+                        <span className="confirmed-participant-mark" aria-hidden="true">✓</span>
+                        <span className="confirmed-participant-name">{credit.displayName}</span>
+                      </span>
+                    ))}
+                  </span>
+                ) : null}
+                {row.lead.canApply ? (
+                  <button
+                    type="button"
+                    aria-haspopup="dialog"
+                    aria-label={`Project ${number} ${row.label} 참여 희망`}
+                    onClick={(event) => openRequest(event, {
+                      leadId: row.lead.leadId,
+                      contextLabel: `PROJECT ${number}`,
+                      roleLabel: row.label
+                    })}
+                  >
+                    <span className="participation-button-label">참여 희망</span>
+                    <span className="participation-button-icon" aria-hidden="true">↗</span>
+                  </button>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>
